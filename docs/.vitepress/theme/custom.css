@@ -1,0 +1,13 @@
+:root {
+  --vp-layout-max-width: 1570px;
+}
+
+@media (min-width: 960px) {
+  .content[data-v-aaa951ed] {
+    padding: 0 0 128px;
+  }
+}
+
+.VPDoc.has-aside .content-container {
+  max-width: 960px !important;
+}

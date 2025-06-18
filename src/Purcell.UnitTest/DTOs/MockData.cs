@@ -1,0 +1,468 @@
+using System.Data;
+
+namespace PurcellLibs.UnitTest;
+
+public static class MockData
+{
+    private static readonly Random Random = new();
+
+    public static readonly List<PurColumn> ExcelColumns =
+    [
+        new("编号") { PropertyName = "Id", Width = 5 },
+        new("姓名") { PropertyName = "Name", Width = 5 },
+        new("年龄") { PropertyName = "Age", Width = 5 },
+        new("性别") { PropertyName = "Gender", Width = 5 },
+        new("出生日期") { PropertyName = "BirthDate", Width = 5 },
+        new("工资") { PropertyName = "Salary", Width = 5 },
+        new("绩效评分") { PropertyName = "PerformanceScore", Width = 5 },
+        new("出勤率") { PropertyName = "AttendanceRate", Width = 5 },
+        new("个人简介") { PropertyName = "Profile", Width = 5 },
+        new("入职时间") { PropertyName = "EntryDate", Width = 5 }
+    ];
+
+    public static List<Employee?> GetGenericData()
+    {
+        List<Employee?> list = new();
+
+        // 生成 1000 条数据
+        Random randomRow = new();
+        for (int i = 1; i <= 100; i++)
+        {
+            // 随机空行
+            if (i > 5 && randomRow.Next(0, 30) == 15)
+            {
+                list.Add(null);
+                continue;
+            }
+
+            list.Add(new Employee
+            {
+                Id = i, // 编号
+                Name = randomRow.Next(0, 50) == 25
+                    ? null
+                    : Surnames[Random.Next(Surnames.Length)] +
+                      Names[Random.Next(Names.Length)],
+                Age = randomRow.Next(0, 50) == 25 ? 0 : Random.Next(18, 61), // 年龄 (18-60岁)
+                Gender = Genders[Random.Next(Genders.Length)], // 性别
+                BirthDate = i == 1 || randomRow.Next(0, 50) == 25
+                    ? null
+                    : new DateTime(1960, 1, 1)
+                        .AddDays(Random.Next((new DateTime(2000, 12, 31) - new DateTime(1960, 1, 1)).Days)), // 出生日期 (1960-2000年)
+                Salary = randomRow.Next(0, 50) == 25
+                    ? null
+                    : Convert.ToDecimal(Math.Round(Random.Next(5000, 50001) + Random.NextDouble(), 2)), // 工资 (5000-50000)
+                PerformanceScore = randomRow.Next(0, 50) == 25 ? null : Math.Round(1 + Random.NextDouble() * 4, 1), // 绩效评分 (1-5分)
+                AttendanceRate = randomRow.Next(0, 50) == 25
+                    ? 0
+                    : Convert.ToDecimal(Math.Round(0.7 + Random.NextDouble() * 0.3, 2)), // 出勤率 (0.7-1.0)
+                Profile = randomRow.Next(0, 50) == 25 ? null :
+                    randomRow.Next(0, 50) == 25 ? string.Empty : Texts[Random.Next(Texts.Length)], // 个人简介
+                EntryDate = randomRow.Next(0, 50) == 25
+                    ? DateTime.MinValue
+                    : new DateTime(2010, 1, 1)
+                        .AddDays(Random.Next((new DateTime(2023, 12, 31) - new DateTime(2010, 1, 1)).Days)) // 入职时间 (2010-2023年)
+            });
+        }
+
+        return list;
+    }
+
+    public static List<Dictionary<string, object?>?> GetDictionaryData()
+    {
+        List<Dictionary<string, object?>?> dictList = new();
+        List<Employee?> list = GetGenericData();
+        foreach (Employee? item in list)
+        {
+            if (item == null)
+            {
+                dictList.Add(null);
+                continue;
+            }
+
+            dictList.Add(new Dictionary<string, object?>
+            {
+                ["Id"] = item.Id, // 编号
+                ["Name"] = item.Name,
+                ["Age"] = item.Age, // 年龄 (18-60岁)
+                ["Gender"] = item.Gender, // 性别
+                ["BirthDate"] = item.BirthDate, // 出生日期 (1960-2000年)
+                ["Salary"] = item.Salary, // 工资 (5000-50000)
+                ["PerformanceScore"] = item.PerformanceScore, // 绩效评分 (1-5分)
+                ["AttendanceRate"] = item.AttendanceRate, // 出勤率 (0.7-1.0)
+                ["Profile"] = item.Profile, // 个人简介
+                ["EntryDate"] = item.EntryDate // 入职时间 (2010-2023年)
+            });
+        }
+
+        return dictList;
+    }
+
+    public static DataTable GetDataTable()
+    {
+        DataTable dt = new("MockData");
+
+        // 添加列定义
+        dt.Columns.Add("Id", typeof(int));
+        dt.Columns.Add("Name", typeof(string));
+        dt.Columns.Add("Age", typeof(int));
+        dt.Columns.Add("Gender", typeof(string));
+        dt.Columns.Add("BirthDate", typeof(DateTime));
+        dt.Columns.Add("Salary", typeof(decimal));
+        dt.Columns.Add("PerformanceScore", typeof(double));
+        dt.Columns.Add("AttendanceRate", typeof(decimal));
+        dt.Columns.Add("Profile", typeof(string));
+        dt.Columns.Add("EntryDate", typeof(DateTime));
+
+        foreach (Employee? item in GetGenericData())
+        {
+            if (item == null)
+            {
+                dt.Rows.Add(dt.NewRow());
+                continue;
+            }
+
+            dt.Rows.Add(
+                item.Id, // 编号
+                item.Name,
+                item.Age, // 年龄 (18-60岁)
+                item.Gender, // 性别
+                item.BirthDate, // 出生日期 (1960-2000年)
+                item.Salary, // 工资 (5000-50000)
+                item.PerformanceScore, // 绩效评分 (1-5分)
+                item.AttendanceRate, // 出勤率 (0.7-1.0)
+                item.Profile, // 个人简介
+                item.EntryDate // 入职时间 (2010-2023年)
+            );
+        }
+
+        return dt;
+    }
+
+    public static List<dynamic?> GetAnonymousDynamicData()
+    {
+        return
+        [
+            new
+            {
+                Id = 1, Name = "零零", Age = 0, Gender = "男", BirthDate = new DateTime(1990, 9, 1), Salary = 0d,
+                PerformanceScore = 0d,
+                AttendanceRate = 0d, Profile = "零零，男，18岁，1990年1月1日出生，工资10000，绩效评分3.5，出勤率90%，个人简介：零零是一个好人。",
+                EntryDate = new DateTime(2010, 1, 1)
+            },
+            new
+            {
+                DiffId = 3, DiffName = "张三", DiffAge = 18, DiffGender = "男", DiffBirthDate = new DateTime(1990, 1, 1),
+                DiffSalary = 10000d, DiffPerformanceScore = 3.5d, DiffAttendanceRate = 0.9d,
+                DiffProfile = "张三，男，18岁，1990年1月1日出生，工资10000，绩效评分3.5，出勤率90%，个人简介：张三是一个好人。",
+                DiffEntryDate = new DateTime(2010, 1, 1)
+            },
+            null,
+            new
+            {
+                Id = 4, Name = "李四", Age = 25, Gender = "女", BirthDate = new DateTime(1985, 1, 1), Salary = 15000d,
+                PerformanceScore = 4.5d,
+                AttendanceRate = 0.8d, Profile = "李四，女，25岁，1985年1月1日出生，工资15000，绩效评分4.5，出勤率80%，个人简介：李四是一个好人。",
+                EntryDate = new DateTime(2015, 1, 1)
+            },
+            new
+            {
+                Id = 5, Name = "王五", Age = 30, Gender = "男", BirthDate = new DateTime(1992, 6, 15), Salary = 20000d,
+                PerformanceScore = 4.8d,
+                AttendanceRate = 0.95d, Profile = "王五，男，30岁，1992年6月15日出生，工资20000，绩效评分4.8，出勤率95%，个人简介：王五是一个经验丰富的技术专家。",
+                EntryDate = new DateTime(2012, 3, 1)
+            },
+            new
+            {
+                Id = 6, Name = "赵六", Age = 28, Gender = "女", BirthDate = new DateTime(1994, 8, 20), Salary = 18000d,
+                PerformanceScore = 4.2d,
+                AttendanceRate = 0.85d, Profile = "赵六，女，28岁，1994年8月20日出生，工资18000，绩效评分4.2，出勤率85%，个人简介：赵六是一个优秀的项目经理。",
+                EntryDate = new DateTime(2016, 7, 1)
+            },
+            new
+            {
+                Id = 7, Name = "孙七", Age = 35, Gender = "男", BirthDate = new DateTime(1988, 3, 10), Salary = 25000d,
+                PerformanceScore = 4.9d,
+                AttendanceRate = 0.98d, Profile = "孙七，男，35岁，1988年3月10日出生，工资25000，绩效评分4.9，出勤率98%，个人简介：孙七是一个资深的系统架构师。",
+                EntryDate = new DateTime(2008, 9, 1)
+            }
+        ];
+    }
+
+    public static object?[] GetAnonymousObjectData()
+    {
+        return GetAnonymousDynamicData().Select(object? (ad) => ad).ToArray();
+    }
+
+    public static List<dynamic?> GetDynamicData()
+    {
+        List<dynamic?> collection =
+        [
+            new
+            {
+                Id = 0, Name = "零零", Age = 0, Gender = "男", BirthDate = new DateTime(1990, 9, 1), Salary = 0d,
+                PerformanceScore = 0d,
+                AttendanceRate = 0d, Profile = "零零，男，18岁，1990年1月1日出生，工资10000，绩效评分3.5，出勤率90%，个人简介：零零是一个好人。",
+                EntryDate = new DateTime(2010, 1, 1)
+            },
+            null
+        ];
+        foreach (Employee? item in GetGenericData())
+        {
+            if (item == null)
+            {
+                collection.Add(null);
+                continue;
+            }
+
+            collection.Add(new
+            {
+                item.Id, // 编号
+                item.Name, // 姓名
+                item.Age, // 年龄 (18-60岁)
+                item.Gender, // 性别
+                item.BirthDate, // 出生日期 (1960-2000年)
+                item.Salary, // 工资 (5000-50000)
+                item.PerformanceScore, // 绩效评分 (1-5分)
+                item.AttendanceRate, // 出勤率 (0.7-1.0)
+                item.Profile, // 个人简介
+                item.EntryDate // 入职时间 (2010-2023年)
+            });
+        }
+
+        return collection;
+    }
+
+    public class Employee
+    {
+        /// <summary>
+        /// 编号
+        /// </summary>
+        [PurColumn("编号")]
+        public int Id { get; init; }
+
+        /// <summary>
+        /// 姓名
+        /// </summary>
+        [PurColumn("姓名")]
+        public string? Name { get; init; }
+
+        /// <summary>
+        /// 年龄
+        /// </summary>
+        [PurColumn("年龄")]
+        public int Age { get; init; }
+
+        /// <summary>
+        /// 性别
+        /// </summary>
+        [PurColumn("性别")]
+        public string? Gender { get; init; }
+
+        /// <summary>
+        /// 出生日期
+        /// </summary>
+        [PurColumn("出生日期")]
+        public DateTime? BirthDate { get; init; }
+
+        /// <summary>
+        /// 工资
+        /// </summary>
+        [PurColumn("工资")]
+        public decimal? Salary { get; init; }
+
+        /// <summary>
+        /// 绩效评分
+        /// </summary>
+        [PurColumn("绩效评分")]
+        public double? PerformanceScore { get; init; }
+
+        /// <summary>
+        /// 出勤率
+        /// </summary>
+        [PurColumn("出勤率")]
+        public decimal AttendanceRate { get; init; }
+
+        /// <summary>
+        /// 个人简介
+        /// </summary>
+        [PurColumn("个人简介")]
+        public string? Profile { get; init; }
+
+        /// <summary>
+        /// 入职时间
+        /// </summary>
+        [PurColumn("入职时间", Width = 5)]
+        public DateTime EntryDate { get; init; }
+    }
+
+    #region 基础数据元素
+
+    private static readonly string[] Surnames =
+    [
+        "张", "王", "李", "赵", "刘", "陈", "杨", "黄", "周", "吴",
+        "徐", "孙", "胡", "朱", "高", "林", "何", "郭", "马", "罗",
+        "梁", "宋", "郑", "谢", "韩", "唐", "冯", "于", "董", "萧",
+        "程", "曹", "袁", "邓", "许", "傅", "沈", "曾", "彭", "吕",
+        "苏", "卢", "蒋", "蔡", "贾", "丁", "魏", "薛", "叶", "阎",
+        "余", "潘", "杜", "戴", "夏", "钟", "汪", "田", "任", "姜",
+        "范", "方", "石", "姚", "谭", "廖", "邹", "熊", "金", "陆",
+        "郝", "孔", "白", "崔", "康", "毛", "邱", "秦", "江", "史",
+        "顾", "侯", "邵", "孟", "龙", "万", "段", "雷", "钱", "汤",
+        "尹", "黎", "易", "常", "武", "乔", "贺", "赖", "龚", "文",
+        "庞", "樊", "兰", "殷", "施", "陶", "洪", "翟", "安", "颜",
+        "倪", "严", "牛", "温", "芦", "季", "俞", "章", "鲁", "葛",
+        "伍", "韦", "申", "尤", "毕", "聂", "丛", "焦", "向", "柳",
+        "邢", "路", "岳", "齐", "沿", "梅", "莫", "庄", "辛", "管",
+        "祝", "左", "涂", "谷", "祁", "时", "舒", "耿", "牟", "卜",
+        "路", "詹", "关", "苗", "凌", "费", "纪", "靳", "盛", "童",
+        "欧", "甄", "项", "曲", "成", "游", "阳", "裴", "席", "卫",
+        "查", "屈", "鲍", "位", "覃", "霍", "翁", "隋", "植", "甘",
+        "景", "薄", "单", "包", "司", "柏", "宁", "柯", "阮", "桂",
+        "闵", "解", "强", "柴", "华", "车", "冉", "房", "边", "辜",
+        "吉", "饶", "刁", "瞿", "戚", "丘", "古", "米", "池", "滕",
+        "晋", "苑", "邬", "臧", "畅", "宫", "来", "嵇", "栾", "宦",
+        "艾", "容", "慎", "戈", "庾", "衡", "耿", "弘", "匡", "阎",
+        "连", "茹", "习", "宰", "郦", "逄", "栾", "郜", "全", "褚",
+        "廉", "简", "娄", "盖", "符", "奚", "木", "穆", "党", "燕",
+        "郎", "冀", "谈", "姬", "屠", "连", "郁", "单", "杭", "洪",
+        "包", "诸", "左", "石", "白", "崔", "邢", "台", "霍", "皮",
+        "卞", "齐", "康", "伍", "余", "元", "卜", "顾", "孟", "平",
+        "黄", "和", "穆", "萧", "尹", "尉", "常", "乐", "于", "时"
+    ];
+
+    private static readonly string[] Names =
+    [
+        "明", "华", "强", "伟", "芳", "娟", "敏", "静", "丽", "军", "超", "燕", "峰", "龙", "勇", "杰", "波", "鹏", "飞", "莉",
+        "霞", "艳", "红", "梅", "洁", "辉", "建", "斌", "浩", "东", "晶", "雪", "宇", "林", "婷", "琳", "平", "文", "力", "刚",
+        "阳", "成", "磊", "洋", "帆", "江", "云", "松", "健", "新", "欣", "瑞", "晨", "钢", "兵", "昊", "君", "虎", "凯", "涛",
+        "冰", "峥", "蕾", "凤", "荣", "诚", "志", "毅", "雷", "雯", "晓", "昕", "鑫", "星", "瑜", "莹", "琪", "璐", "佳", "菲",
+        "楠", "蓉", "青", "瑶", "琴", "岩", "宁", "薇", "璇", "洪", "彬", "旭", "颖", "翔", "宏", "凡", "昱", "然", "川", "晔",
+        "亮", "玲", "珊", "菁", "睿", "瑾", "韵", "融", "园", "咏", "卿", "澜", "纯", "悦", "昭", "冉", "旻", "骏", "捷", "茜",
+        "彤", "黎", "桦", "曼", "宸", "诗", "研", "柯", "迪", "炫", "珂", "玥", "锦", "翎", "萱", "霖", "忆", "寒", "芮", "可",
+        "建国", "文革", "秀英", "桂英", "淑华", "建军", "国庆", "志强", "金花", "丽娟", "春霞", "海燕", "建华", "永康", "明亮",
+        "长江", "瑞华", "光明", "宏伟", "建平", "金龙", "雪梅", "亚萍", "红梅", "海峰", "建军", "国强", "春花", "建设", "建新",
+        "德华", "俊杰", "文博", "雅琴", "海洋", "金凤", "建成", "文静", "志勇", "丽华", "春兰", "海燕", "建民", "国华", "秀兰",
+        "天成", "雅婷", "志远", "瑞阳", "宇轩", "浩然", "梓萱", "欣怡", "语晨", "思远", "诗雨", "晓峰", "雨萌", "子轩", "梓涵",
+        "浩轩", "艺涵", "雨泽", "雨欣", "雨晴", "语桐", "清华", "正阳", "永昌", "瑾瑜", "皓轩", "瑞泽", "明轩", "智宇", "雨晨",
+        "宇航", "梓晨", "思涵", "瑾萱", "明杰", "永安", "志诚", "子墨", "浩宇", "瑞霖", "晓博", "志宏", "永康", "智勇", "晓华",
+        "志伟", "建业", "子豪", "雨轩", "思琪", "欣然", "梓馨", "雨轩", "梓瑶", "思宇", "雨桐", "子涵", "浩博", "瑞雪", "鸿运",
+        "天翔", "鹏飞", "博文", "志鹏", "永胜", "雨婷", "子琪", "浩天", "瑞祥", "晓东", "志峰", "永乐", "智慧", "晓明", "志平",
+        "建荣", "子骏", "雨菲", "思颖", "欣荣", "梓欣", "雨薇", "梓琪", "思远", "雨霏", "子轩", "浩瀚", "瑞星", "鸿福", "天宇",
+        "鹏程", "博雅", "志文", "永辉", "雨涵", "子轩", "浩铭", "瑞雯", "晓峰", "志强", "永兴", "智敏", "晓燕", "志刚", "建福",
+        "子健", "雨馨", "思敏", "欣悦", "梓晴", "雨璇", "梓萌", "思雨", "雨荷", "子豪", "浩然", "瑞芝", "鸿志", "天骄", "鹏云",
+        "博达", "志强", "永昌", "雨彤", "子瑜", "浩文", "瑞云", "晓华", "志明", "永和", "智杰", "晓梅", "志华", "建军", "子悦",
+        "雨晴", "思雅", "欣宇", "梓轩", "雨琪", "梓彤", "思琪", "雨露", "子轩", "浩轩", "瑞莲", "鸿飞", "天翊", "鹏海", "博超",
+        "志勇", "永兴", "雨欣", "子萱", "浩然", "瑞英", "晓军", "志远", "永平", "智豪", "晓芳", "志强", "建华", "子琳", "雨桐",
+        "思颖", "欣妍", "梓琳", "雨凡", "梓涵", "思雨", "雨童", "子轩", "浩天", "瑞华", "鸿涛", "天佑", "鹏翔", "博远", "志鹏",
+        "永强", "雨晨", "子墨", "浩宇", "瑞芳", "晓红", "志文", "永安", "智宸", "晓波", "志刚", "建民", "子涵", "雨霖", "思琪",
+        "欣瑶", "梓萱", "雨晴", "梓航", "思远", "雨菡", "子豪", "浩宸", "瑞萍", "鸿光", "天成", "鹏远", "博厚", "志诚", "永胜"
+    ];
+
+    private static readonly string[] Genders = ["男", "女"];
+
+    private static readonly string[] Texts =
+    [
+        "具有丰富的工作经验，善于团队协作。",
+        "工作认真负责，有较强的学习能力。",
+        "性格开朗，善于沟通，具有良好的团队精神。",
+        "有强烈的责任心，工作态度积极主动。",
+        "专业能力突出，具有创新思维。",
+        "执行力强，能够高效完成各项任务。",
+        "工作细致认真，注重细节把控。",
+        "具备优秀的问题分析和解决能力。",
+        "善于总结经验，持续提升工作效率。",
+        "工作思路清晰，计划性强。",
+        "具有较强的抗压能力，能适应高强度工作。",
+        "专业知识扎实，实践经验丰富。",
+        "工作效率高，时间管理能力出色。",
+        "具有良好的职业素养和职业道德。",
+        "善于创新，勇于尝试新方法。",
+        "逻辑思维能力强，善于分析复杂问题。",
+        "工作主动性强，无需过多督促。",
+        "具备优秀的项目管理能力。",
+        "有较强的风险防控意识。",
+        "工作作风严谨，追求完美。",
+        "人际关系处理得当，深受同事欢迎。",
+        "具有出色的团队协调能力。",
+        "善于倾听他人意见，乐于接受建议。",
+        "具备良好的沟通表达能力。",
+        "能够有效协调各方资源。",
+        "具有较强的团队凝聚力和号召力。",
+        "善于营造积极的团队氛围。",
+        "具备跨部门协作的优秀能力。",
+        "能够快速融入新团队。",
+        "具有良好的客户服务意识。",
+        "善于处理各类突发情况。",
+        "具备优秀的谈判能力。",
+        "能够妥善处理各类矛盾。",
+        "具有较强的说服力和影响力。",
+        "善于建立和维护良好的人际关系。",
+        "具备出色的演讲表达能力。",
+        "能够准确理解和传达工作要求。",
+        "具有较强的团队管理能力。",
+        "善于激发团队成员的工作热情。",
+        "具备良好的情绪管理能力。",
+        "学习能力强，知识面广。",
+        "善于总结和分享经验。",
+        "具有持续学习的热情。",
+        "能够快速掌握新技能。",
+        "具备较强的自我提升能力。",
+        "勇于接受新挑战。",
+        "具有开放的学习心态。",
+        "善于运用新知识解决问题。",
+        "具备良好的知识迁移能力。",
+        "持续关注行业发展动态。",
+        "具有较强的研究分析能力。",
+        "善于利用各种资源学习。",
+        "具备创新思维和探索精神。",
+        "能够快速适应新环境。",
+        "具有较强的独立思考能力。",
+        "善于归纳总结工作经验。",
+        "具备良好的知识管理能力。",
+        "保持持续进步的动力。",
+        "具有终身学习的意识。",
+        "善于把握学习重点。",
+        "性格稳重，处事冷静。",
+        "做事果断，决策明确。",
+        "为人诚实可靠，信守承诺。",
+        "具有积极乐观的心态。",
+        "做事认真细致，一丝不苟。",
+        "性格开朗，易于相处。",
+        "具有较强的责任感和使命感。",
+        "做事有条理，思路清晰。",
+        "具备良好的职业操守。",
+        "性格沉稳，处事老练。",
+        "具有较强的自我管理能力。",
+        "做事雷厉风行，效率很高。",
+        "具备良好的心理素质。",
+        "性格随和，易于合作。",
+        "具有较强的进取心。",
+        "做事严谨，注重质量。",
+        "具备良好的职业修养。",
+        "性格坚韧，意志力强。",
+        "具有较强的自我约束能力。",
+        "做事踏实，脚踏实地。",
+        "具备优秀的领导才能。",
+        "善于制定战略规划。",
+        "具有较强的决策能力。",
+        "能够有效激励团队。",
+        "具备优秀的资源整合能力。",
+        "善于危机管理。",
+        "具有较强的成本意识。",
+        "能够准确把握市场动向。",
+        "具备优秀的组织协调能力。",
+        "善于培养和发展团队。",
+        "具有较强的战略眼光。",
+        "能够有效控制项目进度。",
+        "具备优秀的风险管理能力。",
+        "善于创新管理方法。",
+        "具有较强的目标管理能力。",
+        "能够有效提升团队效率。",
+        "具备优秀的质量管理意识。",
+        "善于建立管理体系。",
+        "具有较强的成本控制能力。",
+        "能够有效推动团队发展。"
+    ];
+
+    #endregion 基础数据元素
+}
