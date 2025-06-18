@@ -18,5 +18,5 @@ public enum WhiteSpaceMode
     /// <summary>
     /// 移除所有空白字符
     /// </summary>
-    RemoveAllSpaces = 1 << 1 // 2
+    RemoveAll = 1 << 1 // 2
 }

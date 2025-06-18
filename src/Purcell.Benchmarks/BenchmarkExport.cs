@@ -9,7 +9,7 @@ public class BenchmarkExport
     [Params("xlsx")]
     public string? Ext { get; set; }
 
-    //[Benchmark(Description = "*ExportDict*", Baseline = true)]
+    [Benchmark(Description = "*ExportDict*", Baseline = true)]
     public void ExportDict()
     {
         string filePath = FileHelper.GenExportFilePath(Ext);
@@ -25,7 +25,7 @@ public class BenchmarkExport
         File.Delete(filePath);
     }
 
-    //[Benchmark(Description = "ExportAnonymousObject")]
+    [Benchmark(Description = "ExportAnonymousObject")]
     public void ExportAnonymousObject()
     {
         string filePath = FileHelper.GenExportFilePath(Ext);
@@ -50,7 +50,7 @@ public class BenchmarkExport
             Profile = item.Profile, // 个人简介
             EntryDate = item.EntryDate // 入职时间 (2010-2023年)
         });
-        Purcell.Export(PurTable.FromRecords(anonymousList), filePath);
+        Purcell.Export(PurTable.From(anonymousList), filePath);
         File.Delete(filePath);
     }
 

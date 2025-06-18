@@ -6,37 +6,6 @@ namespace PurcellLibs;
 public static class PurConstants
 {
     /// <summary>
-    /// Excel (.xlsx) 文件格式支持的最大列数。
-    /// </summary>
-    /// <remarks>
-    /// <para>常量值：16384 (2^14)</para>
-    /// <para>Excel 列范围说明：</para>
-    /// <list type="bullet">
-    ///     <item><description>起始列：A (索引值 0)</description></item>
-    ///     <item><description>结束列：XFD (索引值 16383)</description></item>
-    /// </list>
-    /// </remarks>
-    /// <seealso href="https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3">
-    /// Excel specifications and limits - Microsoft Support
-    /// </seealso>
-    /// <seealso cref="XlsColumnLimit"/>
-    public const int XlsxColumnLimit = 1 << 14;
-
-    /// <summary>
-    /// Excel (.xls) 文件格式支持的最大列数。
-    /// </summary>
-    /// <remarks>
-    /// <para>常量值：256 (2^8)</para>
-    /// <para>Excel 列范围说明：</para>
-    /// <list type="bullet">
-    ///     <item><description>起始列：A (索引值 0)</description></item>
-    ///     <item><description>结束列：IV (索引值 255)</description></item>
-    /// </list>
-    /// </remarks>
-    /// <seealso cref="XlsxColumnLimit"/>
-    public const int XlsColumnLimit = 1 << 8;
-
-    /// <summary>
     /// Excel (.xlsx) 格式工作表中允许的最大工作表数量。
     /// </summary>
     /// <remarks>

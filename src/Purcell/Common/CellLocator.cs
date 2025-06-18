@@ -5,6 +5,9 @@ namespace PurcellLibs;
 /// </summary>
 public readonly struct CellLocator : IEquatable<CellLocator>
 {
+    // Excel (.xlsx) 文件格式支持的最大列数。
+    private const int XlsxColumnLimit = 1 << 14;
+
     /// <summary>
     /// A1表示法字符串正则表达式
     /// </summary>
@@ -31,8 +34,8 @@ public readonly struct CellLocator : IEquatable<CellLocator>
         {
             if (rowIndex < 0 || columnIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(rowIndex), "行索引和列索引不能为负数");
-            if (columnIndex > PurConstants.XlsxColumnLimit - 1)
-                throw new ArgumentOutOfRangeException(nameof(columnIndex), $"列索引超出范围(0-{PurConstants.XlsxColumnLimit - 1})");
+            if (columnIndex > XlsxColumnLimit - 1)
+                throw new ArgumentOutOfRangeException(nameof(columnIndex), $"列索引超出范围(0-{XlsxColumnLimit - 1})");
         }
 
         RowIndex = rowIndex;
@@ -55,8 +58,8 @@ public readonly struct CellLocator : IEquatable<CellLocator>
         int rowIndex = int.Parse(match.Groups["row"].Value) - 1;
         int columnIndex = ColumnLetterToIndex(match.Groups["column"].Value);
 
-        if (columnIndex > PurConstants.XlsxColumnLimit)
-            throw new ArgumentOutOfRangeException(nameof(columnIndex), $"列索引超出范围(0-{PurConstants.XlsxColumnLimit})");
+        if (columnIndex > XlsxColumnLimit)
+            throw new ArgumentOutOfRangeException(nameof(columnIndex), $"列索引超出范围(0-{XlsxColumnLimit})");
 
         RowIndex = rowIndex;
         ColumnIndex = columnIndex;
@@ -143,7 +146,7 @@ public readonly struct CellLocator : IEquatable<CellLocator>
     /// </summary>
     public override string ToString()
     {
-        return $"{GetColumnLetter(ColumnIndex)}{RowIndex + 1}";
+        return ColumnIndex == -1 ? "" : $"{GetColumnLetter(ColumnIndex)}{RowIndex + 1}";
     }
 
     /// <inheritdoc/>

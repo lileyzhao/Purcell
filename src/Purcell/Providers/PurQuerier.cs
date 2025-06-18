@@ -64,7 +64,7 @@ public class PurQuerier : IPurQuerier
         if (typeof(T) == typeof(object))
             throw new ArgumentException("泛型参数 T 不能为 object 或 dynamic 类型，请使用 QueryDynamic() 方法。", nameof(T));
 
-        PurTable config = (tableConfig ?? new PurTable()).EnsureValid();
+        PurTable config = tableConfig ?? new PurTable();
         return _reader.Read<T>(config, progress, cancelToken);
     }
 
@@ -72,7 +72,7 @@ public class PurQuerier : IPurQuerier
     public IEnumerable<IDictionary<string, object?>> Query(PurTable? tableConfig = null,
         IProgress<int>? progress = null, CancellationToken cancelToken = default)
     {
-        PurTable config = (tableConfig ?? new PurTable()).EnsureValid();
+        PurTable config = tableConfig ?? new PurTable();
         return _reader.ReadDict(config, progress, cancelToken);
     }
 
@@ -80,7 +80,7 @@ public class PurQuerier : IPurQuerier
     public IEnumerable<dynamic> QueryDynamic(PurTable? tableConfig = null,
         IProgress<int>? progress = null, CancellationToken cancelToken = default)
     {
-        PurTable config = (tableConfig ?? new PurTable()).EnsureValid();
+        PurTable config = tableConfig ?? new PurTable();
         return _reader.ReadDynamic(config, progress, cancelToken);
     }
 

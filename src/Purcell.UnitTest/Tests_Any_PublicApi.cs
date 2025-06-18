@@ -75,7 +75,7 @@ public class Tests_Any_PublicApi(ITestOutputHelper testHelper)
             PurColumn.FromProperty("Name").AddName("姓名"),
             PurColumn.FromProperty("Age").AddName("年龄")
         ];
-        foreach (dynamic item in Purcell.QueryDynamic(filePath, PurTable.FromColumns(dynamicColumns)))
+        foreach (dynamic item in Purcell.QueryDynamic(filePath, PurTable.From(dynamicColumns)))
         {
             rowIndex++;
             testHelper.WriteLine($"\t[{rowIndex + 1:00}]{item.Id} : {item.Name} {item.Age}岁");

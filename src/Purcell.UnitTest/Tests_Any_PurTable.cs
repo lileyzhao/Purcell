@@ -18,15 +18,15 @@ public class Tests_Any_PurTable(ITestOutputHelper testHelper)
 
         var studentSets = new List<List<Student>>
         {
-            Purcell.Query<Student>(filePath, PurTable.FromIndex(0)).ToList(),
-            Purcell.Query<Student>(filePath, PurTable.FromName("学生信息")).ToList(),
+            Purcell.Query<Student>(filePath, PurTable.From(0)).ToList(),
+            Purcell.Query<Student>(filePath, PurTable.From("学生信息")).ToList(),
             Purcell.Query<Student>(filePath, new PurTable { SheetIndex = 2 }).ToList(),
             Purcell.Query<Student>(filePath, new PurTable { SheetName = "学生信息Locked" }).ToList(),
             Purcell.Query<Student>(filePath, PurTable.New().WithName("学生信息Space")
                 .AddColumn(PurColumn.FromProperty("EnrollmentDate").AddName("Enrollment Date"))
             ).ToList(),
             Purcell.Query<Student>(filePath, PurTable
-                .FromColumns([PurColumn.FromProperty("EnrollmentDate").AddName("Enrollment Date")], "学生信息Space2")
+                .From([PurColumn.FromProperty("EnrollmentDate").AddName("Enrollment Date")], "学生信息Space2")
             ).ToList(),
             Purcell.Query<Student>(filePath, PurTable.New().WithIndex(6)).ToList(),
             Purcell.Query<Student>(filePath, new PurTable
@@ -130,7 +130,7 @@ public class Tests_Any_PurTable(ITestOutputHelper testHelper)
         string filePath = $"Resources/{domain}.{extension}";
 
         var studentsWithoutHeader = Purcell.Query<Student>(filePath,
-            PurTable.FromIndex(0).WithoutHeader().AddColumn(PurColumn.FromProperty(nameof(Student.Id)).WithIndex(0))
+            PurTable.From(0).WithoutHeader().AddColumn(PurColumn.FromProperty(nameof(Student.Id)).WithIndex(0))
         ).ToList();
 
         for (var i = 0; i < studentsWithoutHeader.Count; i++)
@@ -151,7 +151,7 @@ public class Tests_Any_PurTable(ITestOutputHelper testHelper)
         string domain = "StudentsEnMultiSheets";
         string filePath = $"Resources/{domain}.{extension}";
 
-        var studentsRows5 = Purcell.Query<Student>(filePath, PurTable.FromIndex(0).WithMaxReadRows(5)).ToList();
+        var studentsRows5 = Purcell.Query<Student>(filePath, PurTable.From(0).WithMaxReadRows(5)).ToList();
         Assert.Equal(5, studentsRows5.Count); // 确认读取了5行数据
         testHelper.WriteLine($"验证MaxReadRows5设置：✅");
 
@@ -168,16 +168,16 @@ public class Tests_Any_PurTable(ITestOutputHelper testHelper)
     {
         string filePath = FileHelper.GenExportFilePath(extension);
 
-        Purcell.Export(PurTable.FromRecords(MockData.GetGenericData().Where(t => t != null).ToList()).WithMaxWriteRows(9),
+        Purcell.Export(PurTable.From(MockData.GetGenericData().Where(t => t != null).ToList()).WithMaxWriteRows(9),
             filePath);
-        var studentsRows9 = Purcell.Query(filePath, PurTable.FromIndex(0)).ToList();
+        var studentsRows9 = Purcell.Query(filePath, PurTable.From(0)).ToList();
         Assert.Equal(9, studentsRows9.Count); // 确认读取了9行数据
         testHelper.WriteLine($"验证MaxWriteRows9设置：✅");
         File.Delete(filePath);
 
         var purTable = new PurTable { MaxWriteRows = 6 }.WithRecords(MockData.GetGenericData().Where(t => t != null).ToList());
         Purcell.Export(purTable, filePath);
-        var studentsRows6 = Purcell.Query(filePath, PurTable.FromIndex(0)).ToList();
+        var studentsRows6 = Purcell.Query(filePath, PurTable.From(0)).ToList();
         Assert.Equal(6, studentsRows6.Count); // 确认读取了6行数据
         testHelper.WriteLine($"验证MaxWriteRows6设置：✅");
         File.Delete(filePath);
@@ -194,7 +194,7 @@ public class Tests_Any_PurTable(ITestOutputHelper testHelper)
 
         // 设置 HeaderStart，以便测试是否从 2 开始递增
         var studentsWithoutHeaderStart = Purcell.Query<Student>(filePath,
-            PurTable.FromIndex(0).WithHeaderStart("A2").AddColumn(PurColumn.FromProperty(nameof(Student.Id)).WithIndex(0))
+            PurTable.From(0).WithHeaderStart("A2").AddColumn(PurColumn.FromProperty(nameof(Student.Id)).WithIndex(0))
         ).ToList();
 
         for (var i = 0; i < studentsWithoutHeaderStart.Count; i++)
@@ -204,7 +204,7 @@ public class Tests_Any_PurTable(ITestOutputHelper testHelper)
 
         // 设置 HeaderStart，因为无法转换，则Id应均为0
         var studentsWithoutHeaderStart2 = Purcell.Query<Student>(filePath,
-            PurTable.FromIndex(0).WithHeaderStart("B2").WithDataStart(CellLocator.Create("B3"))
+            PurTable.From(0).WithHeaderStart("B2").WithDataStart(CellLocator.Create("B3"))
                 .AddColumn(PurColumn.FromProperty(nameof(Student.Id)).WithIndex(0))
         ).ToList();
 
@@ -217,7 +217,7 @@ public class Tests_Any_PurTable(ITestOutputHelper testHelper)
 
         // 设置 DataStart，以便测试是否从 3 开始递增
         var studentsWithoutDataStart = Purcell.Query<Student>(filePath,
-            PurTable.FromIndex(0).WithDataStart("A4")
+            PurTable.From(0).WithDataStart("A4")
         ).ToList();
 
         for (var i = 0; i < studentsWithoutDataStart.Count; i++)
@@ -234,7 +234,7 @@ public class Tests_Any_PurTable(ITestOutputHelper testHelper)
                 "数据区域的起始列必须与表头区域的起始列相同",
                 Assert.Throws<InvalidOperationException>(() =>
                 {
-                    PurTable.New().WithHeaderStart("A2").WithDataStart("B2").EnsureValid();
+                    PurTable.New().WithHeaderStart("A2").WithDataStart("B2").GetDataStart();
                 }).Message
             );
 
@@ -242,7 +242,7 @@ public class Tests_Any_PurTable(ITestOutputHelper testHelper)
                 "数据区域的起始行必须大于表头区域的起始行",
                 Assert.Throws<InvalidOperationException>(() =>
                 {
-                    PurTable.New().WithHeaderStart("A2").WithDataStart("A2").EnsureValid();
+                    PurTable.New().WithHeaderStart("A2").WithDataStart("A2").GetDataStart();
                 }).Message
             );
         }

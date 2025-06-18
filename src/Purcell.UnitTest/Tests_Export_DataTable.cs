@@ -19,10 +19,10 @@ public class Tests_Export_DataTable(ITestOutputHelper testHelper)
 
         List<PurTable> sheetDatas =
         [
-            PurTable.FromRecords(data).WithTableStyle(PurStyle.MidnightMagic),
-            PurTable.FromRecords(data).WithTableStyle(PurStyle.EarthTones).WithHeaderStart("B2"),
-            PurTable.FromRecords(data).WithTableStyle(PurStyle.SunnyDay).WithHeaderStart(CellLocator.Create(3, 3)),
-            PurTable.FromRecords(data).WithTableStyle(PurStyle.CozyAutumn).WithHeaderStart(CellLocator.Create(5, 2))
+            PurTable.From(data).WithTableStyle(PurStyle.MidnightMagic),
+            PurTable.From(data).WithTableStyle(PurStyle.EarthTones).WithHeaderStart("B2"),
+            PurTable.From(data).WithTableStyle(PurStyle.SunnyDay).WithHeaderStart(CellLocator.Create(3, 3)),
+            PurTable.From(data).WithTableStyle(PurStyle.CozyAutumn).WithHeaderStart(CellLocator.Create(5, 2))
         ];
         Purcell.Export(sheetDatas, filePath);
         filePath.Export(sheetDatas); // 覆盖写入文件测试
@@ -60,10 +60,10 @@ public class Tests_Export_DataTable(ITestOutputHelper testHelper)
 
         List<PurTable> sheetDatas =
         [
-            PurTable.FromRecords(data).WithTableStyle(PurStyle.MidnightMagic),
-            PurTable.FromRecords(data).WithTableStyle(PurStyle.EarthTones).WithHeaderStart("B2"),
-            PurTable.FromRecords(data).WithTableStyle(PurStyle.SunnyDay).WithHeaderStart(CellLocator.Create(3, 3)),
-            PurTable.FromRecords(data).WithTableStyle(PurStyle.CozyAutumn).WithHeaderStart(CellLocator.Create(5, 2))
+            PurTable.From(data).WithTableStyle(PurStyle.MidnightMagic),
+            PurTable.From(data).WithTableStyle(PurStyle.EarthTones).WithHeaderStart("B2"),
+            PurTable.From(data).WithTableStyle(PurStyle.SunnyDay).WithHeaderStart(CellLocator.Create(3, 3)),
+            PurTable.From(data).WithTableStyle(PurStyle.CozyAutumn).WithHeaderStart(CellLocator.Create(5, 2))
         ];
         await Purcell.ExportAsync(sheetDatas, filePath);
         await filePath.ExportAsync(sheetDatas); // 覆盖写入文件测试
@@ -101,10 +101,10 @@ public class Tests_Export_DataTable(ITestOutputHelper testHelper)
 
         List<PurTable> sheetDatas =
         [
-            PurTable.FromRecords(data).WithTableStyle(PurStyle.MidnightMagic),
-            PurTable.FromRecords(data).WithTableStyle(PurStyle.EarthTones).WithHeaderStart("B2"),
-            PurTable.FromRecords(data).WithTableStyle(PurStyle.SunnyDay).WithHeaderStart(CellLocator.Create(3, 3)),
-            PurTable.FromRecords(data).WithTableStyle(PurStyle.CozyAutumn).WithHeaderStart(CellLocator.Create(5, 2))
+            PurTable.From(data).WithTableStyle(PurStyle.MidnightMagic),
+            PurTable.From(data).WithTableStyle(PurStyle.EarthTones).WithHeaderStart("B2"),
+            PurTable.From(data).WithTableStyle(PurStyle.SunnyDay).WithHeaderStart(CellLocator.Create(3, 3)),
+            PurTable.From(data).WithTableStyle(PurStyle.CozyAutumn).WithHeaderStart(CellLocator.Create(5, 2))
         ];
         using (FileStream stream = new(filePath, FileMode.CreateNew))
         {
@@ -164,10 +164,10 @@ public class Tests_Export_DataTable(ITestOutputHelper testHelper)
 
         List<PurTable> sheetDatas =
         [
-            PurTable.FromRecords(data).WithTableStyle(PurStyle.MidnightMagic),
-            PurTable.FromRecords(data).WithTableStyle(PurStyle.EarthTones).WithHeaderStart("B2"),
-            PurTable.FromRecords(data).WithTableStyle(PurStyle.SunnyDay).WithHeaderStart(CellLocator.Create(3, 3)),
-            PurTable.FromRecords(data).WithTableStyle(PurStyle.CozyAutumn).WithHeaderStart(CellLocator.Create(5, 2))
+            PurTable.From(data).WithTableStyle(PurStyle.MidnightMagic),
+            PurTable.From(data).WithTableStyle(PurStyle.EarthTones).WithHeaderStart("B2"),
+            PurTable.From(data).WithTableStyle(PurStyle.SunnyDay).WithHeaderStart(CellLocator.Create(3, 3)),
+            PurTable.From(data).WithTableStyle(PurStyle.CozyAutumn).WithHeaderStart(CellLocator.Create(5, 2))
         ];
         await using (FileStream stream = new(filePath, FileMode.CreateNew))
         {

@@ -226,17 +226,17 @@ public class Tests_Query_Students(ITestOutputHelper testHelper)
 
         int rowIndex = -1;
 
-        foreach (var item in Purcell.Query<Student>(filePath, PurTable.FromColumns(dycColumns)))
+        foreach (var item in Purcell.Query<Student>(filePath, PurTable.From(dycColumns)))
         {
             rowIndex++;
             testHelper.WriteLine($"第 {rowIndex + 1} 行：");
             testHelper.WriteLine(JsonConvert.SerializeObject(item));
         }
 
-        var studentsLimit = Purcell.Query<Student>(filePath, PurTable.FromColumns(dycColumns).WithMaxReadRows(1)).ToList();
+        var studentsLimit = Purcell.Query<Student>(filePath, PurTable.From(dycColumns).WithMaxReadRows(1)).ToList();
         Assert.Equal(1, studentsLimit.Count); // 判断是否限制读取了1行数据
 
-        var students = Purcell.Query<Student>(filePath, PurTable.FromColumns(dycColumns)).ToList();
+        var students = Purcell.Query<Student>(filePath, PurTable.From(dycColumns)).ToList();
 
         Assert.Equal(15, students.Count); // 判断总行数
 

@@ -20,7 +20,6 @@ internal class CsvHelperTableReader : TableReaderBase
     protected override IEnumerable<IDictionary<int, object?>> ReadCore(PurTable tableConfig, IProgress<int>? progress = null,
         CancellationToken cancelToken = default)
     {
-        tableConfig.EnsureValid();
         _tableConfig = tableConfig;
 
         // 创建 CsvReader 配置(无头读取)

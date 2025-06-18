@@ -17,7 +17,7 @@ public partial class Tests_Query_Dynamic(ITestOutputHelper testHelper)
         string filePath = $"Resources/{domain}.{extension}";
 
         int rowIndex = -1;
-        PurTable tableConfig = new() { HeaderSpaceMode = WhiteSpaceMode.RemoveAllSpaces };
+        PurTable tableConfig = new() { HeaderSpaceMode = WhiteSpaceMode.RemoveAll };
         foreach (dynamic item in await Purcell.QueryDynamicAsync(filePath, tableConfig))
         {
             rowIndex++;
@@ -87,7 +87,7 @@ public partial class Tests_Query_Dynamic(ITestOutputHelper testHelper)
         string filePath = $"Resources/{domain}.{extension}";
 
         int rowIndex = -1;
-        PurTable tableConfig = new() { HeaderSpaceMode = WhiteSpaceMode.RemoveAllSpaces };
+        PurTable tableConfig = new() { HeaderSpaceMode = WhiteSpaceMode.RemoveAll };
         foreach (dynamic item in Purcell.QueryDynamic(filePath, tableConfig))
         {
             rowIndex++;
@@ -157,7 +157,7 @@ public partial class Tests_Query_Dynamic(ITestOutputHelper testHelper)
         string filePath = $"Resources/{domain}.{extension}";
 
         int rowIndex = -1;
-        PurTable tableConfig = new() { HeaderSpaceMode = WhiteSpaceMode.RemoveAllSpaces };
+        PurTable tableConfig = new() { HeaderSpaceMode = WhiteSpaceMode.RemoveAll };
         await using FileStream fileStream = File.OpenRead(filePath);
         foreach (dynamic item in await Purcell.QueryDynamicAsync(fileStream, queryType, tableConfig))
         {
@@ -228,7 +228,7 @@ public partial class Tests_Query_Dynamic(ITestOutputHelper testHelper)
         string filePath = $"Resources/{domain}.{extension}";
 
         int rowIndex = -1;
-        PurTable tableConfig = new() { HeaderSpaceMode = WhiteSpaceMode.RemoveAllSpaces };
+        PurTable tableConfig = new() { HeaderSpaceMode = WhiteSpaceMode.RemoveAll };
         using FileStream fileStream = File.OpenRead(filePath);
         foreach (dynamic item in Purcell.QueryDynamic(fileStream, queryType, tableConfig))
         {

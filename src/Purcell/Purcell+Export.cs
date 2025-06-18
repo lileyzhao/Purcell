@@ -46,7 +46,7 @@ public static partial class Purcell
         IProgress<WritePosition>? progress = null, CancellationToken cancelToken = default)
         where T : class, new()
     {
-        PurTable sheetData = PurTable.FromRecords(collection, sheetName);
+        PurTable sheetData = PurTable.From(collection, sheetName);
         if (!string.IsNullOrEmpty(writeStart)) sheetData.WithHeaderStart(writeStart);
         if (!autoFilter) sheetData.WithAutoFilter(autoFilter);
         if (!string.IsNullOrEmpty(password)) sheetData.WithPassword(password);
@@ -63,7 +63,7 @@ public static partial class Purcell
         IProgress<WritePosition>? progress = null, CancellationToken cancelToken = default)
         where T : class, new()
     {
-        PurTable sheetData = PurTable.FromRecords(collection, sheetName);
+        PurTable sheetData = PurTable.From(collection, sheetName);
         if (!string.IsNullOrEmpty(writeStart)) sheetData.WithHeaderStart(writeStart);
         if (!autoFilter) sheetData.WithAutoFilter(autoFilter);
         if (!string.IsNullOrEmpty(password)) sheetData.WithPassword(password);
@@ -79,7 +79,7 @@ public static partial class Purcell
         PurStyle? sheetStyle = null,
         IProgress<WritePosition>? progress = null, CancellationToken cancelToken = default)
     {
-        PurTable sheetData = PurTable.FromRecords(collection, sheetName);
+        PurTable sheetData = PurTable.From(collection, sheetName);
         if (!string.IsNullOrEmpty(writeStart)) sheetData.WithHeaderStart(writeStart);
         if (!autoFilter) sheetData.WithAutoFilter(autoFilter);
         if (!string.IsNullOrEmpty(password)) sheetData.WithPassword(password);
@@ -95,7 +95,7 @@ public static partial class Purcell
         PurStyle? sheetStyle = null,
         IProgress<WritePosition>? progress = null, CancellationToken cancelToken = default)
     {
-        PurTable sheetData = PurTable.FromRecords(collection, sheetName);
+        PurTable sheetData = PurTable.From(collection, sheetName);
         if (!string.IsNullOrEmpty(writeStart)) sheetData.WithHeaderStart(writeStart);
         if (!autoFilter) sheetData.WithAutoFilter(autoFilter);
         if (!string.IsNullOrEmpty(password)) sheetData.WithPassword(password);

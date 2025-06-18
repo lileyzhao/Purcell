@@ -196,8 +196,8 @@ internal abstract class TableReaderBase : ITableReader
         }
 
         // 映射索引字典
-        indexedColumns = tempColumns.Where(rsc => rsc.Index is >= 0)
-            .GroupBy(rsc => rsc.Index ?? 0)
+        indexedColumns = tempColumns.Where(rsc => rsc.Index >= 0)
+            .GroupBy(rsc => rsc.Index)
             .Select(g => new { g.Key, Value = g.ToList() })
             .ToDictionary(g => g.Key, g => g.Value);
 
@@ -244,9 +244,9 @@ internal abstract class TableReaderBase : ITableReader
         }
 
         // 映射索引字典
-        indexedColumns = tempColumns.Where(rsc => rsc.Index is >= 0)
+        indexedColumns = tempColumns.Where(rsc => rsc.Index >= 0)
             .GroupBy(rsc => rsc.Index)
-            .Select(g => new { Key = (int)g.Key!, Value = g.ToList() })
+            .Select(g => new { g.Key, Value = g.ToList() })
             .ToDictionary(g => g.Key, g => g.Value);
 
         return _tableConfig.HasHeader == false;
@@ -285,11 +285,11 @@ internal abstract class TableReaderBase : ITableReader
             {
                 // 如果不存在特性，则创建默认配置
                 resolvedColumn = propertyInfo.GetCustomAttribute<PurColumn>() ??
-                                 new PurColumn(
+                                 PurColumn.From([
                                      propertyInfo.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName ??
                                      propertyInfo.GetCustomAttribute<DescriptionAttribute>()?.Description ??
                                      propertyInfo.Name
-                                 );
+                                 ]);
             }
 
             if (resolvedColumn.Names.Count == 0)

@@ -37,7 +37,6 @@ internal class SylvanExcelTableReader : TableReaderBase
     protected override IEnumerable<IDictionary<int, object?>> ReadCore(PurTable tableConfig, IProgress<int>? progress = null,
         CancellationToken cancelToken = default)
     {
-        tableConfig.EnsureValid();
         _tableConfig = tableConfig;
         LocateSheet(_tableConfig); // 定位工作表
 

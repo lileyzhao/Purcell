@@ -16,7 +16,7 @@ public class CustomConfig : ManualConfig
     public CustomConfig()
     {
         // 添加作业
-        AddJob(Job.Default);
+        AddJob(Job.ShortRun);
 
         // 添加诊断器
         AddDiagnoser(MemoryDiagnoser.Default); // 内存诊断

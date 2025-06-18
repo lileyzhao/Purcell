@@ -11,7 +11,7 @@ public class Tests_Export_WorkSheet
     {
         var localAnonymous = new[] { new { Name = "张三", Age = 18 } };
 
-        PurTable sheetDataLocalAnonymous = PurTable.FromRecords(localAnonymous).WithHeaderStart(CellLocator.Create(2, 3));
+        PurTable sheetDataLocalAnonymous = PurTable.From(localAnonymous).WithHeaderStart(CellLocator.Create(2, 3));
         Assert.Equal(string.Empty, sheetDataLocalAnonymous.SheetName);
         Assert.Equal(localAnonymous.Length, sheetDataLocalAnonymous.Records.Count());
         Assert.Equal(2, sheetDataLocalAnonymous.GetHeaderStart().RowIndex);
@@ -19,7 +19,7 @@ public class Tests_Export_WorkSheet
         Assert.True(sheetDataLocalAnonymous.AutoFilter);
 
         DataTable dataDataTable = MockData.GetDataTable();
-        PurTable sheetDataDataTable = PurTable.FromRecords(dataDataTable, "DT数据表格")
+        PurTable sheetDataDataTable = PurTable.From(dataDataTable, "DT数据表格")
             .WithName("DT数据表格2")
             .WithHeaderStart(CellLocator.Create(5, 6))
             .WithAutoFilter(false);
@@ -30,7 +30,7 @@ public class Tests_Export_WorkSheet
         Assert.False(sheetDataDataTable.AutoFilter);
 
         List<dynamic?> dataDynamic = MockData.GetDynamicData();
-        PurTable sheetDataDynamic = PurTable.FromRecords(dataDynamic, "动态数据表格")
+        PurTable sheetDataDynamic = PurTable.From(dataDynamic, "动态数据表格")
             .WithAutoFilter(false)
             .WithPassword("12345");
         Assert.Equal("动态数据表格", sheetDataDynamic.SheetName);
@@ -39,14 +39,14 @@ public class Tests_Export_WorkSheet
         Assert.Equal("12345", sheetDataDynamic.Password);
 
         List<MockData.Employee?> dataGenericType = MockData.GetGenericData();
-        PurTable sheetDataGenericType = PurTable.FromRecords(dataGenericType, "泛型数据表格")
+        PurTable sheetDataGenericType = PurTable.From(dataGenericType, "泛型数据表格")
             .WithTableStyle(PurStyle.CozyAutumn);
         Assert.Equal("泛型数据表格", sheetDataGenericType.SheetName);
         Assert.Equal(dataGenericType.Count, sheetDataGenericType.Records.Count());
         Assert.Equal(PurStyle.CozyAutumn.HeaderStyle.Fill.Color, sheetDataGenericType.TableStyle.HeaderStyle.Fill.Color);
 
         object?[] dataAnonymous = MockData.GetAnonymousObjectData();
-        PurTable sheetDataAnonymous = PurTable.FromRecords(dataAnonymous, "匿名数据表格")
+        PurTable sheetDataAnonymous = PurTable.From(dataAnonymous, "匿名数据表格")
             .WithTableStyle(PurStyle.Default.SetMinColumnWidth(15).SetMaxColumnWidth(25));
         Assert.Equal("匿名数据表格", sheetDataAnonymous.SheetName);
         Assert.Equal(dataAnonymous.Cast<object>().Count(), sheetDataAnonymous.Records.Count());

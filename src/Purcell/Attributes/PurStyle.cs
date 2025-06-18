@@ -3,51 +3,73 @@
 namespace PurcellLibs;
 
 /// <summary>
-/// 表格样式
+/// Excel 表格样式配置特性（Attribute），用于定义 Excel 表格的表头、内容样式及列宽、行高等参数。
+/// <para>
+/// 仅适用于 Excel 文件的样式设置，可通过特性标记或代码方式配置，支持链式调用进行流畅设置。
+/// </para>
 /// </summary>
 [AttributeUsage(AttributeTargets.Class)]
 public class PurStyle : Attribute
 {
     /// <summary>
-    /// 表头样式
+    /// 表头单元格样式，默认为 <see cref="XlsxStyle.Default"/>。
     /// </summary>
     public XlsxStyle HeaderStyle { get; set; } = XlsxStyle.Default;
 
     /// <summary>
-    /// 内容样式
+    /// 内容单元格样式，默认为 <see cref="XlsxStyle.Default"/>。
     /// </summary>
     public XlsxStyle ContentStyle { get; set; } = XlsxStyle.Default;
 
     /// <summary>
-    /// 最小列宽，默认值 10
+    /// 最小列宽，单位为字符宽度，默认值为 10。
+    /// 中文或全角字符算 2 个宽度单位，英文或数字算 1 个宽度单位。
     /// </summary>
     public double MinColumnWidth { get; set; } = 10d;
 
     /// <summary>
-    /// 最大列宽，默认值 20
+    /// 最大列宽，单位为字符宽度，默认值为 20。
+    /// 中文或全角字符算 2 个宽度单位，英文或数字算 1 个宽度单位。
     /// </summary>
     public double MaxColumnWidth { get; set; } = 20d;
 
     /// <summary>
-    /// 表头行高，默认值 18
+    /// 表头行高，单位为磅（point），默认值为 18。
     /// </summary>
     public double HeaderLineHeight { get; set; } = 18d;
 
     /// <summary>
-    /// 内容行高，默认值 18
+    /// 内容行高，单位为磅（point），默认值为 18。
     /// </summary>
     public double ContentLineHeight { get; set; } = 18d;
 
     #region Fluent 方法链
 
-    /// <summary>设置表头样式</summary>
+    /// <summary>
+    /// 设置表头单元格样式。
+    /// </summary>
+    /// <param name="headerStyle">表头样式对象。</param>
+    /// <returns>返回当前 <see cref="PurStyle"/> 实例，便于链式调用。</returns>
     public PurStyle SetHeaderStyle(XlsxStyle headerStyle)
     {
         HeaderStyle = headerStyle;
         return this;
     }
 
-    /// <summary>设置表头样式</summary>
+    /// <summary>
+    /// 设置表头单元格样式。
+    /// </summary>
+    /// <param name="textColor">文本颜色。</param>
+    /// <param name="fillColor">填充色。</param>
+    /// <param name="fontFamily">字体名称，默认 "Calibri"。</param>
+    /// <param name="fontSize">字体大小，默认 11。</param>
+    /// <param name="fontBold">是否加粗，默认 true。</param>
+    /// <param name="fontItalic">是否斜体，默认 false。</param>
+    /// <param name="fontStrike">是否删除线，默认 false。</param>
+    /// <param name="fontUnderline">下划线样式，默认无。</param>
+    /// <param name="horizontal">水平对齐方式，默认左对齐。</param>
+    /// <param name="vertical">垂直对齐方式，默认居中。</param>
+    /// <returns>返回当前 <see cref="PurStyle"/> 实例，便于链式调用。</returns>
     public PurStyle SetHeaderStyle(Color textColor, Color fillColor, string fontFamily = "Calibri", double fontSize = 11,
         bool fontBold = true,
         bool fontItalic = false, bool fontStrike = false, XlsxFont.Underline fontUnderline = XlsxFont.Underline.None,
@@ -65,7 +87,14 @@ public class PurStyle : Attribute
         return this;
     }
 
-    /// <summary>设置表头样式</summary>
+    /// <summary>
+    /// 设置表头单元格样式。
+    /// </summary>
+    /// <param name="font">字体样式对象。</param>
+    /// <param name="fill">填充样式对象。</param>
+    /// <param name="horizontal">水平对齐方式，默认左对齐。</param>
+    /// <param name="vertical">垂直对齐方式，默认居中。</param>
+    /// <returns>返回当前 <see cref="PurStyle"/> 实例，便于链式调用。</returns>
     public PurStyle SetHeaderStyle(XlsxFont font, XlsxFill fill,
         XlsxAlignment.Horizontal horizontal = XlsxAlignment.Horizontal.Left,
         XlsxAlignment.Vertical vertical = XlsxAlignment.Vertical.Center)
@@ -79,14 +108,31 @@ public class PurStyle : Attribute
         return this;
     }
 
-    /// <summary>设置内容样式</summary>
+    /// <summary>
+    /// 设置内容单元格样式。
+    /// </summary>
+    /// <param name="contentStyle">内容样式对象。</param>
+    /// <returns>返回当前 <see cref="PurStyle"/> 实例，便于链式调用。</returns>
     public PurStyle SetContentStyle(XlsxStyle contentStyle)
     {
         ContentStyle = contentStyle;
         return this;
     }
 
-    /// <summary>设置内容样式</summary>
+    /// <summary>
+    /// 设置内容单元格样式。
+    /// </summary>
+    /// <param name="textColor">文本颜色。</param>
+    /// <param name="fillColor">填充色。</param>
+    /// <param name="fontFamily">字体名称，默认 "Calibri"。</param>
+    /// <param name="fontSize">字体大小，默认 11。</param>
+    /// <param name="fontBold">是否加粗，默认 true。</param>
+    /// <param name="fontItalic">是否斜体，默认 false。</param>
+    /// <param name="fontStrike">是否删除线，默认 false。</param>
+    /// <param name="fontUnderline">下划线样式，默认无。</param>
+    /// <param name="horizontal">水平对齐方式，默认左对齐。</param>
+    /// <param name="vertical">垂直对齐方式，默认居中。</param>
+    /// <returns>返回当前 <see cref="PurStyle"/> 实例，便于链式调用。</returns>
     public PurStyle SetContentStyle(Color textColor, Color fillColor, string fontFamily = "Calibri", double fontSize = 11,
         bool fontBold = true,
         bool fontItalic = false, bool fontStrike = false, XlsxFont.Underline fontUnderline = XlsxFont.Underline.None,
@@ -104,7 +150,14 @@ public class PurStyle : Attribute
         return this;
     }
 
-    /// <summary>设置内容样式</summary>
+    /// <summary>
+    /// 设置内容单元格样式。
+    /// </summary>
+    /// <param name="font">字体样式对象。</param>
+    /// <param name="fill">填充样式对象。</param>
+    /// <param name="horizontal">水平对齐方式，默认左对齐。</param>
+    /// <param name="vertical">垂直对齐方式，默认居中。</param>
+    /// <returns>返回当前 <see cref="PurStyle"/> 实例，便于链式调用。</returns>
     public PurStyle SetContentStyle(XlsxFont font, XlsxFill fill,
         XlsxAlignment.Horizontal horizontal = XlsxAlignment.Horizontal.Left,
         XlsxAlignment.Vertical vertical = XlsxAlignment.Vertical.Center)
@@ -118,28 +171,44 @@ public class PurStyle : Attribute
         return this;
     }
 
-    /// <summary>设置表头行高</summary>
+    /// <summary>
+    /// 设置表头行高。
+    /// </summary>
+    /// <param name="headerLineHeight">表头行高，单位为磅（point）。</param>
+    /// <returns>返回当前 <see cref="PurStyle"/> 实例，便于链式调用。</returns>
     public PurStyle SetHeaderLineHeight(double headerLineHeight)
     {
         HeaderLineHeight = headerLineHeight;
         return this;
     }
 
-    /// <summary>设置内容行高</summary>
+    /// <summary>
+    /// 设置内容行高。
+    /// </summary>
+    /// <param name="contentLineHeight">内容行高，单位为磅（point）。</param>
+    /// <returns>返回当前 <see cref="PurStyle"/> 实例，便于链式调用。</returns>
     public PurStyle SetContentLineHeight(double contentLineHeight)
     {
         ContentLineHeight = contentLineHeight;
         return this;
     }
 
-    /// <summary>设置最小列宽</summary>
+    /// <summary>
+    /// 设置最小列宽。
+    /// </summary>
+    /// <param name="minColumnWidth">最小列宽，单位为字符宽度。</param>
+    /// <returns>返回当前 <see cref="PurStyle"/> 实例，便于链式调用。</returns>
     public PurStyle SetMinColumnWidth(double minColumnWidth)
     {
         MinColumnWidth = minColumnWidth;
         return this;
     }
 
-    /// <summary>设置最大列宽</summary>
+    /// <summary>
+    /// 设置最大列宽。
+    /// </summary>
+    /// <param name="maxColumnWidth">最大列宽，单位为字符宽度。</param>
+    /// <returns>返回当前 <see cref="PurStyle"/> 实例，便于链式调用。</returns>
     public PurStyle SetMaxColumnWidth(double maxColumnWidth)
     {
         MaxColumnWidth = maxColumnWidth;
@@ -151,7 +220,7 @@ public class PurStyle : Attribute
     #region Preset 预设样式
 
     /// <summary>
-    /// 默认 Default<br /><br />
+    /// 默认样式 Default。<br /><br />
     /// 🎨 文本色: #FFFFFF White<br />
     /// 🎨 背景色: #004586 Blue
     /// </summary>
@@ -167,7 +236,7 @@ public class PurStyle : Attribute
     };
 
     /// <summary>
-    /// 明亮清新蓝 BrightFresh<br /><br />
+    /// 明亮清新蓝 BrightFresh。<br /><br />
     /// 🎨 文本色: #FFFFFF White<br />
     /// 🎨 背景色: #00BFFF Sky Blue
     /// </summary>
@@ -183,7 +252,7 @@ public class PurStyle : Attribute
     };
 
     /// <summary>
-    /// 优雅单色 ElegantMonochrome<br /><br />
+    /// 优雅单色 ElegantMonochrome。<br /><br />
     /// 🎨 文本色: #FFFFFF White<br />
     /// 🎨 背景色: #A9A9A9 Dark Gray
     /// </summary>
@@ -199,7 +268,7 @@ public class PurStyle : Attribute
     };
 
     /// <summary>
-    /// 大地色调 EarthTones<br /><br />
+    /// 大地色调 EarthTones。<br /><br />
     /// 🎨 文本色: #FFFFFF White<br />
     /// 🎨 背景色: #808080 Gray
     /// </summary>
@@ -215,7 +284,7 @@ public class PurStyle : Attribute
     };
 
     /// <summary>
-    /// 暖色调 WarmTones<br /><br />
+    /// 暖色调 WarmTones。<br /><br />
     /// 🎨 文本色: #FFFFFF White<br />
     /// 🎨 背景色: #FF0000 Red
     /// </summary>
@@ -231,7 +300,7 @@ public class PurStyle : Attribute
     };
 
     /// <summary>
-    /// 海洋蓝 OceanBlue<br /><br />
+    /// 海洋蓝 OceanBlue。<br /><br />
     /// 🎨 文本色: #FFFFFF White<br />
     /// 🎨 背景色: #191970 Midnight Blue
     /// </summary>
@@ -247,7 +316,7 @@ public class PurStyle : Attribute
     };
 
     /// <summary>
-    /// 复古怀旧 VintageNostalgia<br /><br />
+    /// 复古怀旧 VintageNostalgia。<br /><br />
     /// 🎨 文本色: #808080 Gray<br />
     /// 🎨 背景色: #FFC0CB Pink
     /// </summary>
@@ -263,7 +332,7 @@ public class PurStyle : Attribute
     };
 
     /// <summary>
-    /// 极简黑白 MinimalistBW<br /><br />
+    /// 极简黑白 MinimalistBW。<br /><br />
     /// 🎨 文本色: #808080 Gray<br />
     /// 🎨 背景色: #FFFFFF White
     /// </summary>
@@ -279,7 +348,7 @@ public class PurStyle : Attribute
     };
 
     /// <summary>
-    /// 活力能量 VibrantEnergy
+    /// 活力能量 VibrantEnergy。<br /><br />
     /// 🎨 文本色: #FFFFFF White<br />
     /// 🎨 背景色: #FFA500 Orange
     /// </summary>
@@ -295,7 +364,7 @@ public class PurStyle : Attribute
     };
 
     /// <summary>
-    /// 复古时尚 RetroChic<br /><br />
+    /// 复古时尚 RetroChic。<br /><br />
     /// 🎨 文本色: #FFFFFF White<br />
     /// 🎨 背景色: #DA70D6 Orchid
     /// </summary>
@@ -311,7 +380,7 @@ public class PurStyle : Attribute
     };
 
     /// <summary>
-    /// 温馨秋日 CozyAutumn<br /><br />
+    /// 温馨秋日 CozyAutumn。<br /><br />
     /// 🎨 文本色: #FFFFFF White<br />
     /// 🎨 背景色: #CD853F Peru
     /// </summary>
@@ -327,7 +396,7 @@ public class PurStyle : Attribute
     };
 
     /// <summary>
-    /// 宁静自然 SereneNature<br /><br />
+    /// 宁静自然 SereneNature。<br /><br />
     /// 🎨 文本色: #FFFFFF White<br />
     /// 🎨 背景色: #2E8B57 Sea Green
     /// </summary>
@@ -343,7 +412,7 @@ public class PurStyle : Attribute
     };
 
     /// <summary>
-    /// 午夜魔幻 MidnightMagic<br /><br />
+    /// 午夜魔幻 MidnightMagic。<br /><br />
     /// 🎨 文本色: #FFFFFF White<br />
     /// 🎨 背景色: #000080 Navy
     /// </summary>
@@ -359,7 +428,7 @@ public class PurStyle : Attribute
     };
 
     /// <summary>
-    /// 暖阳阳光 SunnyDay<br /><br />
+    /// 暖阳阳光 SunnyDay。<br /><br />
     /// 🎨 文本色: #808080 Gray<br />
     /// 🎨 背景色: #FFFF00 Yellow
     /// </summary>

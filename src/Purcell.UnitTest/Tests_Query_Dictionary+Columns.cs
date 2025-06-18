@@ -29,7 +29,7 @@ public partial class Tests_Query_Dictionary
             PurColumn.FromProperty(nameof(EmployeeNoAttr.PlaceName)).AddName("PLACE.*")
                 .WithMatchStrategy(MatchStrategy.IgnoreCaseRegex)
         ];
-        foreach (IDictionary<string, object?> item in await Purcell.QueryAsync(filePath, PurTable.FromColumns(dynamicColumns)))
+        foreach (IDictionary<string, object?> item in await Purcell.QueryAsync(filePath, PurTable.From(dynamicColumns)))
         {
             rowIndex++;
             testHelper.WriteLine($"第 {rowIndex + 1} 行：");
@@ -112,7 +112,7 @@ public partial class Tests_Query_Dictionary
             PurColumn.FromProperty(nameof(EmployeeNoAttr.PlaceName)).AddName("PLACE.*")
                 .WithMatchStrategy(MatchStrategy.IgnoreCaseRegex)
         ];
-        foreach (IDictionary<string, object?> item in Purcell.Query(filePath, PurTable.FromColumns(dynamicColumns)))
+        foreach (IDictionary<string, object?> item in Purcell.Query(filePath, PurTable.From(dynamicColumns)))
         {
             rowIndex++;
             testHelper.WriteLine($"第 {rowIndex + 1} 行：");
@@ -197,7 +197,7 @@ public partial class Tests_Query_Dictionary
         ];
         await using FileStream fileStream = File.OpenRead(filePath);
         foreach (IDictionary<string, object?> item in await Purcell.QueryAsync(fileStream, queryType,
-                     PurTable.FromColumns(dynamicColumns)))
+                     PurTable.From(dynamicColumns)))
         {
             rowIndex++;
             testHelper.WriteLine($"第 {rowIndex + 1} 行：");
@@ -281,7 +281,7 @@ public partial class Tests_Query_Dictionary
                 .WithMatchStrategy(MatchStrategy.IgnoreCaseRegex)
         ];
         using FileStream fileStream = File.OpenRead(filePath);
-        foreach (IDictionary<string, object?> item in Purcell.Query(fileStream, queryType, PurTable.FromColumns(dynamicColumns)))
+        foreach (IDictionary<string, object?> item in Purcell.Query(fileStream, queryType, PurTable.From(dynamicColumns)))
         {
             rowIndex++;
             testHelper.WriteLine($"第 {rowIndex + 1} 行：");

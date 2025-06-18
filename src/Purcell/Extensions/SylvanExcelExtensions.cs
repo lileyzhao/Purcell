@@ -65,7 +65,11 @@ internal static class SylvanExcelExtensions
                     return null;
             }
         }
+#if DEBUG
+        catch (Exception ex)
+#else
         catch
+#endif
         {
             if (!ignoreParseError) throw;
 

@@ -27,7 +27,7 @@ internal static class StringExtensions
         }
 
         // 如果没有任何策略需要应用，直接返回原值
-        if (mode != WhiteSpaceMode.Trim && mode != WhiteSpaceMode.RemoveAllSpaces)
+        if (mode != WhiteSpaceMode.Trim && mode != WhiteSpaceMode.RemoveAll)
         {
             return value;
         }
@@ -62,11 +62,12 @@ internal static class StringExtensions
     }
 
     /// <summary>
-    /// 测量文本宽度，宽字符计为2，窄字符计为1
+    /// 测量文本宽度，宽字符计为2，窄字符计为1。
+    /// 中文或全角字符算 2 个宽度单位，英文或数字算 1 个宽度单位。
     /// </summary>
     /// <param name="value">要测量的文本</param>
     /// <param name="adjustment">宽度调整值，默认为2</param>
-    /// <returns>文本的计算宽度</returns>
+    /// <returns>文本的计算宽度。中文或全角字符算 2 个宽度单位，英文或数字算 1 个宽度单位。</returns>
     public static double MeasureText(this string? value, double adjustment = 2)
     {
         if (string.IsNullOrEmpty(value)) return 0;

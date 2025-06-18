@@ -16,7 +16,7 @@ public partial class Tests_Query_Dynamic
         string filePath = $"Resources/{domain}.{extension}";
 
         int rowIndex = -1;
-        PurTable tableConfig = new() { HeaderSpaceMode = WhiteSpaceMode.RemoveAllSpaces };
+        PurTable tableConfig = new() { HeaderSpaceMode = WhiteSpaceMode.RemoveAll };
         List<PurColumn> dynamicColumns =
         [
             PurColumn.FromProperty(nameof(EmployeeNoAttr.FathersName)).AddName("Father's Name"),
@@ -98,7 +98,7 @@ public partial class Tests_Query_Dynamic
         string filePath = $"Resources/{domain}.{extension}";
 
         int rowIndex = -1;
-        PurTable tableConfig = new() { HeaderSpaceMode = WhiteSpaceMode.RemoveAllSpaces };
+        PurTable tableConfig = new() { HeaderSpaceMode = WhiteSpaceMode.RemoveAll };
         List<PurColumn> dynamicColumns =
         [
             PurColumn.FromProperty(nameof(EmployeeNoAttr.FathersName)).AddName("Father's Name"),
@@ -180,7 +180,7 @@ public partial class Tests_Query_Dynamic
         string filePath = $"Resources/{domain}.{extension}";
 
         int rowIndex = -1;
-        PurTable tableConfig = new() { HeaderSpaceMode = WhiteSpaceMode.RemoveAllSpaces };
+        PurTable tableConfig = new() { HeaderSpaceMode = WhiteSpaceMode.RemoveAll };
         List<PurColumn> dynamicColumns =
         [
             PurColumn.FromProperty(nameof(EmployeeNoAttr.FathersName)).AddName("Father's Name"),
@@ -264,7 +264,7 @@ public partial class Tests_Query_Dynamic
         string filePath = $"Resources/{domain}.{extension}";
 
         int rowIndex = -1;
-        PurTable tableConfig = new() { HeaderSpaceMode = WhiteSpaceMode.RemoveAllSpaces };
+        PurTable tableConfig = new() { HeaderSpaceMode = WhiteSpaceMode.RemoveAll };
         List<PurColumn> dynamicColumns =
         [
             PurColumn.FromProperty(nameof(EmployeeNoAttr.FathersName)).AddName("Father's Name"),
