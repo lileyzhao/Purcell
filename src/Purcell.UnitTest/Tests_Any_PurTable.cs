@@ -175,8 +175,8 @@ public class Tests_Any_PurTable(ITestOutputHelper testHelper)
         testHelper.WriteLine($"验证MaxWriteRows9设置：✅");
         File.Delete(filePath);
 
-        var purTable = new PurTable { MaxWriteRows = 6 }.WithRecords(MockData.GetGenericData().Where(t => t != null).ToList());
-        Purcell.Export(purTable, filePath);
+        var tableConfig = new PurTable { MaxWriteRows = 6 }.WithRecords(MockData.GetGenericData().Where(t => t != null).ToList());
+        Purcell.Export(tableConfig, filePath);
         var studentsRows6 = Purcell.Query(filePath, PurTable.From(0)).ToList();
         Assert.Equal(6, studentsRows6.Count); // 确认读取了6行数据
         testHelper.WriteLine($"验证MaxWriteRows6设置：✅");
@@ -268,6 +268,6 @@ public class Tests_Any_PurTable(ITestOutputHelper testHelper)
     [InlineData("xlsx", QueryType.Xlsx), Theory]
     public void Test_IgnoreParseError(string extension, QueryType queryType)
     {
-        // var purTable = new PurTable { IgnoreParseError = true };
+        // var tableConfig = new PurTable { IgnoreParseError = true };
     }
 }

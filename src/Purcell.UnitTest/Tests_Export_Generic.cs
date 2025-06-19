@@ -16,15 +16,15 @@ public class Tests_Export_Generic(ITestOutputHelper testHelper)
 
         List<MockData.Employee?> data = MockData.GetGenericData();
 
-        List<PurTable> sheetDatas =
+        List<PurTable> tableConfigs =
         [
             PurTable.From(data).WithTableStyle(PurStyle.MidnightMagic),
             PurTable.From(data).WithTableStyle(PurStyle.EarthTones).WithHeaderStart("B2"),
             PurTable.From(data).WithTableStyle(PurStyle.SunnyDay).WithHeaderStart(CellLocator.Create(3, 3)),
             PurTable.From(data).WithTableStyle(PurStyle.CozyAutumn).WithHeaderStart(CellLocator.Create(5, 2))
         ];
-        Purcell.Export(sheetDatas, filePath);
-        filePath.Export(sheetDatas); // 覆盖写入文件测试
+        Purcell.Export(tableConfigs, filePath);
+        filePath.Export(tableConfigs); // 覆盖写入文件测试
 
         int rowIndex = -1;
         foreach (IDictionary<string, object?> item in Purcell.Query(filePath))
@@ -57,15 +57,15 @@ public class Tests_Export_Generic(ITestOutputHelper testHelper)
         
         List<MockData.Employee?> data = MockData.GetGenericData();
 
-        List<PurTable> sheetDatas =
+        List<PurTable> tableConfigs =
         [
             PurTable.From(data).WithTableStyle(PurStyle.MidnightMagic),
             PurTable.From(data).WithTableStyle(PurStyle.EarthTones).WithHeaderStart("B2"),
             PurTable.From(data).WithTableStyle(PurStyle.SunnyDay).WithHeaderStart(CellLocator.Create(3, 3)),
             PurTable.From(data).WithTableStyle(PurStyle.CozyAutumn).WithHeaderStart(CellLocator.Create(5, 2))
         ];
-        await Purcell.ExportAsync(sheetDatas, filePath);
-        await filePath.ExportAsync(sheetDatas); // 覆盖写入文件测试
+        await Purcell.ExportAsync(tableConfigs, filePath);
+        await filePath.ExportAsync(tableConfigs); // 覆盖写入文件测试
 
         int rowIndex = -1;
         foreach (IDictionary<string, object?> item in await Purcell.QueryAsync(filePath))
@@ -98,7 +98,7 @@ public class Tests_Export_Generic(ITestOutputHelper testHelper)
 
         List<MockData.Employee?> data = MockData.GetGenericData();
 
-        List<PurTable> sheetDatas =
+        List<PurTable> tableConfigs =
         [
             PurTable.From(data).WithTableStyle(PurStyle.MidnightMagic),
             PurTable.From(data).WithTableStyle(PurStyle.EarthTones).WithHeaderStart("B2"),
@@ -107,13 +107,13 @@ public class Tests_Export_Generic(ITestOutputHelper testHelper)
         ];
         using (FileStream stream = new(filePath, FileMode.CreateNew))
         {
-            Purcell.Export(sheetDatas, stream, exportType);
+            Purcell.Export(tableConfigs, stream, exportType);
         }
 
         // 覆盖写入文件测试
         using (FileStream stream = new(filePath, FileMode.Create))
         {
-            stream.Export(sheetDatas, exportType);
+            stream.Export(tableConfigs, exportType);
         }
 
         // 覆盖并指定类型写入
@@ -122,10 +122,10 @@ public class Tests_Export_Generic(ITestOutputHelper testHelper)
             switch (exportType)
             {
                 case ExportType.Xlsx:
-                    stream.ExportXlsx(sheetDatas);
+                    stream.ExportXlsx(tableConfigs);
                     break;
                 case ExportType.Csv:
-                    stream.ExportCsv(sheetDatas[0]);
+                    stream.ExportCsv(tableConfigs[0]);
                     break;
             }
         }
@@ -161,7 +161,7 @@ public class Tests_Export_Generic(ITestOutputHelper testHelper)
 
         List<MockData.Employee?> data = MockData.GetGenericData();
 
-        List<PurTable> sheetDatas =
+        List<PurTable> tableConfigs =
         [
             PurTable.From(data).WithTableStyle(PurStyle.MidnightMagic),
             PurTable.From(data).WithTableStyle(PurStyle.EarthTones).WithHeaderStart("B2"),
@@ -170,13 +170,13 @@ public class Tests_Export_Generic(ITestOutputHelper testHelper)
         ];
         await using (FileStream stream = new(filePath, FileMode.CreateNew))
         {
-            await Purcell.ExportAsync(sheetDatas, stream, exportType);
+            await Purcell.ExportAsync(tableConfigs, stream, exportType);
         }
 
         // 覆盖写入文件测试
         await using (FileStream stream = new(filePath, FileMode.Create))
         {
-            await stream.ExportAsync(sheetDatas, exportType);
+            await stream.ExportAsync(tableConfigs, exportType);
         }
 
         // 覆盖并指定类型写入
@@ -185,10 +185,10 @@ public class Tests_Export_Generic(ITestOutputHelper testHelper)
             switch (exportType)
             {
                 case ExportType.Xlsx:
-                    await stream.ExportXlsxAsync(sheetDatas);
+                    await stream.ExportXlsxAsync(tableConfigs);
                     break;
                 case ExportType.Csv:
-                    await stream.ExportCsvAsync(sheetDatas[0]);
+                    await stream.ExportCsvAsync(tableConfigs[0]);
                     break;
             }
         }

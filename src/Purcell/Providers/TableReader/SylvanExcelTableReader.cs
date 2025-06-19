@@ -7,8 +7,7 @@ namespace PurcellLibs.Providers.TableReader;
 /// </summary>
 internal class SylvanExcelTableReader : TableReaderBase
 {
-    private int _disposed;
-    private readonly ExcelDataReader _reader;
+    private readonly ExcelWorkbookType _workbookType;
 
     /// <inheritdoc/>
     public SylvanExcelTableReader(Stream stream, QueryType queryType, bool ownsStream = false)
@@ -16,7 +15,7 @@ internal class SylvanExcelTableReader : TableReaderBase
     {
         if (FileUtils.IsTextFile(stream)) throw new NotSupportedException("不是有效的Excel文件，请检查文件格式");
 
-        ExcelWorkbookType workbookType = queryType switch
+        _workbookType = queryType switch
         {
             QueryType.Xlsx => ExcelWorkbookType.ExcelXml,
             QueryType.Xlsb => ExcelWorkbookType.ExcelBinary,
@@ -25,46 +24,59 @@ internal class SylvanExcelTableReader : TableReaderBase
         };
 
         // 创建 Excel 读取器
-        _reader = ExcelDataReader.Create(
+        using ExcelDataReader reader = ExcelDataReader.Create(
             stream,
-            workbookType,
-            new ExcelDataReaderOptions { Schema = ExcelSchema.NoHeaders, ReadHiddenWorksheets = true, GetErrorAsNull = true }
+            _workbookType,
+            new ExcelDataReaderOptions
+            {
+                Schema = ExcelSchema.NoHeaders, ReadHiddenWorksheets = true, GetErrorAsNull = true, OwnsStream = false
+            }
         );
 
-        Worksheets = _reader.WorksheetNames.ToList();
+        Worksheets = reader.WorksheetNames.ToList();
     }
 
     protected override IEnumerable<IDictionary<int, object?>> ReadCore(PurTable tableConfig, IProgress<int>? progress = null,
         CancellationToken cancelToken = default)
     {
-        _tableConfig = tableConfig;
-        LocateSheet(_tableConfig); // 定位工作表
+        TableConfig = tableConfig;
+        _stream.Position = 0; // 重置流位置以确保从头开始读取
+        using ExcelDataReader reader = ExcelDataReader.Create( // 创建 Excel 读取器
+            _stream,
+            _workbookType,
+            new ExcelDataReaderOptions
+            {
+                Schema = ExcelSchema.NoHeaders, ReadHiddenWorksheets = true, GetErrorAsNull = true, OwnsStream = false
+            }
+        );
+
+        LocateSheet(TableConfig, reader); // 定位工作表
 
         // 获取表头和数据起始位置
-        CellLocator headerStart = _tableConfig.GetHeaderStart();
-        CellLocator dataStart = _tableConfig.GetDataStart();
+        CellLocator headerStart = TableConfig.GetHeaderStart();
+        CellLocator dataStart = TableConfig.GetDataStart();
 
         int columnLength = 0;
         int rowIndex = -1;
-        while (_reader.Read())
+        while (reader.Read())
         {
             rowIndex++;
             progress?.Report(rowIndex + 1); // 报告进度
             cancelToken.ThrowIfCancellationRequested(); // 检查任务取消
 
             // 读取表头并把表头作为第一行数据返回且记录表头行的列数作为数据的列数
-            if (_tableConfig.HasHeader && rowIndex == headerStart.RowIndex)
+            if (TableConfig.HasHeader && rowIndex == headerStart.RowIndex)
             {
-                if (_reader.RowFieldCount == 0) throw new InvalidDataException($"无法解析表头：第 {rowIndex + 1} 行为空行");
+                if (reader.RowFieldCount == 0) throw new InvalidDataException($"无法解析表头：第 {rowIndex + 1} 行为空行");
 
-                columnLength = _reader.RowFieldCount; // 记录表头行列数
+                columnLength = reader.RowFieldCount; // 记录表头行列数
                 Dictionary<int, object?> headerData = new();
 
                 for (int colIndex = 0; colIndex < columnLength; colIndex++)
                 {
                     headerData[colIndex] = colIndex < headerStart.ColumnIndex
                         ? null
-                        : _reader.GetExcelValueSafely(colIndex, rowIndex, _tableConfig.IgnoreParseError);
+                        : reader.GetExcelValueSafely(colIndex, rowIndex, TableConfig.IgnoreParseError);
                 }
 
                 yield return headerData;
@@ -74,14 +86,14 @@ internal class SylvanExcelTableReader : TableReaderBase
 
             // ⬇⬇⬇ 读取行数据
 
-            if (columnLength == 0) columnLength = _reader.RowFieldCount;
+            if (columnLength == 0) columnLength = reader.RowFieldCount;
             Dictionary<int, object?> rowData = new();
 
             for (int colIndex = 0; colIndex < columnLength; colIndex++)
             {
-                rowData[colIndex] = colIndex < headerStart.ColumnIndex || colIndex >= _reader.RowFieldCount
+                rowData[colIndex] = colIndex < headerStart.ColumnIndex || colIndex >= reader.RowFieldCount
                     ? null
-                    : _reader.GetExcelValueSafely(colIndex, rowIndex, _tableConfig.IgnoreParseError);
+                    : reader.GetExcelValueSafely(colIndex, rowIndex, TableConfig.IgnoreParseError);
             }
 
             yield return rowData;
@@ -93,38 +105,25 @@ internal class SylvanExcelTableReader : TableReaderBase
     /// 并将Excel读取器指针移动到该工作表位置。
     /// </summary>
     /// <param name="tableConfig">包含工作表定位信息的配置对象</param>
+    /// <param name="reader">读取器</param>
     /// <exception cref="IndexOutOfRangeException">当指定的工作表索引超出有效范围时抛出</exception>
-    private void LocateSheet(PurTable tableConfig)
+    private void LocateSheet(PurTable tableConfig, ExcelDataReader reader)
     {
         if (tableConfig.SheetIndex < 0)
             throw new InvalidOperationException("工作表索引不能小于0");
 
         int targetIndex = tableConfig.SheetIndex;
 
-        if (!string.IsNullOrEmpty(tableConfig.SheetName) && Worksheets.IndexOf(tableConfig.SheetName) >= 0)
-            targetIndex = Worksheets.IndexOf(tableConfig.SheetName);
+        List<string> worksheets = reader.WorksheetNames.ToList();
+
+        if (!string.IsNullOrEmpty(tableConfig.SheetName) && worksheets.IndexOf(tableConfig.SheetName) >= 0)
+            targetIndex = worksheets.IndexOf(tableConfig.SheetName);
 
         // 检查指定的targetIndex是否在有效范围内
-        if (targetIndex > Worksheets.Count - 1)
-            throw new IndexOutOfRangeException($"工作表索引超出范围：索引 {targetIndex} 超过了工作表总数 {Worksheets.Count}");
+        if (targetIndex > worksheets.Count - 1)
+            throw new IndexOutOfRangeException($"工作表索引超出范围：索引 {targetIndex} 超过了工作表总数 {worksheets.Count}");
 
         // 定位到目标工作表：默认从第一个工作表开始，逐步移动到目标工作表
-        for (int i = 0; i < targetIndex; i++) _reader.NextResult();
-    }
-
-    /// <inheritdoc/>
-    protected override async ValueTask DisposeAsyncCore()
-    {
-        await _reader.DisposeAsync();
-        await base.DisposeAsyncCore();
-    }
-
-    /// <inheritdoc/>
-    protected override void Dispose(bool disposing)
-    {
-        if (Interlocked.Exchange(ref _disposed, 1) != 0) return;
-        if (!disposing) return;
-        _reader.Dispose();
-        base.Dispose(disposing);
+        for (int i = 0; i < targetIndex; i++) reader.NextResult();
     }
 }

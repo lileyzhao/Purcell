@@ -64,7 +64,7 @@ public static class PurConstants
     /// </remarks>
     /// <seealso cref="DayTicksL"/>
     public static readonly double DayTicks = 864000000000.0;
-    
+
     /// <summary>
     /// 一天的时钟周期数（Ticks）- long 类型。
     /// </summary>

@@ -1,4 +1,5 @@
 using LargeXlsx;
+using SharpCompress.Compressors.Deflate;
 using DateTimeConverter = PurcellLibs.Converters.DateTimeConverter;
 
 namespace PurcellLibs.Providers.TableWriter;
@@ -18,59 +19,65 @@ internal class LargeXlsxTableWriter : TableWriterBase
     public LargeXlsxTableWriter(Stream stream, bool ownsStream = false)
         : base(stream, ownsStream)
     {
-        _writer = new XlsxWriter(stream);
+        _writer = new XlsxWriter(stream, CompressionLevel.BestSpeed, false, false);
     }
 
     /// <inheritdoc/>
-    public override void WriteTable(IList<PurTable> tableList,
+    public override void WriteTable(IList<PurTable> tableConfigs,
         IProgress<WritePosition>? progress = null, CancellationToken cancelToken = default)
     {
-        if (tableList == null || tableList.Count == 0)
-            throw new ArgumentNullException(nameof(tableList), "工作表数据集合不能为空");
+        if (tableConfigs == null || tableConfigs.Count == 0)
+            throw new ArgumentNullException(nameof(tableConfigs), "工作表数据集合不能为空");
 
-        foreach ((PurTable sheetData, int sheetIndex) in tableList.Select((v, i) => (v, i)))
+        foreach ((PurTable tableConfig, int sheetIndex) in tableConfigs.Select((v, i) => (v, i)))
         {
             cancelToken.ThrowIfCancellationRequested(); // 检查任务取消
 
+            CellLocator headerStart = tableConfig.GetHeaderStart();
+            PurStyle tableStyle = tableConfig.GetActualStyle();
+            
             // xlsx列宽
-            List<XlsxColumn> xlsxColumns = sheetData.CombinedColumns
-                .Select(ec => XlsxColumn.Formatted(ec.Width, hidden: ec.IsHidden))
+            List<XlsxColumn> xlsxColumns = tableConfig.CombinedColumns
+                .Select(ec =>
+                    XlsxColumn.Formatted(Math.Max(ec.Width, tableStyle.MinColumnWidth), hidden: ec.IsHidden))
                 .ToList();
 
             // 把跳列部分包含到列集合中
             xlsxColumns.InsertRange(0,
-                Enumerable.Repeat(XlsxColumn.Formatted(sheetData.TableStyle.MinColumnWidth),
-                        sheetData.GetHeaderStart().ColumnIndex)
+                Enumerable.Repeat(XlsxColumn.Formatted(tableStyle.MinColumnWidth), headerStart.ColumnIndex)
                     .ToList());
 
             // 开始写工作表: 先设置Sheet名称、xlsx列宽配置
-            _writer.BeginWorksheet(string.IsNullOrEmpty(sheetData.SheetName) ? $"Sheet{sheetIndex + 1}" : sheetData.SheetName,
+            _writer.BeginWorksheet(string.IsNullOrEmpty(tableConfig.SheetName) ? $"Sheet{sheetIndex + 1}" : tableConfig.SheetName,
                 columns: xlsxColumns);
 
             // 输出表头，先跳行，再设置表头样式，再开始行，再跳列，最后循环输出表头
-            _writer
-                .SkipRows(sheetData.GetHeaderStart().RowIndex)
-                .SetDefaultStyle(sheetData.TableStyle.HeaderStyle)
-                .BeginRow()
-                .SkipColumns(sheetData.GetHeaderStart().ColumnIndex);
-            foreach (string colName in sheetData.CombinedColumns.Select(ec => ec.PrimaryName ?? string.Empty))
+            if (tableConfig.HasHeader)
             {
-                _writer.Write(colName);
+                _writer
+                    .SkipRows(headerStart.RowIndex)
+                    .SetDefaultStyle(tableStyle.HeaderStyle)
+                    .BeginRow()
+                    .SkipColumns(headerStart.ColumnIndex);
+                foreach (string colName in tableConfig.CombinedColumns.Select(ec => ec.PrimaryName ?? string.Empty))
+                {
+                    _writer.Write(colName);
+                }
             }
 
             // 设置内容样式
-            _writer.SetDefaultStyle(sheetData.TableStyle.ContentStyle);
+            _writer.SetDefaultStyle(tableStyle.ContentStyle);
 
             // 核心：输出内容
-            WriteRowData(sheetData, sheetIndex, progress, cancelToken);
+            WriteRowData(tableConfig, sheetIndex, progress, cancelToken);
 
             // 设置自动筛选
-            if (sheetData.AutoFilter)
+            if (tableConfig.AutoFilter)
             {
                 try
                 {
-                    _writer.SetAutoFilter(sheetData.GetHeaderStart().RowIndex + 1, sheetData.GetHeaderStart().ColumnIndex + 1,
-                        1, sheetData.CombinedColumns.Count);
+                    _writer.SetAutoFilter(headerStart.RowIndex + 1, headerStart.ColumnIndex + 1,
+                        1, tableConfig.CombinedColumns.Count);
                 }
                 catch (Exception ex)
                 {
@@ -79,9 +86,9 @@ internal class LargeXlsxTableWriter : TableWriterBase
             }
 
             // 设置密码保护
-            if (!string.IsNullOrEmpty(sheetData.Password))
+            if (!string.IsNullOrEmpty(tableConfig.Password))
             {
-                _writer.SetSheetProtection(new XlsxSheetProtection(sheetData.Password));
+                _writer.SetSheetProtection(new XlsxSheetProtection(tableConfig.Password));
             }
         }
     }
@@ -100,10 +107,10 @@ internal class LargeXlsxTableWriter : TableWriterBase
 
         CellLocator dataStart = tableConfig.GetDataStart();
         int dataIndex = 0; // 数据行计数器
-        foreach ((IDictionary<string, object?>? rowItem, int rowIndex) in tableConfig.Records.Select((v, i) => (v, i)))
+        foreach (IDictionary<string, object?>? rowItem in tableConfig.Records)
         {
             cancelToken.ThrowIfCancellationRequested(); // 检查任务取消
-            progress?.Report(WritePosition.New(sheetIndex, rowIndex)); // 报告进度
+            if (dataIndex % 100 == 0) progress?.Report(WritePosition.New(sheetIndex, dataIndex)); // 报告进度
 
             if (tableConfig.MaxWriteRows >= 0 && dataIndex >= tableConfig.MaxWriteRows)
                 break; // 如果已达到最大写出行数，则停止写入
@@ -133,7 +140,7 @@ internal class LargeXlsxTableWriter : TableWriterBase
 
                 // 获取单元格值
                 object? cellValue = rowItem[excelColumn.PropertyName];
-                
+
                 // 跳过空值
                 if (cellValue == null || cellValue == DBNull.Value || string.IsNullOrEmpty(cellValue.ToString()))
                 {
@@ -145,9 +152,11 @@ internal class LargeXlsxTableWriter : TableWriterBase
                 // 根据不同数据类型写入单元格
                 WriteCellValue(cellValue, excelColumn);
             }
-            
+
             dataIndex++; // 增加数据行计数器
         }
+
+        progress?.Report(WritePosition.New(sheetIndex, dataIndex)); // 报告进度
     }
 
     /// <summary>

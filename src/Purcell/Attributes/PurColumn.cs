@@ -9,7 +9,7 @@ public class PurColumn : Attribute, IPurColumn
     #region 构造函数
 
     /// <summary>
-    /// 创建一个新的 <see cref="PurColumn"/> 实例。
+    /// 创建新的 <see cref="PurColumn"/> 实例。
     /// </summary>
     public PurColumn()
     {
@@ -19,6 +19,7 @@ public class PurColumn : Attribute, IPurColumn
     /// 通过列索引创建 <see cref="PurColumn"/> 实例。
     /// </summary>
     /// <param name="index">列索引（从 0 开始），范围为 0-16383。</param>
+    /// <exception cref="ArgumentOutOfRangeException">当 <paramref name="index"/> 不在 0-16383 范围内时抛出。</exception>
     public PurColumn(int index)
     {
         Index = index;
@@ -28,6 +29,7 @@ public class PurColumn : Attribute, IPurColumn
     /// 通过列名集合创建 <see cref="PurColumn"/> 实例。
     /// </summary>
     /// <param name="names">列名集合，用于匹配表格列名。</param>
+    /// <exception cref="ArgumentNullException">当 <paramref name="names"/> 为 null 时抛出。</exception>
     public PurColumn(params string[] names)
     {
         Names = names.ToList();
@@ -37,7 +39,7 @@ public class PurColumn : Attribute, IPurColumn
     /// 通过属性反射信息创建 <see cref="PurColumn"/> 实例。
     /// </summary>
     /// <param name="propertyInfo">要映射的属性的反射信息。</param>
-    /// <exception cref="ArgumentException">当传入的属性反射信息为 null 时抛出。</exception>
+    /// <exception cref="ArgumentNullException">当 <paramref name="propertyInfo"/> 为 null 时抛出。</exception>
     public PurColumn(PropertyInfo propertyInfo)
     {
         Property = propertyInfo;
@@ -47,7 +49,7 @@ public class PurColumn : Attribute, IPurColumn
 
     private int _index = -1;
 
-    /// <inheritdoc cref="IPurColumn.Index"/>
+    /// <inheritdoc cref="IPurColumn.Index" />
     public int Index
     {
         get => _index;
@@ -68,7 +70,7 @@ public class PurColumn : Attribute, IPurColumn
 
     private string _indexLetter = string.Empty;
 
-    /// <inheritdoc cref="IPurColumn.IndexLetter"/>
+    /// <inheritdoc cref="IPurColumn.IndexLetter" />
     public string IndexLetter
     {
         get => _indexLetter;
@@ -87,7 +89,7 @@ public class PurColumn : Attribute, IPurColumn
 
     private List<string> _names = [];
 
-    /// <inheritdoc cref="IPurColumn.Names"/>
+    /// <inheritdoc cref="IPurColumn.Names" />
     public List<string> Names
     {
         get => _names;
@@ -109,30 +111,30 @@ public class PurColumn : Attribute, IPurColumn
     /// </summary>
     internal string? PrimaryName => _names.Count > 0 ? _names[0] : null;
 
-    /// <inheritdoc cref="IPurColumn.IsRequired"/>
+    /// <inheritdoc cref="IPurColumn.IsRequired" />
     public bool IsRequired { get; set; } // TODO: 此功能尚未实现
 
-    /// <inheritdoc cref="IPurColumn.DefaultValue"/>
+    /// <inheritdoc cref="IPurColumn.DefaultValue" />
     public object? DefaultValue { get; set; }
 
-    /// <inheritdoc cref="IPurColumn.Format"/>
+    /// <inheritdoc cref="IPurColumn.Format" />
     public string? Format { get; set; }
 
-    /// <inheritdoc cref="IPurColumn.TrimValue"/>
+    /// <inheritdoc cref="IPurColumn.TrimValue" />
     public bool TrimValue { get; set; }
 
-    /// <inheritdoc cref="IPurColumn.MatchStrategy"/>
+    /// <inheritdoc cref="IPurColumn.MatchStrategy" />
     public MatchStrategy MatchStrategy { get; set; } = MatchStrategy.IgnoreCase;
 
-    /// <inheritdoc cref="IPurColumn.IgnoreInQuery"/>
+    /// <inheritdoc cref="IPurColumn.IgnoreInQuery" />
     public bool IgnoreInQuery { get; set; } // TODO: 此功能尚未实现
 
-    /// <inheritdoc cref="IPurColumn.IgnoreInExport"/>
+    /// <inheritdoc cref="IPurColumn.IgnoreInExport" />
     public bool IgnoreInExport { get; set; } // TODO: 此功能尚未实现
 
     private string _propertyName = string.Empty;
 
-    /// <inheritdoc cref="IPurColumn.PropertyName"/>
+    /// <inheritdoc cref="IPurColumn.PropertyName" />
     public string PropertyName
     {
         get => _propertyName;
@@ -147,7 +149,7 @@ public class PurColumn : Attribute, IPurColumn
         }
     }
 
-    /// <inheritdoc cref="IPurColumn.ValueConverter"/>
+    /// <inheritdoc cref="IPurColumn.ValueConverter" />
     public IValueConverter? ValueConverter
     {
         get;
@@ -202,33 +204,33 @@ public class PurColumn : Attribute, IPurColumn
         }
     }
 
-    /// <inheritdoc cref="IPurColumn.Width"/>
+    /// <inheritdoc cref="IPurColumn.Width" />
     public double Width { get; set; }
 
     /// <summary>
-    /// 标记该列的宽度是否为自定义设置。
+    /// 标记列的宽度是否为自定义设置。
     /// </summary>
     internal bool IsCustomWidth { get; set; }
 
-    /// <inheritdoc cref="IPurColumn.HeaderHAlign"/>
+    /// <inheritdoc cref="IPurColumn.HeaderHAlign" />
     public HAlign HeaderHAlign { get; set; } // TODO: 此功能尚未实现
 
-    /// <inheritdoc cref="IPurColumn.HeaderVAlign"/>
+    /// <inheritdoc cref="IPurColumn.HeaderVAlign" />
     public VAlign HeaderVAlign { get; set; } // TODO: 此功能尚未实现
 
-    /// <inheritdoc cref="IPurColumn.ContentHAlign"/>
+    /// <inheritdoc cref="IPurColumn.ContentHAlign" />
     public HAlign ContentHAlign { get; set; } // TODO: 此功能尚未实现
 
-    /// <inheritdoc cref="IPurColumn.ContentVAlign"/>
+    /// <inheritdoc cref="IPurColumn.ContentVAlign" />
     public VAlign ContentVAlign { get; set; } // TODO: 此功能尚未实现
 
-    /// <inheritdoc cref="IPurColumn.IsHidden"/>
+    /// <inheritdoc cref="IPurColumn.IsHidden" />
     public bool IsHidden { get; set; } // TODO: 此功能尚未实现
 
     #region 静态工厂方法
 
     /// <summary>
-    /// 创建一个新的 <see cref="PurColumn"/> 实例，等价于 <c>new PurColumn()</c>。
+    /// 创建新的 <see cref="PurColumn"/> 实例，等价于 <c>new PurColumn()</c>。
     /// </summary>
     /// <returns>返回新的 <see cref="PurColumn"/> 实例。</returns>
     public static PurColumn New()
@@ -241,6 +243,7 @@ public class PurColumn : Attribute, IPurColumn
     /// </summary>
     /// <param name="index">列索引，从 0 开始计数，范围为 0-16383。</param>
     /// <returns>返回新的 <see cref="PurColumn"/> 实例。</returns>
+    /// <exception cref="ArgumentOutOfRangeException">当 <paramref name="index"/> 不在 0-16383 范围内时抛出。</exception>
     public static PurColumn From(int index)
     {
         return new PurColumn(index);
@@ -251,6 +254,7 @@ public class PurColumn : Attribute, IPurColumn
     /// </summary>
     /// <param name="names">列名集合，用于匹配表格列名。</param>
     /// <returns>返回新的 <see cref="PurColumn"/> 实例。</returns>
+    /// <exception cref="ArgumentNullException">当 <paramref name="names"/> 为 null 时抛出。</exception>
     public static PurColumn From(params string[] names)
     {
         return new PurColumn(names);
@@ -261,7 +265,7 @@ public class PurColumn : Attribute, IPurColumn
     /// </summary>
     /// <param name="propertyInfo">要映射的属性的反射信息。</param>
     /// <returns>返回新的 <see cref="PurColumn"/> 实例。</returns>
-    /// <exception cref="ArgumentException">当传入的属性反射信息为 null 时抛出。</exception>
+    /// <exception cref="ArgumentNullException">当 <paramref name="propertyInfo"/> 为 null 时抛出。</exception>
     public static PurColumn From(PropertyInfo propertyInfo)
     {
         return new PurColumn(propertyInfo);
@@ -272,6 +276,7 @@ public class PurColumn : Attribute, IPurColumn
     /// </summary>
     /// <param name="index">列索引，从 0 开始计数，范围为 0-16383。</param>
     /// <returns>返回新的 <see cref="PurColumn"/> 实例。</returns>
+    /// <exception cref="ArgumentOutOfRangeException">当 <paramref name="index"/> 不在 0-16383 范围内时抛出。</exception>
     public static PurColumn FromIndex(int index)
     {
         return new PurColumn(index);
@@ -293,6 +298,7 @@ public class PurColumn : Attribute, IPurColumn
     /// </summary>
     /// <param name="names">列名集合，用于匹配表格列名。</param>
     /// <returns>返回新的 <see cref="PurColumn"/> 实例。</returns>
+    /// <exception cref="ArgumentNullException">当 <paramref name="names"/> 为 null 时抛出。</exception>
     public static PurColumn FromNames(params string[] names)
     {
         return new PurColumn(names);
@@ -314,7 +320,7 @@ public class PurColumn : Attribute, IPurColumn
     /// </summary>
     /// <param name="propertyInfo">要映射的属性的反射信息。</param>
     /// <returns>返回新的 <see cref="PurColumn"/> 实例。</returns>
-    /// <exception cref="ArgumentException">当传入的属性反射信息为 null 时抛出。</exception>
+    /// <exception cref="ArgumentNullException">当 <paramref name="propertyInfo"/> 为 null 时抛出。</exception>
     public static PurColumn FromProperty(PropertyInfo propertyInfo)
     {
         return new PurColumn(propertyInfo);
@@ -324,42 +330,42 @@ public class PurColumn : Attribute, IPurColumn
 
     #region Fluent API
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurColumn.WithIndex(int)" />
     public PurColumn WithIndex(int index)
     {
         Index = index;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurColumn.WithIndex(string)" />
     public PurColumn WithIndex(string indexLetter)
     {
         IndexLetter = indexLetter;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurColumn.WithIndexLetter" />
     public PurColumn WithIndexLetter(string indexLetter)
     {
         IndexLetter = indexLetter;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurColumn.WithNames(IEnumerable{string})" />
     public PurColumn WithNames(IEnumerable<string> names)
     {
         Names = names.ToList();
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurColumn.WithNames(string[])" />
     public PurColumn WithNames(params string[] names)
     {
         Names = names.ToList();
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurColumn.AddName" />
     public PurColumn AddName(string name)
     {
         if (!string.IsNullOrEmpty(name) && !_names.Contains(name))
@@ -368,7 +374,7 @@ public class PurColumn : Attribute, IPurColumn
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurColumn.AddNames" />
     public PurColumn AddNames(params string[] names)
     {
         foreach (string name in names.Where(n => !string.IsNullOrEmpty(n)).Distinct())
@@ -379,70 +385,70 @@ public class PurColumn : Attribute, IPurColumn
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurColumn.WithIsRequired" />
     public PurColumn WithIsRequired(bool isRequired)
     {
         IsRequired = isRequired;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurColumn.WithDefaultValue" />
     public PurColumn WithDefaultValue(object defaultValue)
     {
         DefaultValue = defaultValue;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurColumn.WithFormat" />
     public PurColumn WithFormat(string format)
     {
         Format = format;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurColumn.WithTrimValue" />
     public PurColumn WithTrimValue(bool trimValue)
     {
         TrimValue = trimValue;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurColumn.WithMatchStrategy" />
     public PurColumn WithMatchStrategy(MatchStrategy matchStrategy)
     {
         MatchStrategy = matchStrategy;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurColumn.WithIgnoreInQuery" />
     public PurColumn WithIgnoreInQuery(bool ignore)
     {
         IgnoreInQuery = ignore;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurColumn.WithIgnoreInExport" />
     public PurColumn WithIgnoreInExport(bool ignore)
     {
         IgnoreInExport = ignore;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurColumn.WithProperty(string)" />
     public PurColumn WithProperty(string propertyName)
     {
         PropertyName = propertyName;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurColumn.WithProperty(PropertyInfo)" />
     public PurColumn WithProperty(PropertyInfo propertyInfo)
     {
         Property = propertyInfo;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurColumn.SetConverter" />
     public PurColumn SetConverter(IValueConverter? converter)
     {
         ValueConverter = converter;
@@ -454,13 +460,14 @@ public class PurColumn : Attribute, IPurColumn
     /// </summary>
     /// <param name="propertyType">要映射的属性类型。</param>
     /// <returns>返回当前实例以支持链式调用。</returns>
+    /// <exception cref="ArgumentNullException">当 <paramref name="propertyType"/> 为 null 时抛出。</exception>
     internal PurColumn WithPropertyType(Type propertyType)
     {
         PropertyType = propertyType;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurColumn.WithWidth" />
     public PurColumn WithWidth(double width)
     {
         Width = width;
@@ -468,35 +475,35 @@ public class PurColumn : Attribute, IPurColumn
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurColumn.WithHeaderHAlign" />
     public PurColumn WithHeaderHAlign(HAlign headerHAlign)
     {
         HeaderHAlign = headerHAlign;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurColumn.WithHeaderVAlign" />
     public PurColumn WithHeaderVAlign(VAlign headerVAlign)
     {
         HeaderVAlign = headerVAlign;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurColumn.WithContentHAlign" />
     public PurColumn WithContentHAlign(HAlign contentHAlign)
     {
         ContentHAlign = contentHAlign;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurColumn.WithContentVAlign" />
     public PurColumn WithContentVAlign(VAlign contentVAlign)
     {
         ContentVAlign = contentVAlign;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurColumn.WithIsHidden" />
     public PurColumn WithIsHidden(bool isHidden)
     {
         IsHidden = isHidden;
@@ -505,7 +512,7 @@ public class PurColumn : Attribute, IPurColumn
 
     #endregion Fluent API
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurColumn.Clone" />
     public PurColumn Clone()
     {
         PurColumn clone = (PurColumn)MemberwiseClone();

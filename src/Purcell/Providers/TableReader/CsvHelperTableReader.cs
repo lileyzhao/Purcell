@@ -20,7 +20,7 @@ internal class CsvHelperTableReader : TableReaderBase
     protected override IEnumerable<IDictionary<int, object?>> ReadCore(PurTable tableConfig, IProgress<int>? progress = null,
         CancellationToken cancelToken = default)
     {
-        _tableConfig = tableConfig;
+        TableConfig = tableConfig;
 
         // 创建 CsvReader 配置(无头读取)
         CsvConfiguration config = new(tableConfig.GetCulture())
@@ -30,14 +30,14 @@ internal class CsvHelperTableReader : TableReaderBase
             Escape = tableConfig.CsvEscape
         };
 
-        // 获取表头和数据起始位置
-        CellLocator headerStart = _tableConfig.GetHeaderStart();
-        CellLocator dataStart = _tableConfig.GetDataStart();
-
         // 创建 CsvReader 读取器
         using StreamReader streamReader = new(_stream,
-            tableConfig.GetEncoding() ?? EncodingUtils.DetectEncoding(_stream) ?? Encoding.UTF8);
+            tableConfig.GetFileEncoding() ?? EncodingUtils.DetectEncoding(_stream) ?? Encoding.UTF8);
         using CsvReader reader = new(streamReader, config);
+
+        // 获取表头和数据起始位置
+        CellLocator headerStart = TableConfig.GetHeaderStart();
+        CellLocator dataStart = TableConfig.GetDataStart();
 
         int columnLength = 0;
         int rowIndex = -1;
@@ -48,7 +48,7 @@ internal class CsvHelperTableReader : TableReaderBase
             cancelToken.ThrowIfCancellationRequested(); // 检查任务取消
 
             // 读取表头并把表头作为第一行数据返回且记录表头行的列数作为数据的列数
-            if (_tableConfig.HasHeader && rowIndex == headerStart.RowIndex)
+            if (TableConfig.HasHeader && rowIndex == headerStart.RowIndex)
             {
                 if (row.Keys.Count == 0) throw new InvalidDataException($"无法解析表头：第 {rowIndex + 1} 行为空行");
 
@@ -68,6 +68,7 @@ internal class CsvHelperTableReader : TableReaderBase
             // ⬇⬇⬇ 读取行数据
 
             if (columnLength == 0) columnLength = row.Keys.Count;
+
             Dictionary<int, object?> rowData = new(); // CSV的值永远为string类型
 
             foreach ((string key, int colIndex) in row.Keys.Select((v, i) => (v, i)))

@@ -24,6 +24,8 @@ public class PurTable : Attribute, IPurTable
     /// 通过工作表名称创建 <see cref="PurTable"/> 实例。
     /// </summary>
     /// <param name="sheetName">工作表名称，用于定位要操作的工作表，导出时也用作导出的工作表名。</param>
+    /// <exception cref="ArgumentNullException">当 <paramref name="sheetName"/> 为 null 时抛出。</exception>
+    /// <exception cref="ArgumentOutOfRangeException">当 <paramref name="sheetName"/> 长度超过31个字符时抛出。</exception>
     public PurTable(string sheetName)
     {
         SheetName = sheetName;
@@ -33,6 +35,7 @@ public class PurTable : Attribute, IPurTable
     /// 通过工作表索引创建 <see cref="PurTable"/> 实例。
     /// </summary>
     /// <param name="sheetIndex">工作表索引（从 0 开始），用于定位要操作的工作表（索引序列含隐藏的工作表）。</param>
+    /// <exception cref="ArgumentOutOfRangeException">当 <paramref name="sheetIndex"/> 不在 0-255 范围内时抛出。</exception>
     public PurTable(int sheetIndex)
     {
         SheetIndex = sheetIndex;
@@ -83,22 +86,22 @@ public class PurTable : Attribute, IPurTable
     }
 
     /// <summary>
-    /// 通过动态集合和工作表索引创建 <see cref="PurTable"/> 实例。
+    /// 通过数据集合和工作表索引创建 <see cref="PurTable"/> 实例。
     /// </summary>
     /// <param name="records">要导出的数据集合，可以是对象集合、字典集合或其他可以转换为行数据的集合。</param>
     /// <param name="sheetIndex">工作表索引（从 0 开始），用于定位要操作的工作表（索引序列含隐藏的工作表）。</param>
-    public PurTable(IEnumerable<dynamic?> records, int sheetIndex = 0)
+    public PurTable(IEnumerable<object?> records, int sheetIndex = 0)
     {
         SheetIndex = sheetIndex;
         WithRecords(records);
     }
 
     /// <summary>
-    /// 通过动态集合和工作表名称创建 <see cref="PurTable"/> 实例。
+    /// 通过数据集合和工作表名称创建 <see cref="PurTable"/> 实例。
     /// </summary>
     /// <param name="records">要导出的数据集合，可以是对象集合、字典集合或其他可以转换为行数据的集合。</param>
     /// <param name="sheetName">工作表名称，用于定位要操作的工作表，导出时也用作导出的工作表名。</param>
-    public PurTable(IEnumerable<dynamic?> records, string sheetName)
+    public PurTable(IEnumerable<object?> records, string sheetName)
     {
         SheetName = sheetName;
         WithRecords(records);
@@ -177,7 +180,7 @@ public class PurTable : Attribute, IPurTable
         {
             try
             {
-                _dataStart = new CellLocator(value);
+                _dataStart = value == string.Empty ? CellLocator.Unknown : new CellLocator(value);
             }
             catch (Exception ex)
             {
@@ -194,8 +197,7 @@ public class PurTable : Attribute, IPurTable
         get => _columns;
         set
         {
-            ArgumentNullException.ThrowIfNull(value, "列配置集合不能为 null。");
-
+            value.ThrowIfArgumentNull("列配置集合不能为 null。", nameof(Columns));
             lock (_combinedColumnsLock)
             {
                 _columns = value;
@@ -274,11 +276,11 @@ public class PurTable : Attribute, IPurTable
     /// <inheritdoc cref="IPurTable.MaxWriteRows"/>
     public int MaxWriteRows { get; set; } = -1;
 
-    /// <inheritdoc cref="IPurTable.IgnoreParseError"/>
-    public bool IgnoreParseError { get; set; }
-
     /// <inheritdoc cref="IPurTable.HeaderSpaceMode"/>
     public WhiteSpaceMode HeaderSpaceMode { get; set; } = WhiteSpaceMode.Trim;
+
+    /// <inheritdoc cref="IPurTable.IgnoreParseError"/>
+    public bool IgnoreParseError { get; set; }
 
     private CultureInfo _culture = CultureInfo.InvariantCulture;
 
@@ -290,11 +292,20 @@ public class PurTable : Attribute, IPurTable
         {
             try
             {
-                _culture = new CultureInfo(value);
+                _culture = CultureInfo.GetCultureInfo(value);
+                if (_culture.IsNeutralCulture || _culture.CultureTypes.HasFlag(CultureTypes.NeutralCultures))
+                {
+                    // 检查是否在已知区域性列表中
+                    CultureInfo[] knownCultures = CultureInfo.GetCultures(CultureTypes.AllCultures);
+                    if (!knownCultures.Any(c => string.Equals(c.Name, _culture.Name, StringComparison.OrdinalIgnoreCase)))
+                        throw new ArgumentException(
+                            $"无效的区域性标识符：'{value}'，请使用具体的区域性标识符（如 'zh-CN'、'en-US' 等）。", nameof(Culture));
+                }
             }
             catch (Exception ex)
             {
-                throw new ArgumentException($"无效的区域性标识符：'{value}'，请使用有效的 CultureInfo 名称（如 'zh-CN'、'en-US' 等）。", nameof(Culture), ex);
+                throw new ArgumentException($"无效的区域性标识符：'{value}'，请使用有效的区域性标识符（如 'zh-CN'、'en-US' 等）。", nameof(Culture),
+                    ex);
             }
         }
     }
@@ -319,7 +330,16 @@ public class PurTable : Attribute, IPurTable
             }
             catch (Exception ex)
             {
-                throw new ArgumentException($"无效的编码名称：'{value}'，请使用有效的编码名称（如 'UTF-8'、'GBK' 等）。", nameof(FileEncoding), ex);
+                try
+                {
+                    Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+                    _fileEncoding = Encoding.GetEncoding(value);
+                }
+                catch (Exception)
+                {
+                    throw new ArgumentException($"无效的编码名称：'{value}'，请使用有效的编码名称（如 'UTF-8'、'GBK' 等）。",
+                        nameof(FileEncoding), ex);
+                }
             }
         }
     }
@@ -401,6 +421,9 @@ public class PurTable : Attribute, IPurTable
     /// <inheritdoc cref="IPurTable.TableStyle"/>
     public PurStyle TableStyle { get; set; } = PurStyle.Default;
 
+    /// <inheritdoc cref="IPurTable.PresetStyle"/>
+    public PresetStyle PresetStyle { get; set; } = PresetStyle.Default;
+
     /// <summary>
     /// 元素类型，用于泛型集合导出时指定数据类型。对于非泛型集合、匿名集合，此属性为 null。
     /// </summary>
@@ -438,194 +461,145 @@ public class PurTable : Attribute, IPurTable
         return _culture;
     }
 
-    /// <inheritdoc cref="IPurTable.GetEncoding"/>
-    public Encoding? GetEncoding()
+    /// <inheritdoc cref="IPurTable.GetFileEncoding"/>
+    public Encoding? GetFileEncoding()
     {
         return _fileEncoding;
     }
 
+    /// <inheritdoc cref="IPurTable.GetActualStyle"/>
+    public PurStyle GetActualStyle()
+    {
+        // 1. 如果 TableStyle 不是默认值，优先使用 TableStyle
+        if (!ReferenceEquals(TableStyle, PurStyle.Default))
+            return TableStyle;
+
+        // 2. 如果 PresetStyle 不是默认值，使用 PresetStyle
+        if (PresetStyle != PresetStyle.Default)
+        {
+            return PresetStyle switch
+            {
+                PresetStyle.Default => PurStyle.Default,
+                PresetStyle.BrightFresh => PurStyle.BrightFresh,
+                PresetStyle.ElegantMonochrome => PurStyle.ElegantMonochrome,
+                PresetStyle.EarthTones => PurStyle.EarthTones,
+                PresetStyle.WarmTones => PurStyle.WarmTones,
+                PresetStyle.OceanBlue => PurStyle.OceanBlue,
+                PresetStyle.VintageNostalgia => PurStyle.VintageNostalgia,
+                PresetStyle.MinimalistBw => PurStyle.MinimalistBw,
+                PresetStyle.VibrantEnergy => PurStyle.VibrantEnergy,
+                PresetStyle.RetroChic => PurStyle.RetroChic,
+                PresetStyle.CozyAutumn => PurStyle.CozyAutumn,
+                PresetStyle.SereneNature => PurStyle.SereneNature,
+                PresetStyle.MidnightMagic => PurStyle.MidnightMagic,
+                PresetStyle.SunnyDay => PurStyle.SunnyDay,
+                _ => PurStyle.Default
+            };
+        }
+
+        // 3. 都是默认值，返回默认样式
+        return PurStyle.Default;
+    }
+
     #region 静态工厂方法
 
-    /// <summary>
-    /// 创建一个新的 <see cref="PurTable"/> 实例，等价于 <c>new PurTable()</c>。
-    /// </summary>
-    /// <returns>返回新的 <see cref="PurTable"/> 实例。</returns>
+    /// <inheritdoc cref="PurTable()"/>
     public static PurTable New()
     {
         return new PurTable();
     }
 
-    /// <summary>
-    /// 通过工作表名称创建 <see cref="PurTable"/> 实例，等价于 <c>new PurTable(sheetName)</c>。
-    /// </summary>
-    /// <param name="sheetName">工作表名称，用于定位要操作的工作表，导出时也用作导出的工作表名。</param>
-    /// <returns>返回新的 <see cref="PurTable"/> 实例。</returns>
+    /// <inheritdoc cref="PurTable(string)"/>
     public static PurTable From(string sheetName)
     {
         return new PurTable(sheetName);
     }
 
-    /// <summary>
-    /// 通过工作表索引创建 <see cref="PurTable"/> 实例，等价于 <c>new PurTable(sheetIndex)</c>。
-    /// </summary>
-    /// <param name="sheetIndex">工作表索引（从 0 开始），用于定位要操作的工作表（索引序列含隐藏的工作表）。</param>
-    /// <returns>返回新的 <see cref="PurTable"/> 实例。</returns>
+    /// <inheritdoc cref="PurTable(int)"/>
     public static PurTable From(int sheetIndex)
     {
         return new PurTable(sheetIndex);
     }
 
-    /// <summary>
-    /// 通过列配置集合和工作表索引创建 <see cref="PurTable"/> 实例。
-    /// </summary>
-    /// <param name="dynamicColumns">列配置集合。</param>
-    /// <param name="sheetIndex">工作表索引（从 0 开始），用于定位要操作的工作表（索引序列含隐藏的工作表）。</param>
-    /// <returns>返回新的 <see cref="PurTable"/> 实例。</returns>
+    /// <inheritdoc cref="PurTable(System.Collections.Generic.List{PurcellLibs.PurColumn},int)"/>
     public static PurTable From(List<PurColumn> dynamicColumns, int sheetIndex = 0)
     {
         return new PurTable(dynamicColumns, sheetIndex);
     }
 
-    /// <summary>
-    /// 通过列配置集合和工作表名称创建 <see cref="PurTable"/> 实例。
-    /// </summary>
-    /// <param name="dynamicColumns">列配置集合。</param>
-    /// <param name="sheetName">工作表名称，用于定位要操作的工作表，导出时也用作导出的工作表名。</param>
-    /// <returns>返回新的 <see cref="PurTable"/> 实例。</returns>
+    /// <inheritdoc cref="PurTable(System.Collections.Generic.List{PurcellLibs.PurColumn},string)"/>
     public static PurTable From(List<PurColumn> dynamicColumns, string sheetName)
     {
         return new PurTable(dynamicColumns, sheetName);
     }
 
-    /// <summary>
-    /// 通过 DataTable 和工作表索引创建 <see cref="PurTable"/> 实例。
-    /// </summary>
-    /// <param name="records">要导出的数据表。</param>
-    /// <param name="sheetIndex">工作表索引（从 0 开始），用于定位要操作的工作表（索引序列含隐藏的工作表）。</param>
-    /// <returns>返回新的 <see cref="PurTable"/> 实例。</returns>
+    /// <inheritdoc cref="PurTable(System.Data.DataTable,int)"/>
     public static PurTable From(DataTable records, int sheetIndex = 0)
     {
         return new PurTable(records, sheetIndex);
     }
 
-    /// <summary>
-    /// 通过 DataTable 和工作表名称创建 <see cref="PurTable"/> 实例。
-    /// </summary>
-    /// <param name="records">要导出的数据表。</param>
-    /// <param name="sheetName">工作表名称，用于定位要操作的工作表，导出时也用作导出的工作表名。</param>
-    /// <returns>返回新的 <see cref="PurTable"/> 实例。</returns>
+    /// <inheritdoc cref="PurTable(System.Data.DataTable,string)"/>
     public static PurTable From(DataTable records, string sheetName)
     {
         return new PurTable(records, sheetName);
     }
 
-    /// <summary>
-    /// 通过泛型集合和工作表索引创建 <see cref="PurTable"/> 实例。
-    /// </summary>
-    /// <typeparam name="T">数据类型。</typeparam>
-    /// <param name="records">要导出的数据集合，可以是对象集合、字典集合或其他可以转换为行数据的集合。</param>
-    /// <param name="sheetIndex">工作表索引（从 0 开始），用于定位要操作的工作表（索引序列含隐藏的工作表）。</param>
-    /// <returns>返回新的 <see cref="PurTable"/> 实例。</returns>
+    /// <inheritdoc cref="PurTable(System.Collections.Generic.IEnumerable{object?},int)"/>
     public static PurTable From<T>(IEnumerable<T?> records, int sheetIndex = 0)
     {
         return new PurTable(sheetIndex).WithRecords(records);
     }
 
-    /// <summary>
-    /// 通过泛型集合和工作表名称创建 <see cref="PurTable"/> 实例。
-    /// </summary>
-    /// <typeparam name="T">数据类型。</typeparam>
-    /// <param name="records">要导出的数据集合，可以是对象集合、字典集合或其他可以转换为行数据的集合。</param>
-    /// <param name="sheetName">工作表名称，用于定位要操作的工作表，导出时也用作导出的工作表名。</param>
-    /// <returns>返回新的 <see cref="PurTable"/> 实例。</returns>
+    /// <inheritdoc cref="PurTable(System.Collections.Generic.IEnumerable{object?},string)"/>
     public static PurTable From<T>(IEnumerable<T?> records, string sheetName)
     {
         return new PurTable(sheetName).WithRecords(records);
     }
 
-    /// <summary>
-    /// 通过工作表名称创建 <see cref="PurTable"/> 实例，等价于 <c>new PurTable(sheetName)</c>。
-    /// </summary>
-    /// <param name="sheetName">工作表名称，用于定位要操作的工作表，导出时也用作导出的工作表名。</param>
-    /// <returns>返回新的 <see cref="PurTable"/> 实例。</returns>
+    /// <inheritdoc cref="PurTable(string)"/>
     public static PurTable FromName(string sheetName)
     {
         return new PurTable(sheetName);
     }
 
-    /// <summary>
-    /// 通过工作表索引创建 <see cref="PurTable"/> 实例，等价于 <c>new PurTable(sheetIndex)</c>。
-    /// </summary>
-    /// <param name="sheetIndex">工作表索引（从 0 开始），用于定位要操作的工作表（索引序列含隐藏的工作表）。</param>
-    /// <returns>返回新的 <see cref="PurTable"/> 实例。</returns>
+    /// <inheritdoc cref="PurTable(int)"/>
     public static PurTable FromIndex(int sheetIndex)
     {
         return new PurTable(sheetIndex);
     }
 
-    /// <summary>
-    /// 通过列配置集合和工作表索引创建 <see cref="PurTable"/> 实例。
-    /// </summary>
-    /// <param name="dynamicColumns">列配置集合。</param>
-    /// <param name="sheetIndex">工作表索引（从 0 开始），用于定位要操作的工作表（索引序列含隐藏的工作表）。</param>
-    /// <returns>返回新的 <see cref="PurTable"/> 实例。</returns>
+    /// <inheritdoc cref="PurTable(System.Collections.Generic.List{PurcellLibs.PurColumn},int)"/>
     public static PurTable FromColumns(List<PurColumn> dynamicColumns, int sheetIndex = 0)
     {
         return new PurTable(dynamicColumns, sheetIndex);
     }
 
-    /// <summary>
-    /// 通过列配置集合和工作表名称创建 <see cref="PurTable"/> 实例。
-    /// </summary>
-    /// <param name="dynamicColumns">列配置集合。</param>
-    /// <param name="sheetName">工作表名称，用于定位要操作的工作表，导出时也用作导出的工作表名。</param>
-    /// <returns>返回新的 <see cref="PurTable"/> 实例。</returns>
+    /// <inheritdoc cref="PurTable(System.Collections.Generic.List{PurcellLibs.PurColumn},string)"/>
     public static PurTable FromColumns(List<PurColumn> dynamicColumns, string sheetName)
     {
         return new PurTable(dynamicColumns, sheetName);
     }
 
-    /// <summary>
-    /// 通过 DataTable 和工作表索引创建 <see cref="PurTable"/> 实例。
-    /// </summary>
-    /// <param name="records">要导出的数据表。</param>
-    /// <param name="sheetIndex">工作表索引（从 0 开始），用于定位要操作的工作表（索引序列含隐藏的工作表）。</param>
-    /// <returns>返回新的 <see cref="PurTable"/> 实例。</returns>
+    /// <inheritdoc cref="PurTable(System.Data.DataTable,int)"/>
     public static PurTable FromRecords(DataTable records, int sheetIndex = 0)
     {
         return new PurTable(records, sheetIndex);
     }
 
-    /// <summary>
-    /// 通过 DataTable 和工作表名称创建 <see cref="PurTable"/> 实例。
-    /// </summary>
-    /// <param name="records">要导出的数据表。</param>
-    /// <param name="sheetName">工作表名称，用于定位要操作的工作表，导出时也用作导出的工作表名。</param>
-    /// <returns>返回新的 <see cref="PurTable"/> 实例。</returns>
+    /// <inheritdoc cref="PurTable(System.Data.DataTable,string)"/>
     public static PurTable FromRecords(DataTable records, string sheetName)
     {
         return new PurTable(records, sheetName);
     }
 
-    /// <summary>
-    /// 通过泛型集合和工作表索引创建 <see cref="PurTable"/> 实例。
-    /// </summary>
-    /// <typeparam name="T">数据类型。</typeparam>
-    /// <param name="records">要导出的数据集合，可以是对象集合、字典集合或其他可以转换为行数据的集合。</param>
-    /// <param name="sheetIndex">工作表索引（从 0 开始），用于定位要操作的工作表（索引序列含隐藏的工作表）。</param>
-    /// <returns>返回新的 <see cref="PurTable"/> 实例。</returns>
+    /// <inheritdoc cref="PurTable(System.Collections.Generic.IEnumerable{object?},int)"/>
     public static PurTable FromRecords<T>(IEnumerable<T?> records, int sheetIndex = 0)
     {
         return new PurTable(sheetIndex).WithRecords(records);
     }
 
-    /// <summary>
-    /// 通过泛型集合和工作表名称创建 <see cref="PurTable"/> 实例。
-    /// </summary>
-    /// <typeparam name="T">数据类型。</typeparam>
-    /// <param name="records">要导出的数据集合，可以是对象集合、字典集合或其他可以转换为行数据的集合。</param>
-    /// <param name="sheetName">工作表名称，用于定位要操作的工作表，导出时也用作导出的工作表名。</param>
-    /// <returns>返回新的 <see cref="PurTable"/> 实例。</returns>
+    /// <inheritdoc cref="PurTable(System.Collections.Generic.IEnumerable{object?},string)"/>
     public static PurTable FromRecords<T>(IEnumerable<T?> records, string sheetName)
     {
         return new PurTable(sheetName).WithRecords(records);
@@ -635,42 +609,42 @@ public class PurTable : Attribute, IPurTable
 
     #region Fluent API
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurTable.WithName(string)" />
     public PurTable WithName(string sheetName)
     {
         SheetName = sheetName;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurTable.WithIndex(int)" />
     public PurTable WithIndex(int sheetIndex)
     {
         SheetIndex = sheetIndex;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurTable.WithHasHeader(bool)" />
     public PurTable WithHasHeader(bool hasHeader)
     {
         HasHeader = hasHeader;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurTable.WithoutHeader" />
     public PurTable WithoutHeader()
     {
         HasHeader = false;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurTable.WithHeaderStart(string)" />
     public PurTable WithHeaderStart(string headerStart)
     {
         HeaderStart = headerStart;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurTable.WithHeaderStart(CellLocator)" />
     public PurTable WithHeaderStart(CellLocator headerStart)
     {
         if (headerStart == CellLocator.Unknown)
@@ -680,68 +654,68 @@ public class PurTable : Attribute, IPurTable
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurTable.WithHeaderStart(int, int)" />
     public PurTable WithHeaderStart(int rowIndex, int columnIndex)
     {
         _headerStart = CellLocator.Create(rowIndex, columnIndex);
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurTable.WithDataStart(string)" />
     public PurTable WithDataStart(string dataStart)
     {
         DataStart = dataStart;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurTable.WithDataStart(CellLocator)" />
     public PurTable WithDataStart(CellLocator dataStart)
     {
         _dataStart = dataStart;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurTable.WithDataStart(int, int)" />
     public PurTable WithDataStart(int rowIndex, int columnIndex)
     {
         _dataStart = CellLocator.Create(rowIndex, columnIndex);
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurTable.WithStart(string, string)" />
     public PurTable WithStart(string headerStart, string dataStart)
     {
         return WithHeaderStart(headerStart).WithDataStart(dataStart);
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurTable.WithStart(CellLocator, CellLocator)" />
     public PurTable WithStart(CellLocator headerStart, CellLocator dataStart)
     {
         return WithHeaderStart(headerStart).WithDataStart(dataStart);
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurTable.WithStart(int, int)" />
     public PurTable WithStart(int headerRow, int dataStartRow)
     {
         return WithHeaderStart(CellLocator.Create(headerRow, 0))
             .WithDataStart(CellLocator.Create(dataStartRow, 0));
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurTable.WithColumns(List{PurColumn})" />
     public PurTable WithColumns(List<PurColumn> dynamicColumns)
     {
         Columns = dynamicColumns;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurTable.WithColumns(PurColumn[])" />
     public PurTable WithColumns(PurColumn[] dynamicColumns)
     {
         Columns = dynamicColumns.ToList();
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurTable.AddColumns(List{PurColumn})" />
     public PurTable AddColumns(List<PurColumn> dynamicColumns)
     {
         lock (_combinedColumnsLock)
@@ -753,7 +727,7 @@ public class PurTable : Attribute, IPurTable
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurTable.AddColumns(PurColumn[])" />
     public PurTable AddColumns(PurColumn[] dynamicColumns)
     {
         lock (_combinedColumnsLock)
@@ -765,7 +739,7 @@ public class PurTable : Attribute, IPurTable
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurTable.AddColumn(PurColumn)" />
     public PurTable AddColumn(PurColumn column)
     {
         lock (_combinedColumnsLock)
@@ -777,77 +751,77 @@ public class PurTable : Attribute, IPurTable
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurTable.WithMaxReadRows(int)" />
     public PurTable WithMaxReadRows(int maxReadRows)
     {
         MaxReadRows = maxReadRows >= 0 ? maxReadRows : -1;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurTable.WithMaxWriteRows(int)" />
     public PurTable WithMaxWriteRows(int maxWriteRows)
     {
         MaxWriteRows = maxWriteRows >= 0 ? maxWriteRows : -1;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurTable.WithHeaderSpaceMode(WhiteSpaceMode)" />
     public PurTable WithHeaderSpaceMode(WhiteSpaceMode headerSpaceMode)
     {
         HeaderSpaceMode = headerSpaceMode;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurTable.WithIgnoreParseError(bool)" />
     public PurTable WithIgnoreParseError(bool ignoreParseError)
     {
         IgnoreParseError = ignoreParseError;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurTable.WithCulture(string)" />
     public PurTable WithCulture(string culture)
     {
         Culture = culture;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurTable.WithCulture(CultureInfo)" />
     public PurTable WithCulture(CultureInfo culture)
     {
         Culture = culture.Name;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurTable.WithFileEncoding(string)" />
     public PurTable WithFileEncoding(string fileEncoding)
     {
         FileEncoding = fileEncoding;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurTable.WithFileEncoding(Encoding)" />
     public PurTable WithFileEncoding(Encoding encoding)
     {
         FileEncoding = encoding.EncodingName;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurTable.WithCsvDelimiter(string)" />
     public PurTable WithCsvDelimiter(string csvDelimiter = ",")
     {
         CsvDelimiter = csvDelimiter;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurTable.WithCsvEscape(char)" />
     public PurTable WithCsvEscape(char csvEscape = '"')
     {
         CsvEscape = csvEscape;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurTable.WithRecords(DataTable)" />
     public PurTable WithRecords(DataTable dataTable)
     {
         ArgumentNullException.ThrowIfNull(dataTable);
@@ -877,8 +851,8 @@ public class PurTable : Attribute, IPurTable
         // 基于样本行数据进行列宽自适应计算
         for (int rowIndex = 0; rowIndex < dataTable.Rows.Count; rowIndex++)
         {
-            DataRow rowItem = dataTable.Rows[rowIndex];
             if (rowIndex >= SampleRows) break;
+            DataRow rowItem = dataTable.Rows[rowIndex];
             foreach (PurColumn cc in RecordColumns)
             {
                 string? cellValue = ((object?)rowItem[cc.PropertyName])?.ToString();
@@ -894,6 +868,8 @@ public class PurTable : Attribute, IPurTable
         Records = dataTable.Rows.Cast<DataRow>()
             .Select(row =>
             {
+                if (row.ItemArray.All(r => r == DBNull.Value || r == null)) return null;
+
                 Dictionary<string, object?> dict = new(columnNames.Length);
                 for (int i = 0; i < columnNames.Length; i++)
                 {
@@ -907,7 +883,7 @@ public class PurTable : Attribute, IPurTable
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurTable.WithRecords{T}(IEnumerable{T})" />
     public PurTable WithRecords<T>(IEnumerable<T?> records)
     {
         ArgumentNullException.ThrowIfNull(records);
@@ -953,6 +929,10 @@ public class PurTable : Attribute, IPurTable
         return this;
     }
 
+    /// <summary>
+    /// 处理字典类型的数据集合，从字典键中提取列信息。
+    /// </summary>
+    /// <param name="records">字典类型的数据集合。</param>
     private void WithDictRecords(IEnumerable<IDictionary<string, object?>?> records)
     {
         Records = records;
@@ -994,8 +974,11 @@ public class PurTable : Attribute, IPurTable
     private const int MaxCacheSize = 100; // 限制缓存大小防止内存泄漏
 
     /// <summary>
-    /// 安全地获取类型的属性信息，包含缓存大小限制
+    /// 安全地获取类型的属性信息，包含缓存大小限制。
+    /// 使用 LRU 策略清理缓存，防止内存泄漏。
     /// </summary>
+    /// <param name="type">要获取属性信息的类型。</param>
+    /// <returns>该类型的所有可读属性数组。</returns>
     private static PropertyInfo[] GetCachedProperties(Type type)
     {
         if (TypePropsCache.TryGetValue(type, out PropertyInfo[]? cached))
@@ -1012,16 +995,23 @@ public class PurTable : Attribute, IPurTable
             }
         }
 
+        // 使用工厂方法获取属性信息，只返回可读属性
         return TypePropsCache.GetOrAdd(type, t => t.GetProperties().Where(p => p.CanRead).ToArray());
     }
 
+    /// <summary>
+    /// 处理复杂类型的数据集合，通过反射获取属性信息。
+    /// 支持匿名类型、一般类型和 object 类型。
+    /// </summary>
+    /// <typeparam name="T">数据类型。</typeparam>
+    /// <param name="records">数据集合。</param>
     private void WithComplexRecords<T>(IEnumerable<T?> records)
     {
         Type typeOfT = typeof(T);
         PropertyInfo[] properties = [];
         bool isAnonymousType = false;
 
-        // 处理 Object/Dynamic 类型，基于运行时类型获取属性信息
+        // 处理 Object/Dynamic 类型，需要基于运行时类型获取属性信息
         if (typeOfT == typeof(object))
         {
             T? firstItem = records.FirstOrDefault(r => r != null);
@@ -1059,11 +1049,13 @@ public class PurTable : Attribute, IPurTable
 
         if (RecordColumns.Count == 0) throw new InvalidOperationException("无法从数据集合中获取任何列信息");
 
+        // 将复杂对象转换为字典格式，便于统一处理
         Records = records
             .Select(record =>
             {
                 if (record == null) return null;
 
+                // 匿名类型需要通过运行时类型获取属性值
                 if (isAnonymousType)
                 {
                     return properties.ToDictionary(
@@ -1073,49 +1065,57 @@ public class PurTable : Attribute, IPurTable
                     );
                 }
 
-                Dictionary<string, object?> result = new(properties.Length);
-                foreach (PropertyInfo prop in properties)
-                {
-                    try
+                // 一般类型直接使用编译时属性信息，失败时降级为运行时获取
+                return properties.ToDictionary(
+                    pk => pk.Name,
+                    pv =>
                     {
-                        result[prop.Name] = prop.GetValue(record) ?? prop.PropertyType.GetDefaultValue();
-                    }
-                    catch
-                    {
-                        result[prop.Name] = record.GetType().GetProperty(prop.Name)?.GetValue(record)
-                                            ?? prop.PropertyType.GetDefaultValue();
-                    }
-                }
-
-                return result;
+                        try
+                        {
+                            return pv.GetValue(record) ?? pv.PropertyType.GetDefaultValue();
+                        }
+                        catch
+                        {
+                            // 降级策略：通过运行时类型获取属性值
+                            return record.GetType().GetProperty(pv.Name)?.GetValue(record)
+                                   ?? pv.PropertyType.GetDefaultValue();
+                        }
+                    });
             });
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurTable.WithSampleRows(int)" />
     public PurTable WithSampleRows(int sampleRows)
     {
         SampleRows = sampleRows;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurTable.WithAutoFilter(bool)" />
     public PurTable WithAutoFilter(bool autoFilter)
     {
         AutoFilter = autoFilter;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurTable.WithPassword(string)" />
     public PurTable WithPassword(string? password)
     {
         Password = password;
         return this;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IPurTable.WithTableStyle" />
     public PurTable WithTableStyle(PurStyle style)
     {
         TableStyle = style;
+        return this;
+    }
+
+    /// <inheritdoc cref="IPurTable.WithPresetStyle(PurcellLibs.PresetStyle)" />
+    public PurTable WithPresetStyle(PresetStyle presetStyle)
+    {
+        PresetStyle = presetStyle;
         return this;
     }
 

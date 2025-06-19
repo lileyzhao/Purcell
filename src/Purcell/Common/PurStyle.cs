@@ -3,13 +3,38 @@
 namespace PurcellLibs;
 
 /// <summary>
-/// Excel 表格样式配置特性（Attribute），用于定义 Excel 表格的表头、内容样式及列宽、行高等参数。
-/// <para>
-/// 仅适用于 Excel 文件的样式设置，可通过特性标记或代码方式配置，支持链式调用进行流畅设置。
-/// </para>
+/// Excel 表格样式配置，用于定义 Excel 表格的表头、内容样式及列宽、行高等参数。
 /// </summary>
-[AttributeUsage(AttributeTargets.Class)]
-public class PurStyle : Attribute
+/// <example>
+/// <code>
+/// // 使用预设样式
+/// table.WithTableStyle(PurStyle.BrightFresh);
+/// 
+/// // 自定义样式配置
+/// var customStyle = new PurStyle()
+///     .SetHeaderStyle(Color.White, Color.Blue)
+///     .SetMinColumnWidth(15)
+///     .SetMaxColumnWidth(30);
+/// 
+/// // 在工作表配置中使用
+/// table.WithTableStyle(customStyle);
+/// 
+/// // 导出时使用样式
+/// Purcell.Export(data, "output.xlsx", table);
+/// </code>
+/// </example>
+/// <remarks>
+/// <para>
+/// 仅适用于 Excel 文件的样式设置，通过代码方式配置，支持链式调用进行流畅设置。
+/// </para>
+/// <para>
+/// 提供多种预设样式，包括 Default、BrightFresh、ElegantMonochrome 等，满足不同的视觉需求。
+/// </para>
+/// <para>
+/// ⚠️ 对 CSV 格式无效。
+/// </para>
+/// </remarks>
+public class PurStyle
 {
     /// <summary>
     /// 表头单元格样式，默认为 <see cref="XlsxStyle.Default"/>。
@@ -43,13 +68,13 @@ public class PurStyle : Attribute
     /// </summary>
     public double ContentLineHeight { get; set; } = 18d;
 
-    #region Fluent 方法链
+    #region Fluent API
 
     /// <summary>
     /// 设置表头单元格样式。
     /// </summary>
     /// <param name="headerStyle">表头样式对象。</param>
-    /// <returns>返回当前 <see cref="PurStyle"/> 实例，便于链式调用。</returns>
+    /// <returns>返回当前 <see cref="PurStyle"/> 实例，支持链式调用。</returns>
     public PurStyle SetHeaderStyle(XlsxStyle headerStyle)
     {
         HeaderStyle = headerStyle;
@@ -69,7 +94,7 @@ public class PurStyle : Attribute
     /// <param name="fontUnderline">下划线样式，默认无。</param>
     /// <param name="horizontal">水平对齐方式，默认左对齐。</param>
     /// <param name="vertical">垂直对齐方式，默认居中。</param>
-    /// <returns>返回当前 <see cref="PurStyle"/> 实例，便于链式调用。</returns>
+    /// <returns>返回当前 <see cref="PurStyle"/> 实例，支持链式调用。</returns>
     public PurStyle SetHeaderStyle(Color textColor, Color fillColor, string fontFamily = "Calibri", double fontSize = 11,
         bool fontBold = true,
         bool fontItalic = false, bool fontStrike = false, XlsxFont.Underline fontUnderline = XlsxFont.Underline.None,
@@ -94,7 +119,7 @@ public class PurStyle : Attribute
     /// <param name="fill">填充样式对象。</param>
     /// <param name="horizontal">水平对齐方式，默认左对齐。</param>
     /// <param name="vertical">垂直对齐方式，默认居中。</param>
-    /// <returns>返回当前 <see cref="PurStyle"/> 实例，便于链式调用。</returns>
+    /// <returns>返回当前 <see cref="PurStyle"/> 实例，支持链式调用。</returns>
     public PurStyle SetHeaderStyle(XlsxFont font, XlsxFill fill,
         XlsxAlignment.Horizontal horizontal = XlsxAlignment.Horizontal.Left,
         XlsxAlignment.Vertical vertical = XlsxAlignment.Vertical.Center)
@@ -112,7 +137,7 @@ public class PurStyle : Attribute
     /// 设置内容单元格样式。
     /// </summary>
     /// <param name="contentStyle">内容样式对象。</param>
-    /// <returns>返回当前 <see cref="PurStyle"/> 实例，便于链式调用。</returns>
+    /// <returns>返回当前 <see cref="PurStyle"/> 实例，支持链式调用。</returns>
     public PurStyle SetContentStyle(XlsxStyle contentStyle)
     {
         ContentStyle = contentStyle;
@@ -132,7 +157,7 @@ public class PurStyle : Attribute
     /// <param name="fontUnderline">下划线样式，默认无。</param>
     /// <param name="horizontal">水平对齐方式，默认左对齐。</param>
     /// <param name="vertical">垂直对齐方式，默认居中。</param>
-    /// <returns>返回当前 <see cref="PurStyle"/> 实例，便于链式调用。</returns>
+    /// <returns>返回当前 <see cref="PurStyle"/> 实例，支持链式调用。</returns>
     public PurStyle SetContentStyle(Color textColor, Color fillColor, string fontFamily = "Calibri", double fontSize = 11,
         bool fontBold = true,
         bool fontItalic = false, bool fontStrike = false, XlsxFont.Underline fontUnderline = XlsxFont.Underline.None,
@@ -157,7 +182,7 @@ public class PurStyle : Attribute
     /// <param name="fill">填充样式对象。</param>
     /// <param name="horizontal">水平对齐方式，默认左对齐。</param>
     /// <param name="vertical">垂直对齐方式，默认居中。</param>
-    /// <returns>返回当前 <see cref="PurStyle"/> 实例，便于链式调用。</returns>
+    /// <returns>返回当前 <see cref="PurStyle"/> 实例，支持链式调用。</returns>
     public PurStyle SetContentStyle(XlsxFont font, XlsxFill fill,
         XlsxAlignment.Horizontal horizontal = XlsxAlignment.Horizontal.Left,
         XlsxAlignment.Vertical vertical = XlsxAlignment.Vertical.Center)
@@ -175,7 +200,7 @@ public class PurStyle : Attribute
     /// 设置表头行高。
     /// </summary>
     /// <param name="headerLineHeight">表头行高，单位为磅（point）。</param>
-    /// <returns>返回当前 <see cref="PurStyle"/> 实例，便于链式调用。</returns>
+    /// <returns>返回当前 <see cref="PurStyle"/> 实例，支持链式调用。</returns>
     public PurStyle SetHeaderLineHeight(double headerLineHeight)
     {
         HeaderLineHeight = headerLineHeight;
@@ -186,7 +211,7 @@ public class PurStyle : Attribute
     /// 设置内容行高。
     /// </summary>
     /// <param name="contentLineHeight">内容行高，单位为磅（point）。</param>
-    /// <returns>返回当前 <see cref="PurStyle"/> 实例，便于链式调用。</returns>
+    /// <returns>返回当前 <see cref="PurStyle"/> 实例，支持链式调用。</returns>
     public PurStyle SetContentLineHeight(double contentLineHeight)
     {
         ContentLineHeight = contentLineHeight;
@@ -197,7 +222,7 @@ public class PurStyle : Attribute
     /// 设置最小列宽。
     /// </summary>
     /// <param name="minColumnWidth">最小列宽，单位为字符宽度。</param>
-    /// <returns>返回当前 <see cref="PurStyle"/> 实例，便于链式调用。</returns>
+    /// <returns>返回当前 <see cref="PurStyle"/> 实例，支持链式调用。</returns>
     public PurStyle SetMinColumnWidth(double minColumnWidth)
     {
         MinColumnWidth = minColumnWidth;
@@ -208,22 +233,28 @@ public class PurStyle : Attribute
     /// 设置最大列宽。
     /// </summary>
     /// <param name="maxColumnWidth">最大列宽，单位为字符宽度。</param>
-    /// <returns>返回当前 <see cref="PurStyle"/> 实例，便于链式调用。</returns>
+    /// <returns>返回当前 <see cref="PurStyle"/> 实例，支持链式调用。</returns>
     public PurStyle SetMaxColumnWidth(double maxColumnWidth)
     {
         MaxColumnWidth = maxColumnWidth;
         return this;
     }
 
-    #endregion Fluent 方法链
+    #endregion Fluent API
 
-    #region Preset 预设样式
+    #region 预设样式
 
     /// <summary>
-    /// 默认样式 Default。<br /><br />
-    /// 🎨 文本色: #FFFFFF White<br />
-    /// 🎨 背景色: #004586 Blue
+    /// 默认样式。
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// 文本色：#FFFFFF（白色）
+    /// </para>
+    /// <para>
+    /// 背景色：#004586（蓝色）
+    /// </para>
+    /// </remarks>
     public static readonly PurStyle Default = new()
     {
         HeaderStyle = XlsxStyle.Default
@@ -236,10 +267,16 @@ public class PurStyle : Attribute
     };
 
     /// <summary>
-    /// 明亮清新蓝 BrightFresh。<br /><br />
-    /// 🎨 文本色: #FFFFFF White<br />
-    /// 🎨 背景色: #00BFFF Sky Blue
+    /// 明亮清新蓝样式。
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// 文本色：#FFFFFF（白色）
+    /// </para>
+    /// <para>
+    /// 背景色：#00BFFF（天空蓝）
+    /// </para>
+    /// </remarks>
     public static readonly PurStyle BrightFresh = new()
     {
         HeaderStyle = XlsxStyle.Default
@@ -252,10 +289,16 @@ public class PurStyle : Attribute
     };
 
     /// <summary>
-    /// 优雅单色 ElegantMonochrome。<br /><br />
-    /// 🎨 文本色: #FFFFFF White<br />
-    /// 🎨 背景色: #A9A9A9 Dark Gray
+    /// 优雅单色样式。
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// 文本色：#FFFFFF（白色）
+    /// </para>
+    /// <para>
+    /// 背景色：#A9A9A9（深灰色）
+    /// </para>
+    /// </remarks>
     public static readonly PurStyle ElegantMonochrome = new()
     {
         HeaderStyle = XlsxStyle.Default
@@ -268,10 +311,16 @@ public class PurStyle : Attribute
     };
 
     /// <summary>
-    /// 大地色调 EarthTones。<br /><br />
-    /// 🎨 文本色: #FFFFFF White<br />
-    /// 🎨 背景色: #808080 Gray
+    /// 大地色调样式。
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// 文本色：#FFFFFF（白色）
+    /// </para>
+    /// <para>
+    /// 背景色：#808080（灰色）
+    /// </para>
+    /// </remarks>
     public static readonly PurStyle EarthTones = new()
     {
         HeaderStyle = XlsxStyle.Default
@@ -284,10 +333,16 @@ public class PurStyle : Attribute
     };
 
     /// <summary>
-    /// 暖色调 WarmTones。<br /><br />
-    /// 🎨 文本色: #FFFFFF White<br />
-    /// 🎨 背景色: #FF0000 Red
+    /// 暖色调样式。
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// 文本色：#FFFFFF（白色）
+    /// </para>
+    /// <para>
+    /// 背景色：#FF0000（红色）
+    /// </para>
+    /// </remarks>
     public static readonly PurStyle WarmTones = new()
     {
         HeaderStyle = XlsxStyle.Default
@@ -300,10 +355,16 @@ public class PurStyle : Attribute
     };
 
     /// <summary>
-    /// 海洋蓝 OceanBlue。<br /><br />
-    /// 🎨 文本色: #FFFFFF White<br />
-    /// 🎨 背景色: #191970 Midnight Blue
+    /// 海洋蓝样式。
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// 文本色：#FFFFFF（白色）
+    /// </para>
+    /// <para>
+    /// 背景色：#191970（午夜蓝）
+    /// </para>
+    /// </remarks>
     public static readonly PurStyle OceanBlue = new()
     {
         HeaderStyle = XlsxStyle.Default
@@ -316,10 +377,16 @@ public class PurStyle : Attribute
     };
 
     /// <summary>
-    /// 复古怀旧 VintageNostalgia。<br /><br />
-    /// 🎨 文本色: #808080 Gray<br />
-    /// 🎨 背景色: #FFC0CB Pink
+    /// 复古怀旧样式。
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// 文本色：#808080（灰色）
+    /// </para>
+    /// <para>
+    /// 背景色：#FFC0CB（粉色）
+    /// </para>
+    /// </remarks>
     public static readonly PurStyle VintageNostalgia = new()
     {
         HeaderStyle = XlsxStyle.Default
@@ -332,10 +399,16 @@ public class PurStyle : Attribute
     };
 
     /// <summary>
-    /// 极简黑白 MinimalistBW。<br /><br />
-    /// 🎨 文本色: #808080 Gray<br />
-    /// 🎨 背景色: #FFFFFF White
+    /// 极简黑白样式。
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// 文本色：#808080（灰色）
+    /// </para>
+    /// <para>
+    /// 背景色：#FFFFFF（白色）
+    /// </para>
+    /// </remarks>
     public static readonly PurStyle MinimalistBw = new()
     {
         HeaderStyle = XlsxStyle.Default
@@ -348,10 +421,16 @@ public class PurStyle : Attribute
     };
 
     /// <summary>
-    /// 活力能量 VibrantEnergy。<br /><br />
-    /// 🎨 文本色: #FFFFFF White<br />
-    /// 🎨 背景色: #FFA500 Orange
+    /// 活力能量样式。
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// 文本色：#FFFFFF（白色）
+    /// </para>
+    /// <para>
+    /// 背景色：#FFA500（橙色）
+    /// </para>
+    /// </remarks>
     public static readonly PurStyle VibrantEnergy = new()
     {
         HeaderStyle = XlsxStyle.Default
@@ -364,10 +443,16 @@ public class PurStyle : Attribute
     };
 
     /// <summary>
-    /// 复古时尚 RetroChic。<br /><br />
-    /// 🎨 文本色: #FFFFFF White<br />
-    /// 🎨 背景色: #DA70D6 Orchid
+    /// 复古时尚样式。
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// 文本色：#FFFFFF（白色）
+    /// </para>
+    /// <para>
+    /// 背景色：#DA70D6（兰花紫）
+    /// </para>
+    /// </remarks>
     public static readonly PurStyle RetroChic = new()
     {
         HeaderStyle = XlsxStyle.Default
@@ -380,10 +465,16 @@ public class PurStyle : Attribute
     };
 
     /// <summary>
-    /// 温馨秋日 CozyAutumn。<br /><br />
-    /// 🎨 文本色: #FFFFFF White<br />
-    /// 🎨 背景色: #CD853F Peru
+    /// 温馨秋日样式。
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// 文本色：#FFFFFF（白色）
+    /// </para>
+    /// <para>
+    /// 背景色：#CD853F（秘鲁棕）
+    /// </para>
+    /// </remarks>
     public static readonly PurStyle CozyAutumn = new()
     {
         HeaderStyle = XlsxStyle.Default
@@ -396,10 +487,16 @@ public class PurStyle : Attribute
     };
 
     /// <summary>
-    /// 宁静自然 SereneNature。<br /><br />
-    /// 🎨 文本色: #FFFFFF White<br />
-    /// 🎨 背景色: #2E8B57 Sea Green
+    /// 宁静自然样式。
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// 文本色：#FFFFFF（白色）
+    /// </para>
+    /// <para>
+    /// 背景色：#2E8B57（海绿色）
+    /// </para>
+    /// </remarks>
     public static readonly PurStyle SereneNature = new()
     {
         HeaderStyle = XlsxStyle.Default
@@ -412,10 +509,16 @@ public class PurStyle : Attribute
     };
 
     /// <summary>
-    /// 午夜魔幻 MidnightMagic。<br /><br />
-    /// 🎨 文本色: #FFFFFF White<br />
-    /// 🎨 背景色: #000080 Navy
+    /// 午夜魔幻样式。
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// 文本色：#FFFFFF（白色）
+    /// </para>
+    /// <para>
+    /// 背景色：#000080（海军蓝）
+    /// </para>
+    /// </remarks>
     public static readonly PurStyle MidnightMagic = new()
     {
         HeaderStyle = XlsxStyle.Default
@@ -428,10 +531,16 @@ public class PurStyle : Attribute
     };
 
     /// <summary>
-    /// 暖阳阳光 SunnyDay。<br /><br />
-    /// 🎨 文本色: #808080 Gray<br />
-    /// 🎨 背景色: #FFFF00 Yellow
+    /// 暖阳阳光样式。
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// 文本色：#808080（灰色）
+    /// </para>
+    /// <para>
+    /// 背景色：#FFFF00（黄色）
+    /// </para>
+    /// </remarks>
     public static readonly PurStyle SunnyDay = new()
     {
         HeaderStyle = XlsxStyle.Default
@@ -443,5 +552,5 @@ public class PurStyle : Attribute
         ContentStyle = XlsxStyle.Default
     };
 
-    #endregion Presets 预设样式
+    #endregion 预设样式
 }

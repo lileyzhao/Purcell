@@ -3,11 +3,8 @@
 namespace PurcellLibs.Providers;
 
 /// <summary>
-/// 表格查询器接口
+/// 表格查询器接口 - 为查询方法提供统一的注释。
 /// </summary>
-/// <remarks>
-/// 该封装层的目的是分离实现层(TableReader/TableWriter)，确保底层实现变更时不需要变动上层调用代码，且底层可随时切换。
-/// </remarks>
 public interface IPurQuerier : IDisposable, IAsyncDisposable
 {
     /// <summary>

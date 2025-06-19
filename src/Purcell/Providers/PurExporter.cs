@@ -48,10 +48,10 @@ public class PurExporter : IPurExporter
     }
 
     /// <inheritdoc/>
-    public void Export(IList<PurTable> sheetDatas, IProgress<WritePosition>? progress = null,
+    public void Export(IList<PurTable> tableConfigs, IProgress<WritePosition>? progress = null,
         CancellationToken cancelToken = default)
     {
-        _writer.WriteTable(sheetDatas, progress, cancelToken);
+        _writer.WriteTable(tableConfigs, progress, cancelToken);
     }
 
     #region Disposable Support

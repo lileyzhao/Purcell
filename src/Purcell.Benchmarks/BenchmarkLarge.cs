@@ -2,8 +2,6 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
 using MiniExcelLibs;
 
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-
 namespace PurcellLibs.Benchmarks;
 
 [Config(typeof(CustomConfig))]
@@ -83,7 +81,7 @@ public class BenchmarkLarge
         string[] extArray = ["xlsx", "csv"];
         foreach (string ext in extArray)
         {
-            string filePath = FileHelper.GetDesktopFilePath("100_0000x10", Ext);
+            string filePath = FileHelper.GetDesktopFilePath("100_0000x10", ext);
             if (File.Exists(filePath)) continue;
             Purcell.Export(SampleData.GetGenericData(100_0000), filePath);
         }

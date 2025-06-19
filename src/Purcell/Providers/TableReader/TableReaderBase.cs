@@ -12,7 +12,7 @@ internal abstract class TableReaderBase : ITableReader
     private int _disposed;
     protected readonly Stream _stream;
     private readonly bool _ownsStream;
-    protected PurTable _tableConfig = PurTable.Default;
+    protected PurTable TableConfig = PurTable.Default;
 
     /// <inheritdoc/>
     public IList<string> Worksheets { get; set; }
@@ -30,7 +30,7 @@ internal abstract class TableReaderBase : ITableReader
     /// <summary>
     /// 核心读取方法，子类需要实现此方法以读取表格数据
     /// </summary>
-    protected abstract IEnumerable<IDictionary<int, object?>> ReadCore(PurTable tblConfig,
+    protected abstract IEnumerable<IDictionary<int, object?>> ReadCore(PurTable tableConfig,
         IProgress<int>? progress = null, CancellationToken cancelToken = default);
 
     /// <inheritdoc/>
@@ -171,19 +171,19 @@ internal abstract class TableReaderBase : ITableReader
         if (indexedColumns != null) return true;
 
         // 合并特性和动态列配置，动态配置优先，配置会覆盖特性
-        List<PurColumn> mergedColumns = MergeColumns<T>(_tableConfig.CombinedColumns);
+        List<PurColumn> mergedColumns = MergeColumns<T>(TableConfig.CombinedColumns);
 
         // 映射表头索引
         List<PurColumn> tempColumns = [];
         for (int colIndex = 0; colIndex < rawRowData.Keys.Count; colIndex++)
         {
             string? cellValue = rawRowData[colIndex]?.ToString();
-            string propName = _tableConfig.HasHeader && !string.IsNullOrEmpty(cellValue)
-                ? cellValue.ProcessWhiteSpace(_tableConfig.HeaderSpaceMode)
+            string propName = TableConfig.HasHeader && !string.IsNullOrEmpty(cellValue)
+                ? cellValue.ProcessWhiteSpace(TableConfig.HeaderSpaceMode)
                 : CellLocator.GetColumnLetter(colIndex);
 
             List<PurColumn> matchedColumns = mergedColumns.Count > 0
-                ? ColumnUtils.MatchColumns(colIndex, propName, mergedColumns, _tableConfig.HeaderSpaceMode)
+                ? ColumnUtils.MatchColumns(colIndex, propName, mergedColumns, TableConfig.HeaderSpaceMode)
                 : [];
 
             foreach (PurColumn mtc in matchedColumns)
@@ -201,7 +201,7 @@ internal abstract class TableReaderBase : ITableReader
             .Select(g => new { g.Key, Value = g.ToList() })
             .ToDictionary(g => g.Key, g => g.Value);
 
-        return _tableConfig.HasHeader == false;
+        return TableConfig.HasHeader == false;
     }
 
     /// <summary>
@@ -218,12 +218,12 @@ internal abstract class TableReaderBase : ITableReader
         for (int colIndex = 0; colIndex < rawRowData.Keys.Count; colIndex++)
         {
             string? cellValue = rawRowData[colIndex]?.ToString();
-            string propName = _tableConfig.HasHeader && !string.IsNullOrEmpty(cellValue)
-                ? cellValue.ProcessWhiteSpace(_tableConfig.HeaderSpaceMode)
+            string propName = TableConfig.HasHeader && !string.IsNullOrEmpty(cellValue)
+                ? cellValue.ProcessWhiteSpace(TableConfig.HeaderSpaceMode)
                 : CellLocator.GetColumnLetter(colIndex);
 
-            List<PurColumn> matchedColumns = _tableConfig.CombinedColumns is { Count: > 0 }
-                ? ColumnUtils.MatchColumns(colIndex, propName, _tableConfig.CombinedColumns, _tableConfig.HeaderSpaceMode)
+            List<PurColumn> matchedColumns = TableConfig.CombinedColumns is { Count: > 0 }
+                ? ColumnUtils.MatchColumns(colIndex, propName, TableConfig.CombinedColumns, TableConfig.HeaderSpaceMode)
                 : [];
 
             foreach (PurColumn mtc in matchedColumns)
@@ -249,7 +249,7 @@ internal abstract class TableReaderBase : ITableReader
             .Select(g => new { g.Key, Value = g.ToList() })
             .ToDictionary(g => g.Key, g => g.Value);
 
-        return _tableConfig.HasHeader == false;
+        return TableConfig.HasHeader == false;
     }
 
     private static readonly Dictionary<Type, PropertyInfo[]> TypePropsCache = new();
@@ -285,11 +285,9 @@ internal abstract class TableReaderBase : ITableReader
             {
                 // 如果不存在特性，则创建默认配置
                 resolvedColumn = propertyInfo.GetCustomAttribute<PurColumn>() ??
-                                 PurColumn.From([
-                                     propertyInfo.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName ??
-                                     propertyInfo.GetCustomAttribute<DescriptionAttribute>()?.Description ??
-                                     propertyInfo.Name
-                                 ]);
+                                 PurColumn.From(propertyInfo.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName ??
+                                                propertyInfo.GetCustomAttribute<DescriptionAttribute>()?.Description ??
+                                                propertyInfo.Name);
             }
 
             if (resolvedColumn.Names.Count == 0)
@@ -326,7 +324,7 @@ internal abstract class TableReaderBase : ITableReader
 
         if (targetType.TryGetValueConverter(out IValueConverter? converter))
         {
-            result = converter.Convert(cellValue, targetType, _tableConfig.GetCulture(), columnConfig.Format);
+            result = converter.Convert(cellValue, targetType, TableConfig.GetCulture(), columnConfig.Format);
             return true;
         }
 

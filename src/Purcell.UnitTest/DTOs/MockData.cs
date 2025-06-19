@@ -195,7 +195,7 @@ public static class MockData
 
     public static List<dynamic?> GetDynamicData()
     {
-        List<dynamic?> collection =
+        List<dynamic?> records =
         [
             new
             {
@@ -210,11 +210,11 @@ public static class MockData
         {
             if (item == null)
             {
-                collection.Add(null);
+                records.Add(null);
                 continue;
             }
 
-            collection.Add(new
+            records.Add(new
             {
                 item.Id, // 编号
                 item.Name, // 姓名
@@ -229,7 +229,7 @@ public static class MockData
             });
         }
 
-        return collection;
+        return records;
     }
 
     public class Employee

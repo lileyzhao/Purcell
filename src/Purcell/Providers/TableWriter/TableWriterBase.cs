@@ -6,7 +6,7 @@ namespace PurcellLibs.Providers.TableWriter;
 internal abstract class TableWriterBase : ITableWriter
 {
     private int _disposed;
-    private readonly Stream _stream;
+    protected readonly Stream _stream;
     private readonly bool _ownsStream;
 
     /// <summary>
@@ -19,7 +19,7 @@ internal abstract class TableWriterBase : ITableWriter
     }
 
     /// <inheritdoc/>
-    public abstract void WriteTable(IList<PurTable> tableList,
+    public abstract void WriteTable(IList<PurTable> tableConfigs,
         IProgress<WritePosition>? progress = null, CancellationToken cancelToken = default);
 
     #region Disposable Support
