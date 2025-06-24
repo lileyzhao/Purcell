@@ -22,7 +22,7 @@ public class DateTimeConverter : IValueConverter
     private const long MinUnixSeconds = -2208988800L; // DateTime(1900,1,1) 的秒数 new DateTimeOffset(date).ToUnixTimeSeconds()
 
     /// <inheritdoc/>
-    public object? Convert(object? value, Type targetType, CultureInfo culture, string? format)
+    public object? Convert(object? value, Type targetType, PurColumn columnConfig, CultureInfo culture)
     {
         ArgumentNullException.ThrowIfNull(targetType);
 
@@ -70,8 +70,8 @@ public class DateTimeConverter : IValueConverter
             }
 
             // 使用自定义格式化字符串
-            if (!string.IsNullOrWhiteSpace(format)
-                && DateTime.TryParseExact(trimmedValue, format, culture, DateTimeStyles.None, out DateTime parseResult))
+            if (!string.IsNullOrWhiteSpace(columnConfig.Format)
+                && DateTime.TryParseExact(trimmedValue, columnConfig.Format, culture, DateTimeStyles.None, out DateTime parseResult))
             {
                 return ConvertToDateType(parseResult, actualType) ?? defaultResult;
             }

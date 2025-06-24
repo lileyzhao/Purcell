@@ -15,7 +15,7 @@ public class GuidConverter : IValueConverter
     }
 
     /// <inheritdoc/>
-    public object? Convert(object? value, Type targetType, CultureInfo culture, string? format)
+    public object? Convert(object? value, Type targetType, PurColumn columnConfig, CultureInfo culture)
     {
         ArgumentNullException.ThrowIfNull(targetType);
 
@@ -49,8 +49,8 @@ public class GuidConverter : IValueConverter
             ReadOnlySpan<char> trimmedValue = strValue.AsSpan().Trim();
 
             // 使用自定义格式化字符串
-            if (!string.IsNullOrWhiteSpace(format)
-                && Guid.TryParseExact(trimmedValue, format, out Guid parseResult))
+            if (!string.IsNullOrWhiteSpace(columnConfig.Format)
+                && Guid.TryParseExact(trimmedValue, columnConfig.Format, out Guid parseResult))
             {
                 return parseResult;
             }

@@ -27,7 +27,7 @@ internal static class ReflectionExtensions
     {
         ArgumentNullException.ThrowIfNull(type);
 
-        return Nullable.GetUnderlyingType(type) != null;
+        return Nullable.GetUnderlyingType(type) is not null;
     }
 
     /// <summary>
@@ -53,7 +53,7 @@ internal static class ReflectionExtensions
     {
         ArgumentNullException.ThrowIfNull(type);
 
-        return !type.IsValueType || Nullable.GetUnderlyingType(type) != null;
+        return !type.IsValueType || Nullable.GetUnderlyingType(type) is not null;
     }
 
     /// <summary>
@@ -197,7 +197,7 @@ internal static class ReflectionExtensions
 
         attribute = propertyInfo.GetCustomAttribute<T>(inherit);
 
-        return attribute != null;
+        return attribute is not null;
     }
 
     /// <summary>
@@ -228,6 +228,6 @@ internal static class ReflectionExtensions
             _ => null
         };
 
-        return converter != null;
+        return converter is not null;
     }
 }

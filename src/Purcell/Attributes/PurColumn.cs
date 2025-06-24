@@ -61,30 +61,13 @@ public class PurColumn : Attribute, IPurColumn
             }
 
             _index = value;
-            if (_index >= 0)
-            {
-                _indexLetter = CellLocator.GetColumnLetter(_index);
-            }
         }
     }
-
-    private string _indexLetter = string.Empty;
 
     /// <inheritdoc cref="IPurColumn.IndexLetter" />
     public string IndexLetter
     {
-        get => _indexLetter;
-        set
-        {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                throw new ArgumentException("列索引字母不能为 null 或仅包含空白字符。", nameof(IndexLetter));
-            }
-
-            int newIndex = CellLocator.ColumnLetterToIndex(value);
-            _index = newIndex;
-            _indexLetter = value; // 直接使用传入的值，避免重复计算
-        }
+        get => CellLocator.GetColumnLetter(_index);
     }
 
     private List<string> _names = [];
@@ -112,7 +95,7 @@ public class PurColumn : Attribute, IPurColumn
     internal string? PrimaryName => _names.Count > 0 ? _names[0] : null;
 
     /// <inheritdoc cref="IPurColumn.IsRequired" />
-    public bool IsRequired { get; set; } // TODO: 此功能尚未实现
+    public bool IsRequired { get; set; }
 
     /// <inheritdoc cref="IPurColumn.DefaultValue" />
     public object? DefaultValue { get; set; }
@@ -213,19 +196,19 @@ public class PurColumn : Attribute, IPurColumn
     internal bool IsCustomWidth { get; set; }
 
     /// <inheritdoc cref="IPurColumn.HeaderHAlign" />
-    public HAlign HeaderHAlign { get; set; } // TODO: 此功能尚未实现
+    public HAlign? HeaderHAlign { get; set; }
 
     /// <inheritdoc cref="IPurColumn.HeaderVAlign" />
-    public VAlign HeaderVAlign { get; set; } // TODO: 此功能尚未实现
+    public VAlign? HeaderVAlign { get; set; }
 
     /// <inheritdoc cref="IPurColumn.ContentHAlign" />
-    public HAlign ContentHAlign { get; set; } // TODO: 此功能尚未实现
+    public HAlign? ContentHAlign { get; set; }
 
     /// <inheritdoc cref="IPurColumn.ContentVAlign" />
-    public VAlign ContentVAlign { get; set; } // TODO: 此功能尚未实现
+    public VAlign? ContentVAlign { get; set; }
 
     /// <inheritdoc cref="IPurColumn.IsHidden" />
-    public bool IsHidden { get; set; } // TODO: 此功能尚未实现
+    public bool IsHidden { get; set; }
 
     #region 静态工厂方法
 
@@ -340,14 +323,7 @@ public class PurColumn : Attribute, IPurColumn
     /// <inheritdoc cref="IPurColumn.WithIndex(string)" />
     public PurColumn WithIndex(string indexLetter)
     {
-        IndexLetter = indexLetter;
-        return this;
-    }
-
-    /// <inheritdoc cref="IPurColumn.WithIndexLetter" />
-    public PurColumn WithIndexLetter(string indexLetter)
-    {
-        IndexLetter = indexLetter;
+        Index = CellLocator.ColumnLetterToIndex(indexLetter);
         return this;
     }
 

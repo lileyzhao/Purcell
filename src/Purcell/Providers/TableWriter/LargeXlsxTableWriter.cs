@@ -12,8 +12,7 @@ internal class LargeXlsxTableWriter : TableWriterBase
     private int _disposed;
     private readonly XlsxWriter _writer;
 
-    private readonly XlsxStyle _dateFmt = XlsxStyle.Default.With(new XlsxNumberFormat("yyyy-mm-dd HH:mm:ss"))
-        .With(new XlsxAlignment(XlsxAlignment.Horizontal.Left));
+    private readonly XlsxNumberFormat _dateFormat = new("yyyy-mm-dd HH:mm:ss");
 
     /// <inheritdoc/>
     public LargeXlsxTableWriter(Stream stream, bool ownsStream = false)
@@ -35,11 +34,14 @@ internal class LargeXlsxTableWriter : TableWriterBase
 
             CellLocator headerStart = tableConfig.GetHeaderStart();
             PurStyle tableStyle = tableConfig.GetActualStyle();
-            
+
             // xlsx列宽
             List<XlsxColumn> xlsxColumns = tableConfig.CombinedColumns
                 .Select(ec =>
-                    XlsxColumn.Formatted(Math.Max(ec.Width, tableStyle.MinColumnWidth), hidden: ec.IsHidden))
+                    XlsxColumn.Formatted(
+                        Math.Max(ec.Width, tableStyle.MinColumnWidth),
+                        1,
+                        ec.IsHidden))
                 .ToList();
 
             // 把跳列部分包含到列集合中
@@ -59,9 +61,21 @@ internal class LargeXlsxTableWriter : TableWriterBase
                     .SetDefaultStyle(tableStyle.HeaderStyle)
                     .BeginRow()
                     .SkipColumns(headerStart.ColumnIndex);
-                foreach (string colName in tableConfig.CombinedColumns.Select(ec => ec.PrimaryName ?? string.Empty))
+                foreach (var cc in tableConfig.CombinedColumns)
                 {
-                    _writer.Write(colName);
+                    if (cc.HeaderHAlign.HasValue || cc.HeaderVAlign.HasValue)
+                    {
+                        var columnStyle =
+                            tableStyle.HeaderStyle.With(new XlsxAlignment(
+                                cc.HeaderHAlign?.ToXlsxHorizontal() ?? tableStyle.HeaderStyle.Alignment.HorizontalType,
+                                cc.HeaderVAlign?.ToXlsxVertical() ?? tableStyle.HeaderStyle.Alignment.VerticalType
+                            ));
+                        _writer.Write(cc.PrimaryName ?? string.Empty, columnStyle);
+                    }
+                    else
+                    {
+                        _writer.Write(cc.PrimaryName ?? string.Empty);
+                    }
                 }
             }
 
@@ -106,6 +120,8 @@ internal class LargeXlsxTableWriter : TableWriterBase
         ArgumentNullException.ThrowIfNull(tableConfig.Records);
 
         CellLocator dataStart = tableConfig.GetDataStart();
+        PurStyle tableStyle = tableConfig.GetActualStyle();
+
         int dataIndex = 0; // 数据行计数器
         foreach (IDictionary<string, object?>? rowItem in tableConfig.Records)
         {
@@ -127,30 +143,38 @@ internal class LargeXlsxTableWriter : TableWriterBase
             _writer.BeginRow().SkipColumns(dataStart.ColumnIndex);
 
             // 遍历每一列
-            foreach (PurColumn excelColumn in tableConfig.CombinedColumns)
+            foreach (PurColumn cc in tableConfig.CombinedColumns)
             {
                 cancelToken.ThrowIfCancellationRequested(); // 检查任务取消
 
                 // 跳过无属性名的列
-                if (string.IsNullOrEmpty(excelColumn.PropertyName))
+                if (string.IsNullOrEmpty(cc.PropertyName))
                 {
                     _writer.SkipColumns(1);
                     continue;
                 }
 
+                XlsxStyle? columnStyle = cc.ContentHAlign.HasValue || cc.ContentVAlign.HasValue
+                    ? tableStyle.ContentStyle.With(new XlsxAlignment(
+                        cc.ContentHAlign?.ToXlsxHorizontal() ?? tableStyle.ContentStyle.Alignment.HorizontalType,
+                        cc.ContentVAlign?.ToXlsxVertical() ?? tableStyle.ContentStyle.Alignment.VerticalType
+                    ))
+                    : null;
+                if (!string.IsNullOrWhiteSpace(cc.Format)) columnStyle?.With(new XlsxNumberFormat(cc.Format));
+
                 // 获取单元格值
-                object? cellValue = rowItem[excelColumn.PropertyName];
+                object? cellValue = rowItem[cc.PropertyName];
 
                 // 跳过空值
                 if (cellValue == null || cellValue == DBNull.Value || string.IsNullOrEmpty(cellValue.ToString()))
                 {
                     // _writer.SkipColumns(1);
-                    _writer.Write();
+                    _writer.Write(columnStyle);
                     continue;
                 }
 
                 // 根据不同数据类型写入单元格
-                WriteCellValue(cellValue, excelColumn);
+                WriteCellValue(cellValue, columnStyle, tableStyle, cc);
             }
 
             dataIndex++; // 增加数据行计数器
@@ -163,73 +187,77 @@ internal class LargeXlsxTableWriter : TableWriterBase
     /// 写入单元格值
     /// </summary>
     /// <param name="cellValue">单元格值</param>
-    /// <param name="colConfig">列配置</param>
-    private void WriteCellValue(object cellValue, PurColumn colConfig)
+    /// /// <param name="columnStyle">列样式</param>
+    /// <param name="tableStyle">表格样式</param>
+    /// <param name="columnConfig">列配置</param>
+    private void WriteCellValue(object cellValue, XlsxStyle? columnStyle, PurStyle tableStyle, PurColumn columnConfig)
     {
-        if (colConfig.UnwrappedType == null && cellValue is bool valBool)
+        // 如果有格式字符串，则定义日期格式样式，否则使用列样式
+        var dateStyle = string.IsNullOrWhiteSpace(columnConfig.Format)
+            ? (columnStyle ?? tableStyle.ContentStyle).With(_dateFormat)
+            : (columnStyle ?? tableStyle.ContentStyle).With(new XlsxNumberFormat(columnConfig.Format));
+
+        if (columnConfig.UnwrappedType == null && cellValue is bool valBool)
         {
-            _writer.Write(valBool);
+            _writer.Write(valBool, columnStyle);
         }
-        else if (colConfig.UnwrappedType == typeof(bool) &&
+        else if (columnConfig.UnwrappedType == typeof(bool) &&
                  bool.TryParse(cellValue.ToString(), out bool outBool))
         {
-            _writer.Write(outBool);
+            _writer.Write(outBool, columnStyle);
         }
-        else if (colConfig.UnwrappedType == null && cellValue.GetType().GetActualType().IsNumericType())
+        else if (columnConfig.UnwrappedType == null && cellValue.GetType().GetActualType().IsNumericType())
         {
-            if (cellValue is byte) _writer.Write(Convert.ToByte(cellValue));
-            if (cellValue is sbyte) _writer.Write(Convert.ToSByte(cellValue));
-            if (cellValue is short) _writer.Write(Convert.ToInt16(cellValue));
-            if (cellValue is ushort) _writer.Write(Convert.ToUInt16(cellValue));
-            if (cellValue is int) _writer.Write(Convert.ToInt32(cellValue));
-            if (cellValue is uint) _writer.Write(Convert.ToInt32(cellValue));
-            if (cellValue is long) _writer.Write(Convert.ToDecimal(cellValue));
-            if (cellValue is ulong) _writer.Write(Convert.ToDecimal(cellValue));
-            if (cellValue is float) _writer.Write(Convert.ToSingle(cellValue));
-            if (cellValue is double) _writer.Write(Convert.ToDouble(cellValue));
-            if (cellValue is decimal) _writer.Write(Convert.ToDecimal(cellValue));
+            if (cellValue is byte) _writer.Write(Convert.ToByte(cellValue), columnStyle);
+            if (cellValue is sbyte) _writer.Write(Convert.ToSByte(cellValue), columnStyle);
+            if (cellValue is short) _writer.Write(Convert.ToInt16(cellValue), columnStyle);
+            if (cellValue is ushort) _writer.Write(Convert.ToUInt16(cellValue), columnStyle);
+            if (cellValue is int) _writer.Write(Convert.ToInt32(cellValue), columnStyle);
+            if (cellValue is uint) _writer.Write(Convert.ToInt32(cellValue), columnStyle);
+            if (cellValue is long) _writer.Write(Convert.ToDecimal(cellValue), columnStyle);
+            if (cellValue is ulong) _writer.Write(Convert.ToDecimal(cellValue), columnStyle);
+            if (cellValue is float) _writer.Write(Convert.ToSingle(cellValue), columnStyle);
+            if (cellValue is double) _writer.Write(Convert.ToDouble(cellValue), columnStyle);
+            if (cellValue is decimal) _writer.Write(Convert.ToDecimal(cellValue), columnStyle);
         }
-        else if (colConfig.UnwrappedType?.IsNumericType() == true)
+        else if (columnConfig.UnwrappedType?.IsNumericType() == true)
         {
-            if (colConfig.UnwrappedType == typeof(byte)) _writer.Write(Convert.ToByte(cellValue));
-            if (colConfig.UnwrappedType == typeof(sbyte)) _writer.Write(Convert.ToSByte(cellValue));
-            if (colConfig.UnwrappedType == typeof(short)) _writer.Write(Convert.ToInt16(cellValue));
-            if (colConfig.UnwrappedType == typeof(ushort)) _writer.Write(Convert.ToUInt16(cellValue));
-            if (colConfig.UnwrappedType == typeof(int)) _writer.Write(Convert.ToInt32(cellValue));
-            if (colConfig.UnwrappedType == typeof(uint)) _writer.Write(Convert.ToInt32(cellValue));
-            if (colConfig.UnwrappedType == typeof(long)) _writer.Write(Convert.ToDecimal(cellValue));
-            if (colConfig.UnwrappedType == typeof(ulong)) _writer.Write(Convert.ToDecimal(cellValue));
-            if (colConfig.UnwrappedType == typeof(float)) _writer.Write(Convert.ToSingle(cellValue));
-            if (colConfig.UnwrappedType == typeof(double)) _writer.Write(Convert.ToDouble(cellValue));
-            if (colConfig.UnwrappedType == typeof(decimal)) _writer.Write(Convert.ToDecimal(cellValue));
+            if (columnConfig.UnwrappedType == typeof(byte)) _writer.Write(Convert.ToByte(cellValue), columnStyle);
+            if (columnConfig.UnwrappedType == typeof(sbyte)) _writer.Write(Convert.ToSByte(cellValue), columnStyle);
+            if (columnConfig.UnwrappedType == typeof(short)) _writer.Write(Convert.ToInt16(cellValue), columnStyle);
+            if (columnConfig.UnwrappedType == typeof(ushort)) _writer.Write(Convert.ToUInt16(cellValue), columnStyle);
+            if (columnConfig.UnwrappedType == typeof(int)) _writer.Write(Convert.ToInt32(cellValue), columnStyle);
+            if (columnConfig.UnwrappedType == typeof(uint)) _writer.Write(Convert.ToInt32(cellValue), columnStyle);
+            if (columnConfig.UnwrappedType == typeof(long)) _writer.Write(Convert.ToDecimal(cellValue), columnStyle);
+            if (columnConfig.UnwrappedType == typeof(ulong)) _writer.Write(Convert.ToDecimal(cellValue), columnStyle);
+            if (columnConfig.UnwrappedType == typeof(float)) _writer.Write(Convert.ToSingle(cellValue), columnStyle);
+            if (columnConfig.UnwrappedType == typeof(double)) _writer.Write(Convert.ToDouble(cellValue), columnStyle);
+            if (columnConfig.UnwrappedType == typeof(decimal)) _writer.Write(Convert.ToDecimal(cellValue), columnStyle);
         }
-        else if (colConfig.UnwrappedType == null && cellValue is DateTime valDateTime)
+        else if (columnConfig.UnwrappedType == null && cellValue is DateTime valDateTime)
         {
-            _writer.Write(valDateTime, string.IsNullOrWhiteSpace(colConfig.Format)
-                ? _dateFmt
-                : XlsxStyle.Default.With(new XlsxNumberFormat(colConfig.Format))
-                    .With(new XlsxAlignment(XlsxAlignment.Horizontal.Left)));
+            _writer.Write(valDateTime, dateStyle);
         }
-        else if (colConfig.UnwrappedType == null && cellValue is DateTimeOffset valDateTimeOffset)
+        else if (columnConfig.UnwrappedType == null && cellValue is DateTimeOffset valDateTimeOffset)
         {
-            _writer.Write(Convert.ToDateTime(valDateTimeOffset), _dateFmt);
+            _writer.Write(Convert.ToDateTime(valDateTimeOffset), dateStyle);
         }
-        else if (colConfig.UnwrappedType == typeof(DateTime) || colConfig.UnwrappedType == typeof(DateTimeOffset))
+        else if (columnConfig.UnwrappedType == typeof(DateTime) || columnConfig.UnwrappedType == typeof(DateTimeOffset))
         {
             if (cellValue is DateTime valDateTime2)
             {
-                _writer.Write(valDateTime2, _dateFmt);
+                _writer.Write(valDateTime2, dateStyle);
             }
             else if (cellValue is DateTimeOffset valDateTimeOffset2)
             {
-                _writer.Write(Convert.ToDateTime(valDateTimeOffset2), _dateFmt);
+                _writer.Write(Convert.ToDateTime(valDateTimeOffset2), dateStyle);
             }
             else
             {
                 string? cellValueStr = cellValue.ToString();
                 DateTime? cvDateTime = null;
-                if (DateTimeConverter.Instance.Convert(cellValueStr, typeof(DateTime?), CultureInfo.InvariantCulture,
-                        colConfig.Format)
+                if (DateTimeConverter.Instance.Convert(cellValueStr, typeof(DateTime?), columnConfig,
+                        CultureInfo.InvariantCulture)
                     is DateTime outDt)
                 {
                     cvDateTime = outDt;
@@ -239,17 +267,17 @@ internal class LargeXlsxTableWriter : TableWriterBase
                 {
                     if (cvDateTime.Value.ToUniversalTime() < PurConstants.Epoch1904)
                         cvDateTime = new DateTime(1900, 1, 1);
-                    _writer.Write(cvDateTime.Value, _dateFmt);
+                    _writer.Write(cvDateTime.Value, dateStyle);
                 }
                 else
                 {
-                    _writer.Write(cellValueStr);
+                    _writer.Write(cellValueStr, columnStyle);
                 }
             }
         }
         else
         {
-            _writer.Write(cellValue.ToString());
+            _writer.Write(cellValue.ToString(), columnStyle);
         }
     }
 

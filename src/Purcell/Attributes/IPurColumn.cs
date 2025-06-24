@@ -65,7 +65,7 @@ public interface IPurColumn
     /// </para>
     /// </remarks>
     /// <exception cref="ArgumentException">当传入的列索引字母为空或仅包含空白字符时抛出。</exception>
-    string IndexLetter { get; set; }
+    string IndexLetter { get; }
 
     /// <summary>
     /// 列名集合，用于匹配表格列名的字符串集合。
@@ -117,7 +117,7 @@ public interface IPurColumn
     /// ⚠️ 仅在读取表格时有效。
     /// </para>
     /// </remarks>
-    bool IsRequired { get; set; } // TODO: 功能未实现
+    bool IsRequired { get; set; }
 
     /// <summary>
     /// 列的默认值，表格中对应列的值为空或解析失败时使用此默认值。
@@ -321,31 +321,31 @@ public interface IPurColumn
     /// 导出 Excel 时表头的水平对齐方式。
     /// </summary>
     /// <remarks>⚠️ 仅在导出表格时有效。</remarks>
-    HAlign HeaderHAlign { get; set; } // TODO: 此功能尚未实现
+    HAlign? HeaderHAlign { get; set; }
 
     /// <summary>
     /// 导出 Excel 时表头的垂直对齐方式。
     /// </summary>
     /// <remarks>⚠️ 仅在导出表格时有效。</remarks>
-    VAlign HeaderVAlign { get; set; } // TODO: 此功能尚未实现
+    VAlign? HeaderVAlign { get; set; }
 
     /// <summary>
     /// 导出 Excel 时单元格内容的水平对齐方式。
     /// </summary>
     /// <remarks>⚠️ 仅在导出表格时有效。</remarks>
-    HAlign ContentHAlign { get; set; } // TODO: 此功能尚未实现
+    HAlign? ContentHAlign { get; set; }
 
     /// <summary>
     /// 导出 Excel 时单元格内容的垂直对齐方式。
     /// </summary>
     /// <remarks>⚠️ 仅在导出表格时有效。</remarks>
-    VAlign ContentVAlign { get; set; } // TODO: 此功能尚未实现
+    VAlign? ContentVAlign { get; set; }
 
     /// <summary>
     /// 导出 Excel 时是否隐藏列，默认为 false。
     /// </summary>
     /// <remarks>⚠️ 仅在导出表格时有效。</remarks>
-    bool IsHidden { get; set; } // TODO: 此功能尚未实现
+    bool IsHidden { get; set; }
 
     /// <summary>
     /// 链式设置列索引。
@@ -362,14 +362,6 @@ public interface IPurColumn
     /// <returns>返回当前实例以支持链式调用。</returns>
     /// <exception cref="ArgumentException">当传入的列索引字母为空或仅包含空白字符时抛出。</exception>
     PurColumn WithIndex(string indexLetter);
-
-    /// <summary>
-    /// 链式设置列索引字母。
-    /// </summary>
-    /// <param name="indexLetter">列索引字母，如 "A"、"B" 等。</param>
-    /// <returns>返回当前实例以支持链式调用。</returns>
-    /// <exception cref="ArgumentException">当传入的列索引字母为空或仅包含空白字符时抛出。</exception>
-    PurColumn WithIndexLetter(string indexLetter);
 
     /// <summary>
     /// 链式覆盖列名集合。

@@ -46,7 +46,9 @@ internal abstract class TableReaderBase : ITableReader
             // 解析列配置，并返回是否数据行（true 表示是数据行，应该继续执行循环体来作为数据行处理），
             // 如果返回 false 则表示当前行不是数据行，应该跳过当前行。
             if (!ResolveGenericColumns<T>(rawRowData, ref indexedColumns))
+            {
                 continue;
+            }
 
             // 如果没有任何表头配置则抛出异常
             if (indexedColumns == null || indexedColumns.Keys.Count == 0)
@@ -102,20 +104,25 @@ internal abstract class TableReaderBase : ITableReader
     {
         Dictionary<int, List<PurColumn>>? indexedColumns = null; // 用于存储列索引和对应的列配置
 
+        int dataIndex = 0; // 数据行计数器
         foreach (IDictionary<int, object?> rawRowData in ReadCore(tableConfig, progress, cancelToken))
         {
             // 解析字典列配置，并返回是否数据行（true 表示是数据行，应该继续执行循环体来作为数据行处理），
             // 如果返回 false 则表示当前行不是数据行，应该跳过当前行。
             if (!ResolveDictionaryColumns(rawRowData, ref indexedColumns))
+            {
                 continue;
+            }
 
             // 如果没有任何表头配置则抛出异常
             if (indexedColumns == null || indexedColumns.Keys.Count == 0)
                 throw new InvalidOperationException("无法创建数据列定义：未找到任何匹配的列配置");
 
-            Dictionary<string, object?> rowData = new();
+            if (tableConfig.MaxReadRows >= 0 && dataIndex >= tableConfig.MaxReadRows)
+                yield break; // 如果已达到最大读取行数，则停止迭代
 
-            // 开始读取行数据
+            // 读取数据行
+            Dictionary<string, object?> rowData = new();
             for (int colIndex = 0; colIndex < rawRowData.Keys.Count; colIndex++)
             {
                 object? cellValue = rawRowData[colIndex];
@@ -195,6 +202,18 @@ internal abstract class TableReaderBase : ITableReader
             }
         }
 
+        // 检查是否存在未匹配到的必需列
+        var missingRequiredColumns = mergedColumns
+            .Where(mc => mc is { IsRequired: true, IgnoreInQuery: false })
+            .ExceptBy(tempColumns.Select(tc => tc.PropertyName), rc => rc.PropertyName)
+            .ToList();
+        if (missingRequiredColumns.Any())
+        {
+            var missingColumnNames = string.Join("、", missingRequiredColumns.Select(rc => rc.PropertyName));
+            throw new InvalidDataException(
+                $"数据映射失败：配置了 IsRequired=true 的必需列 [{missingColumnNames}] 在表格中找不到对应的列。请检查列名映射配置或表格结构是否正确。");
+        }
+
         // 映射索引字典
         indexedColumns = tempColumns.Where(rsc => rsc.Index >= 0)
             .GroupBy(rsc => rsc.Index)
@@ -241,6 +260,18 @@ internal abstract class TableReaderBase : ITableReader
             {
                 tempColumns.Add(PurColumn.FromIndex(colIndex).WithProperty(propName));
             }
+        }
+
+        // 检查是否存在未匹配到的必需列
+        var missingRequiredColumns = TableConfig.CombinedColumns
+            .Where(mc => mc is { IsRequired: true, IgnoreInQuery: false })
+            .ExceptBy(tempColumns.Select(tc => tc.PropertyName), rc => rc.PropertyName)
+            .ToList();
+        if (missingRequiredColumns.Any())
+        {
+            var missingColumnNames = string.Join("、", missingRequiredColumns.Select(rc => rc.PropertyName));
+            throw new InvalidDataException(
+                $"列映射失败：配置了 IsRequired=true 的必需列 [{missingColumnNames}] 在表格中找不到对应的列。请检查列名映射配置或表格结构是否正确。");
         }
 
         // 映射索引字典
@@ -324,7 +355,7 @@ internal abstract class TableReaderBase : ITableReader
 
         if (targetType.TryGetValueConverter(out IValueConverter? converter))
         {
-            result = converter.Convert(cellValue, targetType, TableConfig.GetCulture(), columnConfig.Format);
+            result = converter.Convert(cellValue, targetType, columnConfig, TableConfig.GetCulture());
             return true;
         }
 

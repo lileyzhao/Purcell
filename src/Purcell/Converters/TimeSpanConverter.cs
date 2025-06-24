@@ -23,7 +23,7 @@ public class TimeSpanConverter : IValueConverter
     );
 
     /// <inheritdoc/>
-    public object? Convert(object? value, Type targetType, CultureInfo culture, string? format)
+    public object? Convert(object? value, Type targetType, PurColumn columnConfig, CultureInfo culture)
     {
         ArgumentNullException.ThrowIfNull(targetType);
 
@@ -61,8 +61,8 @@ public class TimeSpanConverter : IValueConverter
             ReadOnlySpan<char> trimmedValue = strValue.AsSpan().Trim();
 
             // 使用自定义格式化字符串
-            if (!string.IsNullOrWhiteSpace(format)
-                && TimeSpan.TryParseExact(trimmedValue, format, culture, out TimeSpan parseResult))
+            if (!string.IsNullOrWhiteSpace(columnConfig.Format)
+                && TimeSpan.TryParseExact(trimmedValue, columnConfig.Format, culture, out TimeSpan parseResult))
             {
                 return ConvertToDateType(parseResult, actualType) ?? defaultResult;
             }
@@ -73,8 +73,9 @@ public class TimeSpanConverter : IValueConverter
             }
 
             // 使用自定义格式化字符串
-            if (!string.IsNullOrWhiteSpace(format)
-                && DateTime.TryParseExact(trimmedValue, format, culture, DateTimeStyles.None, out DateTime parseDtResult))
+            if (!string.IsNullOrWhiteSpace(columnConfig.Format)
+                && DateTime.TryParseExact(trimmedValue, columnConfig.Format, culture, DateTimeStyles.None,
+                    out DateTime parseDtResult))
             {
                 return ConvertToDateType(parseDtResult.TimeOfDay, actualType) ?? defaultResult;
             }

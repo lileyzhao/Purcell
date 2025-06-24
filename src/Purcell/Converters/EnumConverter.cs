@@ -26,7 +26,7 @@ public class EnumConverter : IValueConverter
     }
 
     /// <inheritdoc/>
-    public object? Convert(object? value, Type targetType, CultureInfo culture, string? format)
+    public object? Convert(object? value, Type targetType, PurColumn columnConfig, CultureInfo culture)
     {
         ArgumentNullException.ThrowIfNull(targetType);
 

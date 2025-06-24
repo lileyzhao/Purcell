@@ -12,8 +12,8 @@ public interface IValueConverter
     /// </summary>
     /// <param name="value">要转换的单元格值，仅为以下类型之一：null、bool、double、string、DateTime、TimeSpan。</param>
     /// <param name="targetType">要转换到的目标类型</param>
+    /// <param name="columnConfig">格式化字符串</param>
     /// <param name="culture">用于转换的文化信息，来自PurTable的设置；若PurTable未设置文化信息，则为<c>CultureInfo.InvariantCulture</c></param>
-    /// <param name="format">格式化字符串</param>
     /// <returns>
     /// 转换后的值，其类型与目标类型完全匹配。转换规则如下：
     /// <list type="bullet">
@@ -22,5 +22,5 @@ public interface IValueConverter
     ///   <item>目标为引用类型：返回该类型的实例，转换失败时返回null</item>
     /// </list>
     /// </returns>
-    object? Convert(object? value, Type targetType, CultureInfo culture, string? format);
+    object? Convert(object? value, Type targetType, PurColumn columnConfig, CultureInfo culture);
 }

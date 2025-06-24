@@ -8,10 +8,6 @@ namespace PurcellLibs.Benchmarks;
 [Config(typeof(CustomConfig))]
 public class BenchmarkExport
 {
-    // 测试库
-    [Params("Purcell", "MiniExcel", "LargeXlsx")] public string? Lib { get; set; }
-
-    // 测试文件扩展名
     [Params("xlsx")] public string? Ext { get; set; }
 
     [Benchmark(Description = $"*{nameof(ExportDict_LargeXlsx)}*", Baseline = true)]
@@ -19,13 +15,13 @@ public class BenchmarkExport
     {
         string filePath = FileHelper.GenExportFilePath(Ext);
 
-        using var stream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
-        using var xlsxWriter = new XlsxWriter(stream, CompressionLevel.BestSpeed, false, false);
+        using FileStream stream = new(filePath, FileMode.Create, FileAccess.Write);
+        using XlsxWriter xlsxWriter = new(stream, CompressionLevel.BestSpeed, false, false);
 
         xlsxWriter.BeginWorksheet("Sheet1").BeginRow();
 
         int rowIndex = 0;
-        foreach (var dict in _dictData)
+        foreach (Dictionary<string, object?> dict in _dictData)
         {
             if (rowIndex == 0)
             {
@@ -37,7 +33,7 @@ public class BenchmarkExport
             }
 
             xlsxWriter.BeginRow();
-            foreach (var kvp in dict)
+            foreach (KeyValuePair<string, object?> kvp in dict)
             {
                 switch (kvp.Value)
                 {
@@ -95,7 +91,7 @@ public class BenchmarkExport
         Purcell.Export(_genericData, filePath);
         if (File.Exists(filePath)) File.Delete(filePath);
     }
-    
+
     [Benchmark(Description = nameof(ExportGeneric_MiniExcel))]
     public void ExportGeneric_MiniExcel()
     {
@@ -104,24 +100,24 @@ public class BenchmarkExport
         if (File.Exists(filePath)) File.Delete(filePath);
     }
 
-    //[Benchmark(Description = "ExportAnonymousObject")]
-    public void ExportAnonymousObject()
+    [Benchmark(Description = nameof(ExportAnonymousObject_Purcell))]
+    public void ExportAnonymousObject_Purcell()
     {
         string filePath = FileHelper.GenExportFilePath(Ext);
-        if (Lib == "Purcell")
-        {
-            Purcell.Export(_anonObjectData, filePath);
-        }
-        else
-        {
-            MiniExcel.SaveAs(filePath, _anonObjectData);
-        }
-
+        Purcell.Export(_anonObjectData, filePath);
         if (File.Exists(filePath)) File.Delete(filePath);
     }
 
-    //[Benchmark(Description = "ExportAnonymousDynamic")]
-    public void ExportAnonymousDynamic()
+    [Benchmark(Description = nameof(ExportAnonymousObject_MiniExcel))]
+    public void ExportAnonymousObject_MiniExcel()
+    {
+        string filePath = FileHelper.GenExportFilePath(Ext);
+        MiniExcel.SaveAs(filePath, _anonObjectData);
+        if (File.Exists(filePath)) File.Delete(filePath);
+    }
+
+    [Benchmark(Description = nameof(ExportAnonymousDynamic_Purcell))]
+    public void ExportAnonymousDynamic_Purcell()
     {
         string filePath = FileHelper.GenExportFilePath(Ext);
         var anonymousList = _genericData.Select(item => new
@@ -137,18 +133,31 @@ public class BenchmarkExport
             item.Profile, // 个人简介
             item.EntryDate // 入职时间 (2010-2023年)
         });
-        if (Lib == "Purcell")
-        {
-            Purcell.Export(PurTable.From(anonymousList), filePath);
-        }
-        else
-        {
-            MiniExcel.SaveAs(filePath, anonymousList);
-        }
-
+        Purcell.Export(PurTable.From(anonymousList), filePath);
         if (File.Exists(filePath)) File.Delete(filePath);
     }
-    
+
+    [Benchmark(Description = nameof(ExportAnonymousDynamic_MiniExcel))]
+    public void ExportAnonymousDynamic_MiniExcel()
+    {
+        string filePath = FileHelper.GenExportFilePath(Ext);
+        var anonymousList = _genericData.Select(item => new
+        {
+            item.Id, // 编号
+            item.Name,
+            item.Age, // 年龄 (18-60岁)
+            item.Gender, // 性别
+            item.BirthDate, // 出生日期 (1960-2000年)
+            item.Salary, // 工资 (5000-50000)
+            item.PerformanceScore, // 绩效评分 (1-5分)
+            item.AttendanceRate, // 出勤率 (0.7-1.0)
+            item.Profile, // 个人简介
+            item.EntryDate // 入职时间 (2010-2023年)
+        });
+        MiniExcel.SaveAs(filePath, anonymousList);
+        if (File.Exists(filePath)) File.Delete(filePath);
+    }
+
     private List<SampleData.Employee> _genericData = [];
     private List<Dictionary<string, object?>> _dictData = [];
     private List<object> _anonObjectData = [];
