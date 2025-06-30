@@ -8,18 +8,18 @@ public static partial class Purcell
     #region 同步导出
 
     /// <inheritdoc cref="IPurExporter.Export(IList{PurTable},IProgress{WritePosition},CancellationToken)"/>
-    public static void Export(IList<PurTable> tableConfigs, Stream stream, ExportType exportType,
+    public static void Export(IList<PurTable> tableConfigs, Stream stream, TableFileType fileType,
         IProgress<WritePosition>? progress = null, CancellationToken cancelToken = default)
     {
-        using IPurExporter exporter = CreateExporter(stream, exportType);
+        using IPurExporter exporter = CreateExporter(stream, fileType);
         exporter.Export(tableConfigs, progress, cancelToken);
     }
 
     /// <inheritdoc cref="IPurExporter.Export(IList{PurTable},IProgress{WritePosition},CancellationToken)"/>
-    public static void Export(PurTable tableConfig, Stream stream, ExportType exportType,
+    public static void Export(PurTable tableConfig, Stream stream, TableFileType fileType,
         IProgress<WritePosition>? progress = null, CancellationToken cancelToken = default)
     {
-        using IPurExporter exporter = CreateExporter(stream, exportType);
+        using IPurExporter exporter = CreateExporter(stream, fileType);
         exporter.Export([tableConfig], progress, cancelToken);
     }
 
@@ -40,7 +40,7 @@ public static partial class Purcell
     }
 
     /// <inheritdoc cref="IPurExporter.Export(IList{PurTable},IProgress{WritePosition},CancellationToken)"/>
-    public static void Export<T>(IEnumerable<T?> records, Stream stream, ExportType exportType,
+    public static void Export<T>(IEnumerable<T?> records, Stream stream, TableFileType fileType,
         string sheetName = "", bool hasHeader = true, string headerStart = "A1", string dataStart = "",
         List<PurColumn>? columns = null, int maxWriteRows = -1, string? fileEncoding = null,
         string csvDelimiter = ",", char csvEscape = '"', int sampleRows = 5, bool autoFilter = true,
@@ -62,12 +62,12 @@ public static partial class Purcell
         if (!string.IsNullOrEmpty(password)) tableConfig.WithPassword(password);
         if (tableStyle != null) tableConfig.WithTableStyle(tableStyle);
 
-        using IPurExporter exporter = CreateExporter(stream, exportType);
+        using IPurExporter exporter = CreateExporter(stream, fileType);
         exporter.Export([tableConfig], progress, cancelToken);
     }
 
     /// <inheritdoc cref="IPurExporter.Export(IList{PurTable},IProgress{WritePosition},CancellationToken)"/>
-    public static void Export(DataTable records, Stream stream, ExportType exportType,
+    public static void Export(DataTable records, Stream stream, TableFileType fileType,
         string sheetName = "", bool hasHeader = true, string headerStart = "A1", string dataStart = "",
         List<PurColumn>? columns = null, int maxWriteRows = -1, string? fileEncoding = null,
         string csvDelimiter = ",", char csvEscape = '"', int sampleRows = 5, bool autoFilter = true,
@@ -89,7 +89,7 @@ public static partial class Purcell
         if (!string.IsNullOrEmpty(password)) tableConfig.WithPassword(password);
         if (tableStyle != null) tableConfig.WithTableStyle(tableStyle);
 
-        using IPurExporter exporter = CreateExporter(stream, exportType);
+        using IPurExporter exporter = CreateExporter(stream, fileType);
         exporter.Export([tableConfig], progress, cancelToken);
     }
 
@@ -151,7 +151,7 @@ public static partial class Purcell
     public static void ExportCsv(PurTable tableConfig, Stream stream,
         IProgress<WritePosition>? progress = null, CancellationToken cancelToken = default)
     {
-        using IPurExporter exporter = CreateExporter(stream, ExportType.Csv);
+        using IPurExporter exporter = CreateExporter(stream, TableFileType.Csv);
         exporter.Export([tableConfig], progress, cancelToken);
     }
 
@@ -164,7 +164,7 @@ public static partial class Purcell
         IProgress<WritePosition>? progress = null, CancellationToken cancelToken = default)
     {
         Export(
-            records, stream, ExportType.Csv,
+            records, stream, TableFileType.Csv,
             sheetName, hasHeader, headerStart, dataStart,
             columns, maxWriteRows, fileEncoding,
             csvDelimiter, csvEscape, sampleRows, autoFilter,
@@ -181,7 +181,7 @@ public static partial class Purcell
         IProgress<WritePosition>? progress = null, CancellationToken cancelToken = default)
     {
         Export(
-            dataTable, stream, ExportType.Csv,
+            dataTable, stream, TableFileType.Csv,
             sheetName, hasHeader, headerStart, dataStart,
             columns, maxWriteRows, fileEncoding,
             csvDelimiter, csvEscape, sampleRows, autoFilter,
@@ -193,7 +193,7 @@ public static partial class Purcell
     public static void ExportXlsx(IList<PurTable> tableConfigs, Stream stream,
         IProgress<WritePosition>? progress = null, CancellationToken cancelToken = default)
     {
-        using IPurExporter exporter = CreateExporter(stream, ExportType.Xlsx);
+        using IPurExporter exporter = CreateExporter(stream, TableFileType.Xlsx);
         exporter.Export(tableConfigs, progress, cancelToken);
     }
 
@@ -201,7 +201,7 @@ public static partial class Purcell
     public static void ExportXlsx(PurTable tableConfig, Stream stream,
         IProgress<WritePosition>? progress = null, CancellationToken cancelToken = default)
     {
-        using IPurExporter exporter = CreateExporter(stream, ExportType.Xlsx);
+        using IPurExporter exporter = CreateExporter(stream, TableFileType.Xlsx);
         exporter.Export([tableConfig], progress, cancelToken);
     }
 
@@ -214,7 +214,7 @@ public static partial class Purcell
         IProgress<WritePosition>? progress = null, CancellationToken cancelToken = default)
     {
         Export(
-            records, stream, ExportType.Xlsx,
+            records, stream, TableFileType.Xlsx,
             sheetName, hasHeader, headerStart, dataStart,
             columns, maxWriteRows, fileEncoding,
             csvDelimiter, csvEscape, sampleRows, autoFilter,
@@ -231,7 +231,7 @@ public static partial class Purcell
         IProgress<WritePosition>? progress = null, CancellationToken cancelToken = default)
     {
         Export(
-            dataTable, stream, ExportType.Xlsx,
+            dataTable, stream, TableFileType.Xlsx,
             sheetName, hasHeader, headerStart, dataStart,
             columns, maxWriteRows, fileEncoding,
             csvDelimiter, csvEscape, sampleRows, autoFilter,
@@ -244,17 +244,19 @@ public static partial class Purcell
     #region 异步导出
 
     /// <inheritdoc cref="IPurExporter.Export(IList{PurTable},IProgress{WritePosition},CancellationToken)"/>
-    public static async Task ExportAsync(IList<PurTable> tableConfigs, Stream stream, ExportType exportType,
+    public static async Task ExportAsync(IList<PurTable> tableConfigs, Stream stream, TableFileType fileType,
         IProgress<WritePosition>? progress = null, CancellationToken cancelToken = default)
     {
-        await Task.Run(() => Export(tableConfigs, stream, exportType, progress, cancelToken), cancelToken).ConfigureAwait(false);
+        await Task.Run(() => Export(tableConfigs, stream, fileType, progress, cancelToken), cancelToken)
+            .ConfigureAwait(false);
     }
 
     /// <inheritdoc cref="IPurExporter.Export(IList{PurTable},IProgress{WritePosition},CancellationToken)"/>
-    public static async Task ExportAsync(PurTable tableConfig, Stream stream, ExportType exportType,
+    public static async Task ExportAsync(PurTable tableConfig, Stream stream, TableFileType fileType,
         IProgress<WritePosition>? progress = null, CancellationToken cancelToken = default)
     {
-        await Task.Run(() => Export(tableConfig, stream, exportType, progress, cancelToken), cancelToken).ConfigureAwait(false);
+        await Task.Run(() => Export(tableConfig, stream, fileType, progress, cancelToken), cancelToken)
+            .ConfigureAwait(false);
     }
 
     /// <inheritdoc cref="IPurExporter.Export(IList{PurTable},IProgress{WritePosition},CancellationToken)"/>
@@ -272,7 +274,7 @@ public static partial class Purcell
     }
 
     /// <inheritdoc cref="IPurExporter.Export(IList{PurTable},IProgress{WritePosition},CancellationToken)"/>
-    public static async Task ExportAsync<T>(IEnumerable<T?> records, Stream stream, ExportType exportType,
+    public static async Task ExportAsync<T>(IEnumerable<T?> records, Stream stream, TableFileType fileType,
         string sheetName = "", bool hasHeader = true, string headerStart = "A1", string dataStart = "",
         List<PurColumn>? columns = null, int maxWriteRows = -1, string? fileEncoding = null,
         string csvDelimiter = ",", char csvEscape = '"', int sampleRows = 5, bool autoFilter = true,
@@ -280,7 +282,7 @@ public static partial class Purcell
         IProgress<WritePosition>? progress = null, CancellationToken cancelToken = default)
     {
         await Task.Run(() => Export(
-                    records, stream, exportType,
+                    records, stream, fileType,
                     sheetName, hasHeader, headerStart, dataStart,
                     columns, maxWriteRows, fileEncoding,
                     csvDelimiter, csvEscape, sampleRows, autoFilter,
@@ -291,7 +293,7 @@ public static partial class Purcell
     }
 
     /// <inheritdoc cref="IPurExporter.Export(IList{PurTable},IProgress{WritePosition},CancellationToken)"/>
-    public static async Task ExportAsync(DataTable dataTable, Stream stream, ExportType exportType,
+    public static async Task ExportAsync(DataTable dataTable, Stream stream, TableFileType fileType,
         string sheetName = "", bool hasHeader = true, string headerStart = "A1", string dataStart = "",
         List<PurColumn>? columns = null, int maxWriteRows = -1, string? fileEncoding = null,
         string csvDelimiter = ",", char csvEscape = '"', int sampleRows = 5, bool autoFilter = true,
@@ -299,7 +301,7 @@ public static partial class Purcell
         IProgress<WritePosition>? progress = null, CancellationToken cancelToken = default)
     {
         await Task.Run(() => Export(
-                    dataTable, stream, exportType,
+                    dataTable, stream, fileType,
                     sheetName, hasHeader, headerStart, dataStart,
                     columns, maxWriteRows, fileEncoding,
                     csvDelimiter, csvEscape, sampleRows, autoFilter,
@@ -363,7 +365,7 @@ public static partial class Purcell
         IProgress<WritePosition>? progress = null, CancellationToken cancelToken = default)
     {
         await Task.Run(() => Export(
-                    records, stream, ExportType.Csv,
+                    records, stream, TableFileType.Csv,
                     sheetName, hasHeader, headerStart, dataStart,
                     columns, maxWriteRows, fileEncoding,
                     csvDelimiter, csvEscape, sampleRows, autoFilter,
@@ -382,7 +384,7 @@ public static partial class Purcell
         IProgress<WritePosition>? progress = null, CancellationToken cancelToken = default)
     {
         await Task.Run(() => Export(
-                    dataTable, stream, ExportType.Csv,
+                    dataTable, stream, TableFileType.Csv,
                     sheetName, hasHeader, headerStart, dataStart,
                     columns, maxWriteRows, fileEncoding,
                     csvDelimiter, csvEscape, sampleRows, autoFilter,
@@ -396,7 +398,8 @@ public static partial class Purcell
     public static async Task ExportXlsxAsync(IList<PurTable> tableConfigs, Stream stream,
         IProgress<WritePosition>? progress = null, CancellationToken cancelToken = default)
     {
-        await Task.Run(() => ExportXlsx(tableConfigs, stream, progress, cancelToken), cancelToken).ConfigureAwait(false);
+        await Task.Run(() => ExportXlsx(tableConfigs, stream, progress, cancelToken), cancelToken)
+            .ConfigureAwait(false);
     }
 
     /// <inheritdoc cref="IPurExporter.Export(IList{PurTable},IProgress{WritePosition},CancellationToken)"/>
@@ -415,7 +418,7 @@ public static partial class Purcell
         IProgress<WritePosition>? progress = null, CancellationToken cancelToken = default)
     {
         await Task.Run(() => Export(
-                    records, stream, ExportType.Xlsx,
+                    records, stream, TableFileType.Xlsx,
                     sheetName, hasHeader, headerStart, dataStart,
                     columns, maxWriteRows, fileEncoding,
                     csvDelimiter, csvEscape, sampleRows, autoFilter,
@@ -434,7 +437,7 @@ public static partial class Purcell
         IProgress<WritePosition>? progress = null, CancellationToken cancelToken = default)
     {
         await Task.Run(() => Export(
-                    dataTable, stream, ExportType.Xlsx,
+                    dataTable, stream, TableFileType.Xlsx,
                     sheetName, hasHeader, headerStart, dataStart,
                     columns, maxWriteRows, fileEncoding,
                     csvDelimiter, csvEscape, sampleRows, autoFilter,

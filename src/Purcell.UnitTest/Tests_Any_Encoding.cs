@@ -1,5 +1,5 @@
 using System.Text;
-using PurcellLibs.Utilities;
+using PurcellLibs.Utils;
 using Xunit.Abstractions;
 
 // ReSharper disable InconsistentNaming

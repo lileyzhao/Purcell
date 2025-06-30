@@ -13,7 +13,7 @@ public static partial class Purcell
         IProgress<int>? progress = null, CancellationToken cancelToken = default)
         where T : class, new()
     {
-        using IPurQuerier querier = CreateQuerier(stream, QueryType.Csv);
+        using IPurQuerier querier = CreateQuerier(stream, TableFileType.Csv);
         foreach (T item in querier.Query<T>(tableConfig, progress, cancelToken))
             yield return item;
     }
@@ -23,7 +23,7 @@ public static partial class Purcell
         Stream stream, PurTable? tableConfig = null,
         IProgress<int>? progress = null, CancellationToken cancelToken = default)
     {
-        using IPurQuerier querier = CreateQuerier(stream, QueryType.Csv);
+        using IPurQuerier querier = CreateQuerier(stream, TableFileType.Csv);
         foreach (IDictionary<string, object?> item in querier.Query(tableConfig, progress, cancelToken))
             yield return item;
     }
@@ -33,7 +33,7 @@ public static partial class Purcell
         Stream stream, PurTable? tableConfig = null,
         IProgress<int>? progress = null, CancellationToken cancelToken = default)
     {
-        using IPurQuerier querier = CreateQuerier(stream, QueryType.Csv);
+        using IPurQuerier querier = CreateQuerier(stream, TableFileType.Csv);
         foreach (dynamic item in querier.QueryDynamic(tableConfig, progress, cancelToken))
             yield return item;
     }
@@ -44,7 +44,7 @@ public static partial class Purcell
         IProgress<int>? progress = null, CancellationToken cancelToken = default)
         where T : class, new()
     {
-        using IPurQuerier querier = CreateQuerier(stream, QueryType.Xlsx);
+        using IPurQuerier querier = CreateQuerier(stream, TableFileType.Xlsx);
         foreach (T item in querier.Query<T>(tableConfig, progress, cancelToken))
             yield return item;
     }
@@ -54,7 +54,7 @@ public static partial class Purcell
         Stream stream, PurTable? tableConfig = null,
         IProgress<int>? progress = null, CancellationToken cancelToken = default)
     {
-        using IPurQuerier querier = CreateQuerier(stream, QueryType.Xlsx);
+        using IPurQuerier querier = CreateQuerier(stream, TableFileType.Xlsx);
         foreach (IDictionary<string, object?> item in querier.Query(tableConfig, progress, cancelToken))
             yield return item;
     }
@@ -64,41 +64,11 @@ public static partial class Purcell
         Stream stream, PurTable? tableConfig = null,
         IProgress<int>? progress = null, CancellationToken cancelToken = default)
     {
-        using IPurQuerier querier = CreateQuerier(stream, QueryType.Xlsx);
+        using IPurQuerier querier = CreateQuerier(stream, TableFileType.Xlsx);
         foreach (dynamic item in querier.QueryDynamic(tableConfig, progress, cancelToken))
             yield return item;
     }
 
-    /// <inheritdoc cref="IPurQuerier.Query{T}(PurTable,IProgress{int},CancellationToken)"/>
-    public static IEnumerable<T> QueryXlsb<T>(
-        Stream stream, PurTable? tableConfig = null,
-        IProgress<int>? progress = null, CancellationToken cancelToken = default)
-        where T : class, new()
-    {
-        using IPurQuerier querier = CreateQuerier(stream, QueryType.Xlsb);
-        foreach (T item in querier.Query<T>(tableConfig, progress, cancelToken))
-            yield return item;
-    }
-
-    /// <inheritdoc cref="IPurQuerier.Query(PurTable,IProgress{int},CancellationToken)"/>
-    public static IEnumerable<IDictionary<string, object?>> QueryXlsb(
-        Stream stream, PurTable? tableConfig = null,
-        IProgress<int>? progress = null, CancellationToken cancelToken = default)
-    {
-        using IPurQuerier querier = CreateQuerier(stream, QueryType.Xlsb);
-        foreach (IDictionary<string, object?> item in querier.Query(tableConfig, progress, cancelToken))
-            yield return item;
-    }
-
-    /// <inheritdoc cref="IPurQuerier.QueryDynamic(PurTable,IProgress{int},CancellationToken)"/>
-    public static IEnumerable<dynamic> QueryXlsbDynamic(
-        Stream stream, PurTable? tableConfig = null,
-        IProgress<int>? progress = null, CancellationToken cancelToken = default)
-    {
-        using IPurQuerier querier = CreateQuerier(stream, QueryType.Xlsb);
-        foreach (dynamic item in querier.QueryDynamic(tableConfig, progress, cancelToken))
-            yield return item;
-    }
 
     /// <inheritdoc cref="IPurQuerier.Query{T}(PurTable,IProgress{int},CancellationToken)"/>
     public static IEnumerable<T> QueryXls<T>(
@@ -106,7 +76,7 @@ public static partial class Purcell
         IProgress<int>? progress = null, CancellationToken cancelToken = default)
         where T : class, new()
     {
-        using IPurQuerier querier = CreateQuerier(stream, QueryType.Xls);
+        using IPurQuerier querier = CreateQuerier(stream, TableFileType.Xls);
         foreach (T item in querier.Query<T>(tableConfig, progress, cancelToken))
             yield return item;
     }
@@ -116,7 +86,7 @@ public static partial class Purcell
         Stream stream, PurTable? tableConfig = null,
         IProgress<int>? progress = null, CancellationToken cancelToken = default)
     {
-        using IPurQuerier querier = CreateQuerier(stream, QueryType.Xls);
+        using IPurQuerier querier = CreateQuerier(stream, TableFileType.Xls);
         foreach (IDictionary<string, object?> item in querier.Query(tableConfig, progress, cancelToken))
             yield return item;
     }
@@ -126,7 +96,7 @@ public static partial class Purcell
         Stream stream, PurTable? tableConfig = null,
         IProgress<int>? progress = null, CancellationToken cancelToken = default)
     {
-        using IPurQuerier querier = CreateQuerier(stream, QueryType.Xls);
+        using IPurQuerier querier = CreateQuerier(stream, TableFileType.Xls);
         foreach (dynamic item in querier.QueryDynamic(tableConfig, progress, cancelToken))
             yield return item;
     }
@@ -191,33 +161,6 @@ public static partial class Purcell
             .ConfigureAwait(false);
     }
 
-    /// <inheritdoc cref="IPurQuerier.Query{T}(PurTable,IProgress{int},CancellationToken)"/>
-    public static async Task<IEnumerable<T>> QueryXlsbAsync<T>(
-        Stream stream, PurTable? tableConfig = null,
-        IProgress<int>? progress = null, CancellationToken cancelToken = default)
-        where T : class, new()
-    {
-        return await Task.Run(() => QueryXlsb<T>(stream, tableConfig, progress, cancelToken), cancelToken)
-            .ConfigureAwait(false);
-    }
-
-    /// <inheritdoc cref="IPurQuerier.Query(PurTable,IProgress{int},CancellationToken)"/>
-    public static async Task<IEnumerable<IDictionary<string, object?>>> QueryXlsbAsync(
-        Stream stream, PurTable? tableConfig = null,
-        IProgress<int>? progress = null, CancellationToken cancelToken = default)
-    {
-        return await Task.Run(() => QueryXlsb(stream, tableConfig, progress, cancelToken), cancelToken)
-            .ConfigureAwait(false);
-    }
-
-    /// <inheritdoc cref="IPurQuerier.QueryDynamic(PurTable,IProgress{int},CancellationToken)"/>
-    public static async Task<IEnumerable<dynamic>> QueryXlsbDynamicAsync(
-        Stream stream, PurTable? tableConfig = null,
-        IProgress<int>? progress = null, CancellationToken cancelToken = default)
-    {
-        return await Task.Run(() => QueryXlsbDynamic(stream, tableConfig, progress, cancelToken), cancelToken)
-            .ConfigureAwait(false);
-    }
 
     /// <inheritdoc cref="IPurQuerier.Query{T}(PurTable,IProgress{int},CancellationToken)"/>
     public static async Task<IEnumerable<T>> QueryXlsAsync<T>(

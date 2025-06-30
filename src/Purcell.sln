@@ -10,11 +10,19 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "解决方案项", "解决方案项", "{6A1160C6-8CD5-4FFA-B561-2DC86309FD1C}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		CLAUDE.md = CLAUDE.md
+		.gitignore = .gitignore
+		.claude/settings.json = .claude/settings.json
+		.claude/settings.local.json = .claude/settings.local.json
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Purcell.UnitTest", "Purcell.UnitTest\Purcell.UnitTest.csproj", "{BFE9B4CF-98A5-4961-BA92-8405F458E57E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Purcell.ConsoleApp", "Purcell.ConsoleApp\Purcell.ConsoleApp.csproj", "{252A7E3D-052C-4863-A25C-45257EF5A3AE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpEdge", "SharpEdge\SharpEdge.csproj", "{1B990FE0-4635-4C20-80BD-F1FBFDB8B32B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Purcell.FakeData", "Purcell.FakeData\Purcell.FakeData.csproj", "{5C937840-0E84-4851-A3DC-E2F7A4F0F034}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,11 +46,21 @@ Global
 		{252A7E3D-052C-4863-A25C-45257EF5A3AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{252A7E3D-052C-4863-A25C-45257EF5A3AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{252A7E3D-052C-4863-A25C-45257EF5A3AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B990FE0-4635-4C20-80BD-F1FBFDB8B32B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B990FE0-4635-4C20-80BD-F1FBFDB8B32B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B990FE0-4635-4C20-80BD-F1FBFDB8B32B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B990FE0-4635-4C20-80BD-F1FBFDB8B32B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C937840-0E84-4851-A3DC-E2F7A4F0F034}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C937840-0E84-4851-A3DC-E2F7A4F0F034}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C937840-0E84-4851-A3DC-E2F7A4F0F034}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C937840-0E84-4851-A3DC-E2F7A4F0F034}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {08413471-50D1-4DFC-A330-74D130A87A98}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
 EndGlobal

@@ -9,12 +9,12 @@ public static partial class Purcell
     /// 根据数据流和类型创建相应的表格导出器
     /// </summary>
     /// <param name="stream">数据流</param>
-    /// <param name="exportType">导出类型枚举</param>
+    /// <param name="fileType">导出类型枚举</param>
     /// <returns>对应类型的表格导出器实例</returns>
     /// <exception cref="NotSupportedException">当指定了不支持的导出类型时抛出</exception>
-    public static IPurExporter CreateExporter(Stream stream, ExportType exportType)
+    public static IPurExporter CreateExporter(Stream stream, TableFileType fileType)
     {
-        return new PurExporter(stream, exportType);
+        return new PurExporter(stream, fileType);
     }
 
     /// <summary>
@@ -35,7 +35,7 @@ public static partial class Purcell
     /// <param name="type">导入类型枚举</param>
     /// <returns>对应类型的表格查询器实例</returns>
     /// <exception cref="NotSupportedException">当指定了不支持的文件类型时抛出</exception>
-    public static IPurQuerier CreateQuerier(Stream stream, QueryType type)
+    public static IPurQuerier CreateQuerier(Stream stream, TableFileType type)
     {
         return new PurQuerier(stream, type);
     }

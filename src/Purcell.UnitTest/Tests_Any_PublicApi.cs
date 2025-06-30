@@ -7,10 +7,10 @@ namespace PurcellLibs.UnitTest;
 public class Tests_Any_PublicApi(ITestOutputHelper testHelper)
 {
     [Theory]
-    [InlineData("xlsx", QueryType.Xlsx)]
-    [InlineData("xls", QueryType.Xls)]
-    [InlineData("csv", QueryType.Csv)]
-    public void TestGeneric(string extension, QueryType queryType)
+    [InlineData("xlsx", TableFileType.Xlsx)]
+    [InlineData("xls", TableFileType.Xls)]
+    [InlineData("csv", TableFileType.Csv)]
+    public void TestGeneric(string extension, TableFileType queryType)
     {
         string filePath = $"Resources/Employee_100.{extension}";
 

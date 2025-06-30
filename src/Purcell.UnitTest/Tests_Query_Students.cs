@@ -9,10 +9,10 @@ namespace PurcellLibs.UnitTest.ReadingTableTests;
 public class Tests_Query_Students(ITestOutputHelper testHelper)
 {
     [Theory]
-    [InlineData("xlsx", QueryType.Xlsx)]
-    [InlineData("xls", QueryType.Xls)]
-    [InlineData("csv", QueryType.Csv)]
-    public void TestBasicReadingEn(string extension, QueryType queryType)
+    [InlineData("xlsx", TableFileType.Xlsx)]
+    [InlineData("xls", TableFileType.Xls)]
+    [InlineData("csv", TableFileType.Csv)]
+    public void TestBasicReadingEn(string extension, TableFileType fileType)
     {
         string domain = "StudentsEn";
         string filePath = $"Resources/{domain}.{extension}";
@@ -104,10 +104,10 @@ public class Tests_Query_Students(ITestOutputHelper testHelper)
     }
 
     [Theory]
-    [InlineData("xlsx", QueryType.Xlsx)]
-    [InlineData("xls", QueryType.Xls)]
-    [InlineData("csv", QueryType.Csv)]
-    public void TestBasicReadingCn(string extension, QueryType queryType)
+    [InlineData("xlsx", TableFileType.Xlsx)]
+    [InlineData("xls", TableFileType.Xls)]
+    [InlineData("csv", TableFileType.Csv)]
+    public void TestBasicReadingCn(string extension, TableFileType fileType)
     {
         string domain = "StudentsCn";
         string filePath = $"Resources/{domain}.{extension}";
@@ -195,10 +195,10 @@ public class Tests_Query_Students(ITestOutputHelper testHelper)
     }
 
     [Theory]
-    [InlineData("xlsx", QueryType.Xlsx)]
-    [InlineData("xls", QueryType.Xls)]
-    [InlineData("csv", QueryType.Csv)]
-    public void TestBasicReadingCnDynamicColumns(string extension, QueryType queryType)
+    [InlineData("xlsx", TableFileType.Xlsx)]
+    [InlineData("xls", TableFileType.Xls)]
+    [InlineData("csv", TableFileType.Csv)]
+    public void TestBasicReadingCnDynamicColumns(string extension, TableFileType fileType)
     {
         string domain = "StudentsCn";
         string filePath = $"Resources/{domain}.{extension}";

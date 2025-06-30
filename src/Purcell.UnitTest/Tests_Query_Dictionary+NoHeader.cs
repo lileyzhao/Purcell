@@ -7,10 +7,10 @@ namespace PurcellLibs.UnitTest;
 public partial class Tests_Query_Dictionary
 {
     [Theory]
-    [InlineData("xlsx", QueryType.Xlsx)]
-    [InlineData("xls", QueryType.Xls)]
-    [InlineData("csv", QueryType.Csv)]
-    public async Task TestQueryDictionaryAsync_Complex_FilePath_NoHeader(string extension, QueryType queryType)
+    [InlineData("xlsx", TableFileType.Xlsx)]
+    [InlineData("xls", TableFileType.Xls)]
+    [InlineData("csv", TableFileType.Csv)]
+    public async Task TestQueryDictionaryAsync_Complex_FilePath_NoHeader(string extension, TableFileType fileType)
     {
         string domain = "Complex";
         string filePath = $"Resources/{domain}.{extension}";
@@ -74,10 +74,10 @@ public partial class Tests_Query_Dictionary
     }
 
     [Theory]
-    [InlineData("xlsx", QueryType.Xlsx)]
-    [InlineData("xls", QueryType.Xls)]
-    [InlineData("csv", QueryType.Csv)]
-    public void TestQueryDictionary_Complex_FilePath_NoHeader(string extension, QueryType queryType)
+    [InlineData("xlsx", TableFileType.Xlsx)]
+    [InlineData("xls", TableFileType.Xls)]
+    [InlineData("csv", TableFileType.Csv)]
+    public void TestQueryDictionary_Complex_FilePath_NoHeader(string extension, TableFileType fileType)
     {
         string domain = "Complex";
         string filePath = $"Resources/{domain}.{extension}";
@@ -141,10 +141,10 @@ public partial class Tests_Query_Dictionary
     }
 
     [Theory]
-    [InlineData("xlsx", QueryType.Xlsx)]
-    [InlineData("xls", QueryType.Xls)]
-    [InlineData("csv", QueryType.Csv)]
-    public async Task TestQueryDictionaryAsync_Complex_FileStream_NoHeader(string extension, QueryType queryType)
+    [InlineData("xlsx", TableFileType.Xlsx)]
+    [InlineData("xls", TableFileType.Xls)]
+    [InlineData("csv", TableFileType.Csv)]
+    public async Task TestQueryDictionaryAsync_Complex_FileStream_NoHeader(string extension, TableFileType fileType)
     {
         string domain = "Complex";
         string filePath = $"Resources/{domain}.{extension}";
@@ -152,7 +152,7 @@ public partial class Tests_Query_Dictionary
         int rowIndex = -1;
         PurTable tableConfig = new() { HasHeader = false };
         await using FileStream fileStream = File.OpenRead(filePath);
-        foreach (IDictionary<string, object?> item in await Purcell.QueryAsync(fileStream, queryType, tableConfig))
+        foreach (IDictionary<string, object?> item in await Purcell.QueryAsync(fileStream, fileType, tableConfig))
         {
             rowIndex++;
             testHelper.WriteLine($"第 {rowIndex + 1} 行：");
@@ -209,10 +209,10 @@ public partial class Tests_Query_Dictionary
     }
 
     [Theory]
-    [InlineData("xlsx", QueryType.Xlsx)]
-    [InlineData("xls", QueryType.Xls)]
-    [InlineData("csv", QueryType.Csv)]
-    public void TestQueryDictionary_Complex_FileStream_NoHeader(string extension, QueryType queryType)
+    [InlineData("xlsx", TableFileType.Xlsx)]
+    [InlineData("xls", TableFileType.Xls)]
+    [InlineData("csv", TableFileType.Csv)]
+    public void TestQueryDictionary_Complex_FileStream_NoHeader(string extension, TableFileType fileType)
     {
         string domain = "Complex";
         string filePath = $"Resources/{domain}.{extension}";
@@ -220,7 +220,7 @@ public partial class Tests_Query_Dictionary
         int rowIndex = -1;
         PurTable tableConfig = new() { HasHeader = false };
         using FileStream fileStream = File.OpenRead(filePath);
-        foreach (IDictionary<string, object?> item in Purcell.Query(fileStream, queryType, tableConfig))
+        foreach (IDictionary<string, object?> item in Purcell.Query(fileStream, fileType, tableConfig))
         {
             rowIndex++;
             testHelper.WriteLine($"第 {rowIndex + 1} 行：");

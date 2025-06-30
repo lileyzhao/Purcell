@@ -8,10 +8,10 @@ namespace PurcellLibs.UnitTest;
 public partial class Tests_Query_Dynamic(ITestOutputHelper testHelper)
 {
     [Theory]
-    [InlineData("xlsx", QueryType.Xlsx)]
-    [InlineData("xls", QueryType.Xls)]
-    [InlineData("csv", QueryType.Csv)]
-    public async Task TestQueryDynamicAsync_Complex_FilePath(string extension, QueryType queryType)
+    [InlineData("xlsx", TableFileType.Xlsx)]
+    [InlineData("xls", TableFileType.Xls)]
+    [InlineData("csv", TableFileType.Csv)]
+    public async Task TestQueryDynamicAsync_Complex_FilePath(string extension, TableFileType fileType)
     {
         string domain = "Complex";
         string filePath = $"Resources/{domain}.{extension}";
@@ -78,10 +78,10 @@ public partial class Tests_Query_Dynamic(ITestOutputHelper testHelper)
     }
 
     [Theory]
-    [InlineData("xlsx", QueryType.Xlsx)]
-    [InlineData("xls", QueryType.Xls)]
-    [InlineData("csv", QueryType.Csv)]
-    public void TestQueryDynamic_Complex_FilePath(string extension, QueryType queryType)
+    [InlineData("xlsx", TableFileType.Xlsx)]
+    [InlineData("xls", TableFileType.Xls)]
+    [InlineData("csv", TableFileType.Csv)]
+    public void TestQueryDynamic_Complex_FilePath(string extension, TableFileType fileType)
     {
         string domain = "Complex";
         string filePath = $"Resources/{domain}.{extension}";
@@ -148,10 +148,10 @@ public partial class Tests_Query_Dynamic(ITestOutputHelper testHelper)
     }
 
     [Theory]
-    [InlineData("xlsx", QueryType.Xlsx)]
-    [InlineData("xls", QueryType.Xls)]
-    [InlineData("csv", QueryType.Csv)]
-    public async Task TestQueryDynamicAsync_Complex_FileStream(string extension, QueryType queryType)
+    [InlineData("xlsx", TableFileType.Xlsx)]
+    [InlineData("xls", TableFileType.Xls)]
+    [InlineData("csv", TableFileType.Csv)]
+    public async Task TestQueryDynamicAsync_Complex_FileStream(string extension, TableFileType fileType)
     {
         string domain = "Complex";
         string filePath = $"Resources/{domain}.{extension}";
@@ -159,7 +159,7 @@ public partial class Tests_Query_Dynamic(ITestOutputHelper testHelper)
         int rowIndex = -1;
         PurTable tableConfig = new() { HeaderSpaceMode = WhiteSpaceMode.RemoveAll };
         await using FileStream fileStream = File.OpenRead(filePath);
-        foreach (dynamic item in await Purcell.QueryDynamicAsync(fileStream, queryType, tableConfig))
+        foreach (dynamic item in await Purcell.QueryDynamicAsync(fileStream, fileType, tableConfig))
         {
             rowIndex++;
             testHelper.WriteLine($"第 {rowIndex + 1} 行：");
@@ -219,10 +219,10 @@ public partial class Tests_Query_Dynamic(ITestOutputHelper testHelper)
     }
 
     [Theory]
-    [InlineData("xlsx", QueryType.Xlsx)]
-    [InlineData("xls", QueryType.Xls)]
-    [InlineData("csv", QueryType.Csv)]
-    public void TestQueryDynamic_Complex_FileStream(string extension, QueryType queryType)
+    [InlineData("xlsx", TableFileType.Xlsx)]
+    [InlineData("xls", TableFileType.Xls)]
+    [InlineData("csv", TableFileType.Csv)]
+    public void TestQueryDynamic_Complex_FileStream(string extension, TableFileType fileType)
     {
         string domain = "Complex";
         string filePath = $"Resources/{domain}.{extension}";
@@ -230,7 +230,7 @@ public partial class Tests_Query_Dynamic(ITestOutputHelper testHelper)
         int rowIndex = -1;
         PurTable tableConfig = new() { HeaderSpaceMode = WhiteSpaceMode.RemoveAll };
         using FileStream fileStream = File.OpenRead(filePath);
-        foreach (dynamic item in Purcell.QueryDynamic(fileStream, queryType, tableConfig))
+        foreach (dynamic item in Purcell.QueryDynamic(fileStream, fileType, tableConfig))
         {
             rowIndex++;
             testHelper.WriteLine($"第 {rowIndex + 1} 行：");

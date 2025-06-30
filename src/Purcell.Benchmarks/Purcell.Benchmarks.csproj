@@ -16,7 +16,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Purcell\Purcell.csproj"/>
+      <ProjectReference Include="..\Purcell.FakeData\Purcell.FakeData.csproj" />
+      <ProjectReference Include="..\Purcell\Purcell.csproj" />
     </ItemGroup>
 
 </Project>

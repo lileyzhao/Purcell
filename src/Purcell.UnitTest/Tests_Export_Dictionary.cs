@@ -90,9 +90,9 @@ public class Tests_Export_Dictionary(ITestOutputHelper testHelper)
     }
 
     [Theory]
-    [InlineData("xlsx", ExportType.Xlsx)]
-    [InlineData("csv", ExportType.Csv)]
-    public void ExportDictionary_FileStream(string extension, ExportType exportType)
+    [InlineData("xlsx", TableFileType.Xlsx)]
+    [InlineData("csv", TableFileType.Csv)]
+    public void ExportDictionary_FileStream(string extension, TableFileType fileType)
     {
         string filePath = FileHelper.GenExportFilePath(extension);
 
@@ -107,24 +107,24 @@ public class Tests_Export_Dictionary(ITestOutputHelper testHelper)
         ];
         using (FileStream stream = new(filePath, FileMode.CreateNew))
         {
-            Purcell.Export(tableConfigs, stream, exportType);
+            Purcell.Export(tableConfigs, stream, fileType);
         }
 
         // 覆盖写入文件测试
         using (FileStream stream = new(filePath, FileMode.Create))
         {
-            stream.Export(tableConfigs, exportType);
+            stream.Export(tableConfigs, fileType);
         }
 
         // 覆盖并指定类型写入
         using (FileStream stream = new(filePath, FileMode.Create))
         {
-            switch (exportType)
+            switch (fileType)
             {
-                case ExportType.Xlsx:
+                case TableFileType.Xlsx:
                     stream.ExportXlsx(tableConfigs);
                     break;
-                case ExportType.Csv:
+                case TableFileType.Csv:
                     stream.ExportCsv(tableConfigs[0]);
                     break;
             }
@@ -153,9 +153,9 @@ public class Tests_Export_Dictionary(ITestOutputHelper testHelper)
     }
 
     [Theory]
-    [InlineData("xlsx", ExportType.Xlsx)]
-    [InlineData("csv", ExportType.Csv)]
-    public async Task ExportDictionaryAsync_FileStream(string extension, ExportType exportType)
+    [InlineData("xlsx", TableFileType.Xlsx)]
+    [InlineData("csv", TableFileType.Csv)]
+    public async Task ExportDictionaryAsync_FileStream(string extension, TableFileType fileType)
     {
         string filePath = FileHelper.GenExportFilePath(extension);
 
@@ -170,24 +170,24 @@ public class Tests_Export_Dictionary(ITestOutputHelper testHelper)
         ];
         await using (FileStream stream = new(filePath, FileMode.CreateNew))
         {
-            await Purcell.ExportAsync(tableConfigs, stream, exportType);
+            await Purcell.ExportAsync(tableConfigs, stream, fileType);
         }
 
         // 覆盖写入文件测试
         await using (FileStream stream = new(filePath, FileMode.Create))
         {
-            await stream.ExportAsync(tableConfigs, exportType);
+            await stream.ExportAsync(tableConfigs, fileType);
         }
 
         // 覆盖并指定类型写入
         await using (FileStream stream = new(filePath, FileMode.Create))
         {
-            switch (exportType)
+            switch (fileType)
             {
-                case ExportType.Xlsx:
+                case TableFileType.Xlsx:
                     await stream.ExportXlsxAsync(tableConfigs);
                     break;
-                case ExportType.Csv:
+                case TableFileType.Csv:
                     await stream.ExportCsvAsync(tableConfigs[0]);
                     break;
             }

@@ -9,10 +9,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Purcell\Purcell.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
       <None Update="Resources\Complex.xlsx">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
@@ -86,6 +82,11 @@
 
     <ItemGroup>
       <PackageReference Include="MiniExcel" Version="1.41.3" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Purcell.FakeData\Purcell.FakeData.csproj" />
+      <ProjectReference Include="..\Purcell\Purcell.csproj" />
     </ItemGroup>
 
 </Project>

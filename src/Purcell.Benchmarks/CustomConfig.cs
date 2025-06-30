@@ -6,6 +6,7 @@ using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using Perfolizer.Horology;
 using Perfolizer.Metrology;
 
@@ -15,8 +16,17 @@ public class CustomConfig : ManualConfig
 {
     public CustomConfig()
     {
+        // 🔥 关键修改：创建快速测试Job
+        var quickJob = Job.Default
+            .WithWarmupCount(1)      // 只预热1次（默认是多次）
+            .WithIterationCount(2)   // 只运行3次迭代（默认是更多）
+            .WithInvocationCount(1)  // 每次迭代只调用1次
+            .WithUnrollFactor(1)     // 不展开循环
+            .WithToolchain(InProcessEmitToolchain.Instance); // 使用进程内工具链，更快
+        
         // 添加作业
-        AddJob(Job.Default);
+        // AddJob(Job.Default);
+        AddJob(quickJob);
 
         // 添加诊断器
         AddDiagnoser(MemoryDiagnoser.Default); // 内存诊断

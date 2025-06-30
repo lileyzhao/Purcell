@@ -7,10 +7,10 @@ namespace PurcellLibs.UnitTest;
 public partial class Tests_Query_Generic
 {
     [Theory]
-    [InlineData("xlsx", QueryType.Xlsx)]
-    [InlineData("xls", QueryType.Xls)]
-    [InlineData("csv", QueryType.Csv)]
-    public async Task TestQueryGenericAsync_Complex_FilePath_Columns(string extension, QueryType queryType)
+    [InlineData("xlsx", TableFileType.Xlsx)]
+    [InlineData("xls", TableFileType.Xls)]
+    [InlineData("csv", TableFileType.Csv)]
+    public async Task TestQueryGenericAsync_Complex_FilePath_Columns(string extension, TableFileType fileType)
     {
         string domain = "Complex";
         string filePath = $"Resources/{domain}.{extension}";
@@ -91,10 +91,10 @@ public partial class Tests_Query_Generic
     }
 
     [Theory]
-    [InlineData("xlsx", QueryType.Xlsx)]
-    [InlineData("xls", QueryType.Xls)]
-    [InlineData("csv", QueryType.Csv)]
-    public void TestQueryGeneric_Complex_FilePath_Columns(string extension, QueryType queryType)
+    [InlineData("xlsx", TableFileType.Xlsx)]
+    [InlineData("xls", TableFileType.Xls)]
+    [InlineData("csv", TableFileType.Csv)]
+    public void TestQueryGeneric_Complex_FilePath_Columns(string extension, TableFileType fileType)
     {
         string domain = "Complex";
         string filePath = $"Resources/{domain}.{extension}";
@@ -174,10 +174,10 @@ public partial class Tests_Query_Generic
     }
 
     [Theory]
-    [InlineData("xlsx", QueryType.Xlsx)]
-    [InlineData("xls", QueryType.Xls)]
-    [InlineData("csv", QueryType.Csv)]
-    public async Task TestQueryGenericAsync_Complex_FileStream_Columns(string extension, QueryType queryType)
+    [InlineData("xlsx", TableFileType.Xlsx)]
+    [InlineData("xls", TableFileType.Xls)]
+    [InlineData("csv", TableFileType.Csv)]
+    public async Task TestQueryGenericAsync_Complex_FileStream_Columns(string extension, TableFileType fileType)
     {
         string domain = "Complex";
         string filePath = $"Resources/{domain}.{extension}";
@@ -207,7 +207,7 @@ public partial class Tests_Query_Generic
                 .WithMatchStrategy(MatchStrategy.IgnoreCaseRegex)
         ];
         await using FileStream fileStream = File.OpenRead(filePath);
-        foreach (EmployeeNoAttr item in await Purcell.QueryAsync<EmployeeNoAttr>(fileStream, queryType,
+        foreach (EmployeeNoAttr item in await Purcell.QueryAsync<EmployeeNoAttr>(fileStream, fileType,
                      tableConfig.WithColumns(dynamicColumns)))
         {
             rowIndex++;
@@ -259,10 +259,10 @@ public partial class Tests_Query_Generic
     }
 
     [Theory]
-    [InlineData("xlsx", QueryType.Xlsx)]
-    [InlineData("xls", QueryType.Xls)]
-    [InlineData("csv", QueryType.Csv)]
-    public void TestQueryGeneric_Complex_FileStream_Columns(string extension, QueryType queryType)
+    [InlineData("xlsx", TableFileType.Xlsx)]
+    [InlineData("xls", TableFileType.Xls)]
+    [InlineData("csv", TableFileType.Csv)]
+    public void TestQueryGeneric_Complex_FileStream_Columns(string extension, TableFileType fileType)
     {
         string domain = "Complex";
         string filePath = $"Resources/{domain}.{extension}";
@@ -292,7 +292,7 @@ public partial class Tests_Query_Generic
                 .WithMatchStrategy(MatchStrategy.IgnoreCaseRegex)
         ];
         using FileStream fileStream = File.OpenRead(filePath);
-        foreach (EmployeeNoAttr item in Purcell.Query<EmployeeNoAttr>(fileStream, queryType,
+        foreach (EmployeeNoAttr item in Purcell.Query<EmployeeNoAttr>(fileStream, fileType,
                      tableConfig.WithColumns(dynamicColumns)))
         {
             rowIndex++;

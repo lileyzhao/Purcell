@@ -8,10 +8,10 @@ namespace PurcellLibs.UnitTest;
 public partial class Tests_Query_Generic(ITestOutputHelper testHelper)
 {
     [Theory]
-    [InlineData("xlsx", QueryType.Xlsx)]
-    [InlineData("xls", QueryType.Xls)]
-    [InlineData("csv", QueryType.Csv)]
-    public async Task TestQueryGenericAsync_Complex_FilePath(string extension, QueryType queryType)
+    [InlineData("xlsx", TableFileType.Xlsx)]
+    [InlineData("xls", TableFileType.Xls)]
+    [InlineData("csv", TableFileType.Csv)]
+    public async Task TestQueryGenericAsync_Complex_FilePath(string extension, TableFileType fileType)
     {
         string domain = "Complex";
         string filePath = $"Resources/{domain}.{extension}";
@@ -69,10 +69,10 @@ public partial class Tests_Query_Generic(ITestOutputHelper testHelper)
     }
 
     [Theory]
-    [InlineData("xlsx", QueryType.Xlsx)]
-    [InlineData("xls", QueryType.Xls)]
-    [InlineData("csv", QueryType.Csv)]
-    public void TestQueryGeneric_Complex_FilePath(string extension, QueryType queryType)
+    [InlineData("xlsx", TableFileType.Xlsx)]
+    [InlineData("xls", TableFileType.Xls)]
+    [InlineData("csv", TableFileType.Csv)]
+    public void TestQueryGeneric_Complex_FilePath(string extension, TableFileType fileType)
     {
         string domain = "Complex";
         string filePath = $"Resources/{domain}.{extension}";
@@ -130,10 +130,10 @@ public partial class Tests_Query_Generic(ITestOutputHelper testHelper)
     }
 
     [Theory]
-    [InlineData("xlsx", QueryType.Xlsx)]
-    [InlineData("xls", QueryType.Xls)]
-    [InlineData("csv", QueryType.Csv)]
-    public async Task TestQueryGenericAsync_Complex_FileStream(string extension, QueryType queryType)
+    [InlineData("xlsx", TableFileType.Xlsx)]
+    [InlineData("xls", TableFileType.Xls)]
+    [InlineData("csv", TableFileType.Csv)]
+    public async Task TestQueryGenericAsync_Complex_FileStream(string extension, TableFileType fileType)
     {
         string domain = "Complex";
         string filePath = $"Resources/{domain}.{extension}";
@@ -141,7 +141,7 @@ public partial class Tests_Query_Generic(ITestOutputHelper testHelper)
         int rowIndex = -1;
         PurTable tableConfig = new() { HeaderSpaceMode = WhiteSpaceMode.Trim };
         await using FileStream fileStream = File.OpenRead(filePath);
-        foreach (EmployeeWithAttr item in await Purcell.QueryAsync<EmployeeWithAttr>(fileStream, queryType, tableConfig))
+        foreach (EmployeeWithAttr item in await Purcell.QueryAsync<EmployeeWithAttr>(fileStream, fileType, tableConfig))
         {
             rowIndex++;
             testHelper.WriteLine($"第 {rowIndex + 1} 行：");
@@ -192,10 +192,10 @@ public partial class Tests_Query_Generic(ITestOutputHelper testHelper)
     }
 
     [Theory]
-    [InlineData("xlsx", QueryType.Xlsx)]
-    [InlineData("xls", QueryType.Xls)]
-    [InlineData("csv", QueryType.Csv)]
-    public void TestQueryGeneric_Complex_FileStream(string extension, QueryType queryType)
+    [InlineData("xlsx", TableFileType.Xlsx)]
+    [InlineData("xls", TableFileType.Xls)]
+    [InlineData("csv", TableFileType.Csv)]
+    public void TestQueryGeneric_Complex_FileStream(string extension, TableFileType fileType)
     {
         string domain = "Complex";
         string filePath = $"Resources/{domain}.{extension}";
@@ -203,7 +203,7 @@ public partial class Tests_Query_Generic(ITestOutputHelper testHelper)
         int rowIndex = -1;
         PurTable tableConfig = new() { HeaderSpaceMode = WhiteSpaceMode.Trim };
         using FileStream fileStream = File.OpenRead(filePath);
-        foreach (EmployeeWithAttr item in Purcell.Query<EmployeeWithAttr>(fileStream, queryType, tableConfig))
+        foreach (EmployeeWithAttr item in Purcell.Query<EmployeeWithAttr>(fileStream, fileType, tableConfig))
         {
             rowIndex++;
             testHelper.WriteLine($"第 {rowIndex + 1} 行：");

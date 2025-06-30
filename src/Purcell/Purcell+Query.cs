@@ -9,7 +9,7 @@ public static partial class Purcell
 
     /// <inheritdoc cref="IPurQuerier.Query{T}(PurTable,IProgress{int},CancellationToken)"/>
     public static IEnumerable<T> Query<T>(
-        Stream stream, QueryType queryType, PurTable? tableConfig = null,
+        Stream stream, TableFileType queryType, PurTable? tableConfig = null,
         IProgress<int>? progress = null, CancellationToken cancelToken = default)
         where T : class, new()
     {
@@ -31,7 +31,7 @@ public static partial class Purcell
 
     /// <inheritdoc cref="IPurQuerier.Query(PurTable,IProgress{int},CancellationToken)"/>
     public static IEnumerable<IDictionary<string, object?>> Query(
-        Stream stream, QueryType queryType, PurTable? tableConfig = null,
+        Stream stream, TableFileType queryType, PurTable? tableConfig = null,
         IProgress<int>? progress = null, CancellationToken cancelToken = default)
     {
         using IPurQuerier querier = CreateQuerier(stream, queryType);
@@ -51,7 +51,7 @@ public static partial class Purcell
 
     /// <inheritdoc cref="IPurQuerier.QueryDynamic(PurTable,IProgress{int},CancellationToken)"/>
     public static IEnumerable<dynamic> QueryDynamic(
-        Stream stream, QueryType queryType, PurTable? tableConfig = null,
+        Stream stream, TableFileType queryType, PurTable? tableConfig = null,
         IProgress<int>? progress = null, CancellationToken cancelToken = default)
     {
         using IPurQuerier querier = CreateQuerier(stream, queryType);
@@ -75,7 +75,7 @@ public static partial class Purcell
 
     /// <inheritdoc cref="IPurQuerier.Query{T}(PurTable,IProgress{int},CancellationToken)"/>
     public static async Task<IEnumerable<T>> QueryAsync<T>(
-        Stream stream, QueryType queryType, PurTable? tableConfig = null,
+        Stream stream, TableFileType queryType, PurTable? tableConfig = null,
         IProgress<int>? progress = null, CancellationToken cancelToken = default)
         where T : class, new()
     {
@@ -95,7 +95,7 @@ public static partial class Purcell
 
     /// <inheritdoc cref="IPurQuerier.Query(PurTable,IProgress{int},CancellationToken)"/>
     public static async Task<IEnumerable<IDictionary<string, object?>>> QueryAsync(
-        Stream stream, QueryType queryType, PurTable? tableConfig = null,
+        Stream stream, TableFileType queryType, PurTable? tableConfig = null,
         IProgress<int>? progress = null, CancellationToken cancelToken = default)
     {
         return await Task.Run(() => Query(stream, queryType, tableConfig, progress, cancelToken), cancelToken)
@@ -113,7 +113,7 @@ public static partial class Purcell
 
     /// <inheritdoc cref="IPurQuerier.QueryDynamic(PurTable,IProgress{int},CancellationToken)"/>
     public static async Task<IEnumerable<dynamic>> QueryDynamicAsync(
-        Stream stream, QueryType queryType, PurTable? tableConfig = null,
+        Stream stream, TableFileType queryType, PurTable? tableConfig = null,
         IProgress<int>? progress = null, CancellationToken cancelToken = default)
     {
         return await Task.Run(() => QueryDynamic(stream, queryType, tableConfig, progress, cancelToken), cancelToken)

@@ -10,8 +10,8 @@ public class Tests_Any_PurTable(ITestOutputHelper testHelper)
     /// <summary>
     /// 测试 SheetIndex 和 SheetName 正确读取指定工作表，测试数据集正确读取
     /// </summary>
-    [InlineData("xlsx", QueryType.Xlsx), Theory]
-    public void Test_Index_Name_DataSet(string extension, QueryType queryType)
+    [InlineData("xlsx", TableFileType.Xlsx), Theory]
+    public void Test_Index_Name_DataSet(string extension, TableFileType fileType)
     {
         string domain = "StudentsEnMultiSheets";
         string filePath = $"Resources/{domain}.{extension}";
@@ -123,8 +123,8 @@ public class Tests_Any_PurTable(ITestOutputHelper testHelper)
     /// <summary>
     /// 测试 HasHeader = false
     /// </summary>
-    [InlineData("xlsx", QueryType.Xlsx), Theory]
-    public void Test_HasHeader_False(string extension, QueryType queryType)
+    [InlineData("xlsx", TableFileType.Xlsx), Theory]
+    public void Test_HasHeader_False(string extension, TableFileType fileType)
     {
         string domain = "StudentsEnMultiSheets";
         string filePath = $"Resources/{domain}.{extension}";
@@ -145,8 +145,8 @@ public class Tests_Any_PurTable(ITestOutputHelper testHelper)
     /// <summary>
     /// 测试 MaxReadRows
     /// </summary>
-    [InlineData("xlsx", QueryType.Xlsx), Theory]
-    public void Test_MaxReadRows(string extension, QueryType queryType)
+    [InlineData("xlsx", TableFileType.Xlsx), Theory]
+    public void Test_MaxReadRows(string extension, TableFileType fileType)
     {
         string domain = "StudentsEnMultiSheets";
         string filePath = $"Resources/{domain}.{extension}";
@@ -163,8 +163,8 @@ public class Tests_Any_PurTable(ITestOutputHelper testHelper)
     /// <summary>
     /// 测试 MaxWriteRows
     /// </summary>
-    [InlineData("xlsx", QueryType.Xlsx), Theory]
-    public void Test_MaxWriteRows(string extension, QueryType queryType)
+    [InlineData("xlsx", TableFileType.Xlsx), Theory]
+    public void Test_MaxWriteRows(string extension, TableFileType fileType)
     {
         string filePath = FileHelper.GenExportFilePath(extension);
 
@@ -186,8 +186,8 @@ public class Tests_Any_PurTable(ITestOutputHelper testHelper)
     /// <summary>
     /// 测试 HeaderStart 和 DataStart 的设置
     /// </summary>
-    [InlineData("xlsx", QueryType.Xlsx), Theory]
-    public void Test_HeaderStart_DataStart(string extension, QueryType queryType)
+    [InlineData("xlsx", TableFileType.Xlsx), Theory]
+    public void Test_HeaderStart_DataStart(string extension, TableFileType fileType)
     {
         string domain = "StudentsEnMultiSheets";
         string filePath = $"Resources/{domain}.{extension}";
@@ -257,16 +257,16 @@ public class Tests_Any_PurTable(ITestOutputHelper testHelper)
     /// <summary>
     /// 测试列配置
     /// </summary>
-    [InlineData("xlsx", QueryType.Xlsx), Theory]
-    public void Test_Columns(string extension, QueryType queryType)
+    [InlineData("xlsx", TableFileType.Xlsx), Theory]
+    public void Test_Columns(string extension, TableFileType fileType)
     {
     }
 
     /// <summary>
     /// 测试 IgnoreParseError
     /// </summary>
-    [InlineData("xlsx", QueryType.Xlsx), Theory]
-    public void Test_IgnoreParseError(string extension, QueryType queryType)
+    [InlineData("xlsx", TableFileType.Xlsx), Theory]
+    public void Test_IgnoreParseError(string extension, TableFileType fileType)
     {
         // var tableConfig = new PurTable { IgnoreParseError = true };
     }
