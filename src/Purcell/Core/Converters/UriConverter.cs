@@ -1,10 +1,11 @@
 namespace PurcellLibs.Converters;
 
 /// <summary>
-/// Uri转换器
+/// URI 转换器。
 /// </summary>
 public class UriConverter : IValueConverter
 {
+    // 单例实例的懒加载
     private static readonly Lazy<UriConverter> _instance = new(() => new UriConverter());
 
     /// <inheritdoc cref="UriConverter"/>
@@ -23,9 +24,9 @@ public class UriConverter : IValueConverter
         bool canBeNull = targetType.CanBeNull();
 
         // 验证目标类型是否为支持的类型
-        if (actualType != typeof(Version))
+        if (actualType != typeof(Uri))
         {
-            throw new InvalidOperationException($"目标类型 {targetType.FullName} 不是支持的类型(Guid)。");
+            throw new InvalidOperationException($"目标类型 {targetType.FullName} 不是支持的类型(Uri)。");
         }
 
         Uri? defaultResult = canBeNull ? null : new Uri("about:blank");

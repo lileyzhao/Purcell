@@ -209,10 +209,10 @@ public static T DefaultIfNull<T>(this T? value, T defaultValue) where T : class
 - **属性注释**：说明属性的含义和用途，必要时包含 `<value>` 标签
 - **字段注释规则**：
   - **private 普通字段**：不需要注释
-  - **private static 字段**：需要注释（包括 static readonly）
-  - **private const 字段**：需要注释
-  - **private readonly 字段**：需要注释
-  - **public/protected/internal 字段**：需要注释
+  - **private static 字段**：使用单行注释 `//`（包括 static readonly）
+  - **private const 字段**：使用单行注释 `//`（包括 static readonly）
+  - **private readonly 字段**：需要 XML 文档注释
+  - **public/protected/internal 字段**：需要 XML 文档注释
 - **事件注释**：说明事件触发条件和参数含义
 
 ### 注释原则

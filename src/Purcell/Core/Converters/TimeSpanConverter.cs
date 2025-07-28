@@ -3,10 +3,11 @@
 namespace PurcellLibs.Converters;
 
 /// <summary>
-/// 高性能时间间隔转换器
+/// 时间间隔转换器。
 /// </summary>
 public class TimeSpanConverter : IValueConverter
 {
+    // 单例实例的懒加载
     private static readonly Lazy<TimeSpanConverter> _instance = new(() => new TimeSpanConverter());
 
     /// <inheritdoc cref="TimeSpanConverter"/>
@@ -108,7 +109,12 @@ public class TimeSpanConverter : IValueConverter
         return defaultResult;
     }
 
-    // 类型转换
+    /// <summary>
+    /// 将 <see cref="TimeSpan"/> 转换为指定的时间类型。
+    /// </summary>
+    /// <param name="timeSpan">要转换的 <see cref="TimeSpan"/>。</param>
+    /// <param name="actualType">目标类型。</param>
+    /// <returns>转换结果；如果转换失败则返回 <see langword="null"/>。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static object? ConvertToDateType(TimeSpan timeSpan, Type actualType)
     {

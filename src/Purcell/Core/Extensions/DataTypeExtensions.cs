@@ -5,9 +5,7 @@ namespace PurcellLibs.Extensions;
 /// </summary>
 public static class DataTypeExtensions
 {
-    /// <summary>
-    /// DataType 到 .NET Type 的映射表。
-    /// </summary>
+    // DataType 到 .NET Type 的映射表
     private static readonly Dictionary<DataType, Type> TypeMap = new()
     {
         [DataType.Unsupported] = typeof(object),
@@ -27,9 +25,7 @@ public static class DataTypeExtensions
         [DataType.Guid] = typeof(Guid)
     };
 
-    /// <summary>
-    /// .NET Type 到 DataType 的反向映射表。
-    /// </summary>
+    // .NET Type 到 DataType 的反向映射表
     private static readonly Dictionary<Type, DataType> ReverseTypeMap =
         TypeMap.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
 

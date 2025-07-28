@@ -2,18 +2,20 @@ namespace PurcellLibs.Converters;
 
 /// <summary>
 /// 值转换器的接口，用于电子表格单元格值的类型转换。
-/// 电子表格单元格的数据类型是确定的，输入值是以下类型之一：null、bool、double、string、DateTime、TimeSpan。
-/// 实现此接口时，应针对这些特定类型编写转换逻辑，例如使用switch-case语句处理每种可能的输入类型。
 /// </summary>
+/// <remarks>
+/// <para>电子表格单元格的数据类型是确定的，输入值是以下类型之一：<see langword="null"/>、<see langword="bool"/>、<see langword="double"/>、<see langword="string"/>、<see cref="DateTime"/>、<see cref="TimeSpan"/>。</para>
+/// <para>实现此接口时，应针对这些特定类型编写转换逻辑，例如使用 switch-case 语句处理每种可能的输入类型。</para>
+/// </remarks>
 public interface IValueConverter
 {
     /// <summary>
-    /// 将单元格值转换为指定目标类型的值
+    /// 将单元格值转换为指定目标类型的值。
     /// </summary>
-    /// <param name="value">要转换的单元格值，仅为以下类型之一：null、bool、double、string、DateTime、TimeSpan。</param>
-    /// <param name="targetType">要转换到的目标类型</param>
-    /// <param name="columnConfig">格式化字符串</param>
-    /// <param name="culture">用于转换的文化信息，来自PurTable的设置；若PurTable未设置文化信息，则为<c>CultureInfo.InvariantCulture</c></param>
+    /// <param name="value">要转换的单元格值，仅为以下类型之一：<see langword="null"/>、<see langword="bool"/>、<see langword="double"/>、<see langword="string"/>、<see cref="DateTime"/>、<see cref="TimeSpan"/>。</param>
+    /// <param name="targetType">要转换到的目标类型。</param>
+    /// <param name="columnConfig">列配置信息，包含格式化字符串等。</param>
+    /// <param name="culture">用于转换的文化信息，来自 <see cref="PurTable"/> 的设置；若 <see cref="PurTable"/> 未设置文化信息，则为 <see cref="CultureInfo.InvariantCulture"/>。</param>
     /// <returns>
     /// 转换后的值，其类型与目标类型完全匹配。转换规则如下：
     /// <list type="bullet">

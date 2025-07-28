@@ -71,7 +71,7 @@ public abstract class DisposableBase : IDisposable, IAsyncDisposable
         }
         catch (ObjectDisposedException)
         {
-            // SemaphoreSlim 已被释放，说明 Dispose() 已经被调用
+            // SemaphoreSlim 已被释放，说明 Dispose() 已经被调用。
             return;
         }
 
@@ -103,7 +103,7 @@ public abstract class DisposableBase : IDisposable, IAsyncDisposable
     /// </summary>
     protected virtual void DisposeResources()
     {
-        // 子类实现具体的资源释放逻辑
+        // 子类实现具体的资源释放逻辑。
     }
 
     /// <summary>
@@ -112,7 +112,7 @@ public abstract class DisposableBase : IDisposable, IAsyncDisposable
     /// <returns>表示异步操作的 <see cref="ValueTask"/>。</returns>
     protected virtual ValueTask DisposeResourcesAsync()
     {
-        // 子类实现具体的异步资源释放逻辑
+        // 子类实现具体的异步资源释放逻辑。
         return ValueTask.CompletedTask;
     }
 
@@ -144,7 +144,7 @@ public abstract class DisposableBase : IDisposable, IAsyncDisposable
         }
         catch
         {
-            // 忽略释放过程中的异常
+            // 忽略释放过程中的异常。
         }
     }
 
@@ -166,7 +166,7 @@ public abstract class DisposableBase : IDisposable, IAsyncDisposable
         }
         catch
         {
-            // 忽略释放过程中的异常
+            // 忽略释放过程中的异常。
         }
     }
 
@@ -190,7 +190,7 @@ public abstract class DisposableBase : IDisposable, IAsyncDisposable
         }
         catch
         {
-            // 忽略释放过程中的异常
+            // 忽略释放过程中的异常。
         }
     }
 
@@ -220,7 +220,7 @@ public abstract class DisposableBase : IDisposable, IAsyncDisposable
         }
         catch
         {
-            // 忽略释放过程中的异常
+            // 忽略释放过程中的异常。
         }
     }
 }

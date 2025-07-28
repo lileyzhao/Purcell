@@ -1,4 +1,4 @@
-namespace Purcell.FakeData.Internal.Data;
+namespace PurcellLibs.FakeData.Internal.Data;
 
 /// <summary>
 /// 中文姓名数据

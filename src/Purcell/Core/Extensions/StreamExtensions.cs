@@ -349,7 +349,7 @@ public static class StreamExtensions
     /// <summary>
     /// 检测数据是否可能为 UTF-32 编码。
     /// </summary>
-    /// <param name="data">要棆测的字节数组。</param>
+    /// <param name="data">要检测的字节数组。</param>
     /// <returns>如果数据可能是 UTF-32 编码则返回 <see langword="true"/>；否则返回 <see langword="false"/>。</returns>
     private static bool IsLikelyUtf32(byte[] data)
     {
@@ -604,7 +604,7 @@ public static class StreamExtensions
     /// 检测是否包含西里尔字母编码的特征字节。
     /// </summary>
     /// <param name="sample">要检测的样本字节数组。</param>
-    /// <returns>如果包含扩里尔字母编码特征则返回 <see langword="true"/>；否则返回 <see langword="false"/>。</returns>
+    /// <returns>如果包含西里尔字母编码特征则返回 <see langword="true"/>；否则返回 <see langword="false"/>。</returns>
     private static bool HasCyrillicEncodingCharacteristics(byte[] sample)
     {
         int cyrillicChars = 0;

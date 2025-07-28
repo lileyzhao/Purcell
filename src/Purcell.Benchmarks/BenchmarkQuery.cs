@@ -5,14 +5,14 @@ using BenchmarkDotNet.Engines;
 using CsvHelper;
 using CsvHelper.Configuration;
 using MiniExcelLibs;
+using Sylvan.Data.Excel;
+
 // using Purcell.Providers.Abstractions;
 // using Purcell.Providers.Csv;
 // using Purcell.Providers.Excel;
-using Sylvan.Data.Excel;
 
 namespace PurcellLibs.Benchmarks;
 
-[Config(typeof(CustomConfig))]
 public class BenchmarkQuery
 {
     //[Benchmark(Description = $"*{nameof(QueryDict_SylvanNative_Xlsx)}*", Baseline = true)]
@@ -75,13 +75,13 @@ public class BenchmarkQuery
         // }
     }
 
-    [Benchmark(Description = nameof(QueryDict_CsvHelperNative_Csv))]
+    [Benchmark(Description = nameof(QueryDict_CsvHelperNative_Csv), Baseline = true)]
     public void QueryDict_CsvHelperNative_Csv()
     {
         string filePath = FileHelper.GetDesktopFilePath("100_0000x10", "csv");
 
         using FileStream fileStream = File.OpenRead(filePath);
-        
+
         // 创建 CsvReader 配置(无头读取)
         CsvConfiguration config = new(CultureInfo.InvariantCulture)
         {
@@ -89,11 +89,11 @@ public class BenchmarkQuery
             Delimiter = ",",
             Escape = '"'
         };
-        
+
         // 创建 CsvReader 读取器
         using StreamReader streamReader = new(fileStream, Encoding.UTF8);
         using CsvReader reader = new(streamReader, config);
-        
+
         Consumer consumer = new();
         foreach (IDictionary<string, object?> item in reader.GetRecords<dynamic>())
         {
@@ -107,16 +107,26 @@ public class BenchmarkQuery
         string filePath = FileHelper.GetDesktopFilePath("100_0000x10", "csv");
 
         using FileStream fileStream = File.OpenRead(filePath);
-        // using var reader = new CsvHelperTableReader(fileStream);
-        //
-        // Consumer consumer = new();
-        // foreach (IDictionary<int, object?> item in reader.ReadRows(
-        //              0, string.Empty,
-        //              true, (0, 0),
-        //              (1, 0), CultureInfo.InvariantCulture))
-        // {
-        //     consumer.Consume(item); // 防止被编译器优化掉
-        // }
+        using var reader = new PurcellLibs.Providers.Csv.CsvHelperTableReader(fileStream);
+
+        Consumer consumer = new();
+        foreach (var item in reader.ReadTable(PurTable.New()))
+        {
+            consumer.Consume(item); // 防止被编译器优化掉
+        }
+    }
+
+    //[Benchmark(Description = nameof(QueryDict_Purcell_Csv))]
+    public void QueryDict_Purcell_Csv()
+    {
+        string filePath = FileHelper.GetDesktopFilePath("100_0000x10", "csv");
+
+        using FileStream fileStream = File.OpenRead(filePath);
+        Consumer consumer = new();
+        foreach (var item in Purcell.QueryCsv(fileStream))
+        {
+            consumer.Consume(item); // 防止被编译器优化掉
+        }
     }
 
     // [Benchmark(Description = nameof(QueryDict_MiniExcel))]

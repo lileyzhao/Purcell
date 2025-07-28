@@ -1,8 +1,8 @@
 using AutoFixture;
 using Bogus;
-using Purcell.FakeData.Internal.Data;
+using PurcellLibs.FakeData.Internal.Data;
 
-namespace Purcell.FakeData.Internal.Builders;
+namespace PurcellLibs.FakeData.Internal.Builders;
 
 /// <summary>
 /// 学生数据建造者，内部实现流畅API

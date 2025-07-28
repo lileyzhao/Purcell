@@ -1,10 +1,11 @@
 namespace PurcellLibs.Converters;
 
 /// <summary>
-/// IP地址转换器
+/// IP 地址转换器。
 /// </summary>
 public class IPAddressConverter : IValueConverter
 {
+    // 单例实例的懒加载
     private static readonly Lazy<IPAddressConverter> _instance = new(() => new IPAddressConverter());
 
     /// <inheritdoc cref="IPAddressConverter"/>
@@ -23,9 +24,9 @@ public class IPAddressConverter : IValueConverter
         bool canBeNull = targetType.CanBeNull();
 
         // 验证目标类型是否为支持的类型
-        if (actualType != typeof(Version))
+        if (actualType != typeof(IPAddress))
         {
-            throw new InvalidOperationException($"目标类型 {targetType.FullName} 不是支持的类型(Guid)。");
+            throw new InvalidOperationException($"目标类型 {targetType.FullName} 不是支持的类型(IPAddress)。");
         }
 
         IPAddress? defaultResult = canBeNull ? null : IPAddress.None;

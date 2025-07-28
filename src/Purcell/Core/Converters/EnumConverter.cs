@@ -1,10 +1,11 @@
 namespace PurcellLibs.Converters;
 
 /// <summary>
-/// 枚举转换器
+/// 枚举转换器。
 /// </summary>
 public class EnumConverter : IValueConverter
 {
+    // 单例实例的懒加载
     private static readonly Lazy<EnumConverter> _instance = new(() => new EnumConverter());
 
     /// <inheritdoc cref="EnumConverter"/>
@@ -14,14 +15,32 @@ public class EnumConverter : IValueConverter
     {
     }
 
+    // 枚举元数据缓存，用于提高性能
     private static readonly ConcurrentDictionary<Type, EnumValueMappings> EnumMetadataCache = new();
 
+    /// <summary>
+    /// 枚举值映射信息，包含不同类型的名称映射。
+    /// </summary>
     private class EnumValueMappings
     {
+        /// <summary>
+        /// 枚举名称映射。
+        /// </summary>
         public Dictionary<string, object> NameMapping { get; } = new(StringComparer.OrdinalIgnoreCase);
+        
+        /// <summary>
+        /// Description 特性映射。
+        /// </summary>
         public Dictionary<string, object> DescriptionMapping { get; } = new(StringComparer.OrdinalIgnoreCase);
+        
+        /// <summary>
+        /// EnumMember 特性映射。
+        /// </summary>
         public Dictionary<string, object> EnumMemberMapping { get; } = new(StringComparer.OrdinalIgnoreCase);
 
+        /// <summary>
+        /// PurEnum 特性映射。
+        /// </summary>
         public Dictionary<string, object> PurEnumMapping { get; } = new(StringComparer.OrdinalIgnoreCase);
     }
 
@@ -99,6 +118,11 @@ public class EnumConverter : IValueConverter
         return null;
     }
 
+    /// <summary>
+    /// 创建指定枚举类型的值映射信息。
+    /// </summary>
+    /// <param name="type">枚举类型。</param>
+    /// <returns>枚举值映射信息。</returns>
     private EnumValueMappings CreateEnumMappings(Type type)
     {
         EnumValueMappings metadata = new();

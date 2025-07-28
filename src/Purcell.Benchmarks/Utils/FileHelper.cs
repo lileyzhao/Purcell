@@ -49,11 +49,11 @@ public static class FileHelper
     private static string GenerateCommitStyleHash(string val, int length = 8)
     {
         // 模拟Git提交对象的内容结构
-        var commitContent =
+        string commitContent =
             $"blob {val}\0{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}\0{Environment.MachineName}\0{Guid.NewGuid()}";
 
-        using var sha1 = SHA1.Create();
-        var hash = sha1.ComputeHash(Encoding.UTF8.GetBytes(commitContent));
+        using SHA1 sha1 = SHA1.Create();
+        byte[] hash = sha1.ComputeHash(Encoding.UTF8.GetBytes(commitContent));
         return Convert.ToHexString(hash)[..length].ToLower();
     }
 }

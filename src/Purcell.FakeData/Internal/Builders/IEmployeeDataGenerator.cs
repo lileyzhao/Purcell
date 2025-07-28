@@ -1,4 +1,4 @@
-namespace Purcell.FakeData.Internal.Builders;
+namespace PurcellLibs.FakeData.Internal.Builders;
 
 /// <summary>
 /// 员工数据生成器接口，内部流畅API抽象

@@ -10,9 +10,7 @@ public readonly struct CellLocator : IEquatable<CellLocator>
     /// </summary>
     private const int XlsxColumnLimit = 1 << 14;
 
-    /// <summary>
-    /// A1 表示法字符串正则表达式。
-    /// </summary>
+    // A1 表示法字符串正则表达式
     private static readonly Regex A1NotationRegex =
         new(@"^(?<column>[A-Za-z]{1,3})(?<row>[1-9][0-9]*)$", RegexOptions.Compiled);
 

@@ -3,30 +3,36 @@
 namespace PurcellLibs.Extensions;
 
 /// <summary>
-/// String 扩展方法类
+/// String 扩展方法类。
 /// </summary>
 internal static class StringExtensions
 {
+    /// <summary>
+    /// 如果 <paramref name="str"/> 为 <see langword="null"/> 或空字符串，则返回 <paramref name="defaultValue"/>；否则返回 <paramref name="str"/>。
+    /// </summary>
+    /// <param name="str">要检查的字符串。</param>
+    /// <param name="defaultValue">当 <paramref name="str"/> 为 <see langword="null"/> 或空字符串时返回的默认值。</param>
+    /// <returns>如果 <paramref name="str"/> 不为 <see langword="null"/> 或空字符串则返回 <paramref name="str"/>；否则返回 <paramref name="defaultValue"/>。</returns>
     public static string DefaultIfEmpty(this string? str, string defaultValue)
     {
         return string.IsNullOrEmpty(str) ? defaultValue : str;
     }
 
     /// <summary>
-    /// 根据指定策略处理字符串中的空白字符
+    /// 根据指定策略处理字符串中的空白字符。
     /// </summary>
-    /// <param name="value">要处理的字符串</param>
-    /// <param name="mode">空白字符处理策略</param>
-    /// <returns>处理后的字符串</returns>
+    /// <param name="value">要处理的字符串。</param>
+    /// <param name="mode">空白字符处理策略。</param>
+    /// <returns>处理后的字符串。</returns>
     public static string ProcessWhiteSpace(this string? value, WhiteSpaceMode mode)
     {
-        // 快速路径：空值检查
+        // 快速路径：空值检查。
         if (string.IsNullOrEmpty(value))
         {
             return string.Empty;
         }
 
-        // 如果没有任何策略需要应用，直接返回原值
+        // 如果没有任何策略需要应用，直接返回原值。
         if (mode != WhiteSpaceMode.Trim && mode != WhiteSpaceMode.RemoveAll)
         {
             return value;
@@ -34,10 +40,10 @@ internal static class StringExtensions
 
         if (mode == WhiteSpaceMode.Trim) return value.Trim();
 
-        // 使用 ReadOnlySpan<char> 优化字符串操作
+        // 使用 ReadOnlySpan<char> 优化字符串操作。
         ReadOnlySpan<char> span = value.AsSpan();
 
-        // 计算非空白字符的数量
+        // 计算非空白字符的数量。
         int nonWhiteSpaceCount = 0;
         foreach (char c in span)
         {
@@ -47,7 +53,7 @@ internal static class StringExtensions
             }
         }
 
-        // 创建精确大小的结果字符串
+        // 创建精确大小的结果字符串。
         return string.Create(nonWhiteSpaceCount, value, (chars, str) =>
         {
             int writeIndex = 0;
@@ -65,8 +71,8 @@ internal static class StringExtensions
     /// 测量文本宽度，宽字符计为2，窄字符计为1。
     /// 中文或全角字符算 2 个宽度单位，英文或数字算 1 个宽度单位。
     /// </summary>
-    /// <param name="value">要测量的文本</param>
-    /// <param name="adjustment">宽度调整值，默认为2</param>
+    /// <param name="value">要测量的文本。</param>
+    /// <param name="adjustment">宽度调整值，默认为 2。</param>
     /// <returns>文本的计算宽度。中文或全角字符算 2 个宽度单位，英文或数字算 1 个宽度单位。</returns>
     public static double MeasureText(this string? value, double adjustment = 2)
     {
@@ -82,14 +88,14 @@ internal static class StringExtensions
                 length += 1;
         }
 
-        return length + adjustment; // 使用参数化的补充长度后返回
+        return length + adjustment; // 使用参数化的补充长度后返回。
 
-        // 判断一个字符是否是宽字符（显示宽度为普通字符的两倍）
+        // 判断一个字符是否是宽字符（显示宽度为普通字符的两倍）。
         bool IsWideCharacter(char ch)
         {
             int codePoint = ch;
 
-            // 判断字符是否在常见的宽字符范围内
+            // 判断字符是否在常见的宽字符范围内。
             return codePoint == 0x2329 || codePoint == 0x232A || // Angle brackets
                    (codePoint >= 0x1100 && codePoint <= 0x115F) || // Hangul Jamo
                    (codePoint >= 0x2E80 && codePoint <= 0x2FFB) || // CJK Radicals Supplement and Kangxi Radicals

@@ -1,10 +1,11 @@
 namespace PurcellLibs.Converters;
 
 /// <summary>
-/// Guid转换器
+/// Guid 转换器。
 /// </summary>
 public class GuidConverter : IValueConverter
 {
+    // 单例实例的懒加载
     private static readonly Lazy<GuidConverter> _instance = new(() => new GuidConverter());
 
     /// <inheritdoc cref="GuidConverter"/>

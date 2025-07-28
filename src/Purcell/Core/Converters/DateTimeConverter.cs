@@ -3,12 +3,15 @@
 namespace PurcellLibs.Converters;
 
 /// <summary>
-/// 日期时间转换器
-/// <para>支持格式：ISO8601、Unix时间戳、多国日期格式、Excel序列日期</para>
-/// <para>性能特性：预编译格式、零分配路径、类型缓存、边界检查</para>
+/// 日期时间转换器。
 /// </summary>
+/// <remarks>
+/// <para>支持格式：ISO8601、Unix 时间戳、多国日期格式、Excel 序列日期。</para>
+/// <para>性能特性：预编译格式、零分配路径、类型缓存、边界检查。</para>
+/// </remarks>
 public class DateTimeConverter : IValueConverter
 {
+    // 单例实例的懒加载
     private static readonly Lazy<DateTimeConverter> _instance = new(() => new DateTimeConverter());
 
     /// <inheritdoc cref="DateTimeConverter"/>
@@ -18,9 +21,8 @@ public class DateTimeConverter : IValueConverter
     {
     }
 
-    // 时间戳边界常量 - 避免魔法数字
-    private const long
-        MinUnixSeconds = -2208988800L; // DateTime(1900,1,1) 的秒数 new DateTimeOffset(date).ToUnixTimeSeconds()
+    // 时间戳边界常量 - DateTime(1900,1,1) 的秒数
+    private const long MinUnixSeconds = -2208988800L;
 
     /// <inheritdoc/>
     public object? Convert(object? value, Type targetType, PurColumn columnConfig, CultureInfo culture)
@@ -93,7 +95,12 @@ public class DateTimeConverter : IValueConverter
         return defaultResult;
     }
 
-    // 时间戳解析
+    /// <summary>
+    /// 解析 Unix 时间戳为 <see cref="DateTime"/>。
+    /// </summary>
+    /// <param name="timestamp">Unix 时间戳（秒）。</param>
+    /// <param name="result">解析结果。</param>
+    /// <returns>如果解析成功则返回 <see langword="true"/>；否则返回 <see langword="false"/>。</returns>
     private static bool TryParseTimestamp(long timestamp, out DateTime result)
     {
         result = default;
@@ -115,7 +122,12 @@ public class DateTimeConverter : IValueConverter
         return false;
     }
 
-    // 类型转换
+    /// <summary>
+    /// 将 <see cref="DateTime"/> 转换为指定的日期时间类型。
+    /// </summary>
+    /// <param name="dateTime">要转换的 <see cref="DateTime"/>。</param>
+    /// <param name="targetType">目标类型。</param>
+    /// <returns>转换结果；如果转换失败则返回 <see langword="null"/>。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static object? ConvertToDateType(DateTime dateTime, Type targetType)
     {
@@ -129,7 +141,12 @@ public class DateTimeConverter : IValueConverter
         return null;
     }
 
-    // 类型转换
+    /// <summary>
+    /// 将 <see cref="TimeSpan"/> 转换为指定的日期时间类型。
+    /// </summary>
+    /// <param name="timeSpan">要转换的 <see cref="TimeSpan"/>。</param>
+    /// <param name="targetType">目标类型。</param>
+    /// <returns>转换结果；如果转换失败则返回 <see langword="null"/>。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static object? ConvertToTimeType(TimeSpan timeSpan, Type targetType)
     {

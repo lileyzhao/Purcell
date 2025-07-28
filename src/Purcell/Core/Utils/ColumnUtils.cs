@@ -1,24 +1,24 @@
 namespace PurcellLibs.Utils;
 
 /// <summary>
-/// 列操作工具类，提供列名匹配、列属性处理等功能
+/// 列操作工具类，提供列名匹配、列属性处理等功能。
 /// </summary>
 public static class ColumnUtils
 {
     /// <summary>
-    /// 根据指定的匹配策略，将自动列与动态列列表进行匹配
+    /// 根据指定的匹配策略，将自动列与动态列列表进行匹配。
     /// </summary>
-    /// <param name="colIndex">列索引</param>
-    /// <param name="propName">属性名称</param>
-    /// <param name="dynamicColumns">用于匹配的动态列列表</param>
-    /// <param name="whiteSpaceMode">空白字符处理模式</param>
-    /// <returns>返回匹配成功的列列表</returns>
+    /// <param name="colIndex">要匹配的列索引。</param>
+    /// <param name="propName">要匹配的属性名称。</param>
+    /// <param name="dynamicColumns">用于匹配的动态列列表。</param>
+    /// <param name="whiteSpaceMode">空白字符处理模式。</param>
+    /// <returns>匹配成功的 <see cref="PurColumn"/> 列表；如果没有匹配项则返回空列表。</returns>
     public static List<PurColumn> MatchColumns(int colIndex, string propName, List<PurColumn> dynamicColumns,
         WhiteSpaceMode whiteSpaceMode)
     {
         List<PurColumn> matchedColumns = [];
 
-        // 在属性名称匹配时，根据.net的规则移除所有空格
+        // 在属性名称匹配时，根据 .NET 的规则移除所有空格。
         // string procPropName = propName.ProcessWhiteSpace(whiteSpaceMode);
 
         foreach (PurColumn dyc in
@@ -30,7 +30,7 @@ public static class ColumnUtils
                 continue;
             }
 
-            // 处理忽略大小写的情况
+            // 处理忽略大小写的情况。
             StringComparison strCpn = dyc.MatchStrategy.HasFlag(MatchStrategy.IgnoreCase)
                 ? StringComparison.OrdinalIgnoreCase
                 : StringComparison.Ordinal;
@@ -41,7 +41,7 @@ public static class ColumnUtils
                 .Concat(dyc.Names).Distinct()
                 .ToList();
 
-            // 根据不同策略查找匹配的列
+            // 根据不同策略查找匹配的列。
             if (dyc.MatchStrategy.HasFlag(MatchStrategy.Contains))
             {
                 if (propName.IndexOf(dyc.PropertyName, strCpn) >= 0 ||

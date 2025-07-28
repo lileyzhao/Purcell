@@ -1,7 +1,7 @@
 namespace PurcellLibs;
 
 /// <summary>
-/// Purcell 常量
+/// Purcell 常量。
 /// </summary>
 public static class PurConstants
 {
