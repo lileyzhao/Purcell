@@ -16,13 +16,16 @@ public static class SampleData
                 Age = Random.Next(18, 61), // 年龄 (18-60岁)
                 Gender = Genders[Random.Next(Genders.Length)], // 性别
                 BirthDate = new DateTime(1960, 1, 1)
-                    .AddDays(Random.Next((new DateTime(2000, 12, 31) - new DateTime(1960, 1, 1)).Days)), // 出生日期 (1960-2000年)
-                Salary = Convert.ToDecimal(Math.Round(Random.Next(5000, 50001) + Random.NextDouble(), 2)), // 工资 (5000-50000)
+                    .AddDays(Random.Next((new DateTime(2000, 12, 31) - new DateTime(1960, 1, 1))
+                        .Days)), // 出生日期 (1960-2000年)
+                Salary = Convert.ToDecimal(Math.Round(Random.Next(5000, 50001) + Random.NextDouble(),
+                    2)), // 工资 (5000-50000)
                 PerformanceScore = Math.Round(1 + Random.NextDouble() * 4, 1), // 绩效评分 (1-5分)
                 AttendanceRate = Convert.ToDecimal(Math.Round(0.7 + Random.NextDouble() * 0.3, 2)), // 出勤率 (0.7-1.0)
                 Profile = Texts[Random.Next(Texts.Length)], // 个人简介
                 EntryDate = new DateTime(2010, 1, 1)
-                    .AddDays(Random.Next((new DateTime(2023, 12, 31) - new DateTime(2010, 1, 1)).Days)) // 入职时间 (2010-2023年)
+                    .AddDays(Random.Next((new DateTime(2023, 12, 31) - new DateTime(2010, 1, 1))
+                        .Days)) // 入职时间 (2010-2023年)
             };
         }
     }

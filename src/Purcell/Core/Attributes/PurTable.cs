@@ -973,9 +973,7 @@ public class PurTable : Attribute, IPurTable
         }
     }
 
-    /// <summary>
-    /// 类型属性信息的静态缓存，用于提升反射性能。
-    /// </summary>
+    // 类型属性信息的静态缓存，用于提升反射性能。
     private static readonly ConcurrentDictionary<Type, PropertyInfo[]> TypePropsCache = new();
 
     /// <summary>

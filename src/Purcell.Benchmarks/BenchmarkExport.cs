@@ -5,7 +5,6 @@ using SharpCompress.Compressors.Deflate;
 
 namespace PurcellLibs.Benchmarks;
 
-[Config(typeof(CustomConfig))]
 public class BenchmarkExport
 {
     [Params("xlsx")] public string? Ext { get; set; }

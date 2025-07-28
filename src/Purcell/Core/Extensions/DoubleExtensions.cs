@@ -1,16 +1,16 @@
 namespace PurcellLibs.Extensions;
 
 /// <summary>
-/// Double 扩展方法类
+/// Double 扩展方法类。
 /// </summary>
 internal static class DoubleExtensions
 {
     /// <summary>
-    /// 安全地将 double 转换为 long，处理边界情况和溢出
+    /// 安全地将 double 转换为 long，处理边界情况和溢出。
     /// </summary>
-    /// <param name="value">要转换的 double 值</param>
-    /// <param name="defaultValue">当转换失败时返回的默认值</param>
-    /// <returns>转换后的 long 值，或在无法转换时返回默认值</returns>
+    /// <param name="value">要转换的 double 值。</param>
+    /// <param name="defaultValue">当转换失败时返回的默认值。</param>
+    /// <returns>转换后的 long 值，或在无法转换时返回默认值。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static long ToInt64Safe(this double value, long defaultValue = 0)
     {
@@ -29,11 +29,11 @@ internal static class DoubleExtensions
     }
 
     /// <summary>
-    /// 安全地将 double 转换为 ulong，处理边界情况和溢出
+    /// 安全地将 double 转换为 ulong，处理边界情况和溢出。
     /// </summary>
-    /// <param name="value">要转换的 double 值</param>
-    /// <param name="defaultValue">当转换失败时返回的默认值</param>
-    /// <returns>转换后的 ulong 值，或在无法转换时返回默认值</returns>
+    /// <param name="value">要转换的 double 值。</param>
+    /// <param name="defaultValue">当转换失败时返回的默认值。</param>
+    /// <returns>转换后的 ulong 值，或在无法转换时返回默认值。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ulong ToUInt64Safe(this double value, ulong defaultValue = 0)
     {
@@ -52,11 +52,11 @@ internal static class DoubleExtensions
     }
 
     /// <summary>
-    /// 安全地将 double 转换为 int，处理边界情况和溢出
+    /// 安全地将 double 转换为 int，处理边界情况和溢出。
     /// </summary>
-    /// <param name="value">要转换的 double 值</param>
-    /// <param name="defaultValue">当转换失败时返回的默认值</param>
-    /// <returns>转换后的 int 值，或在无法转换时返回默认值</returns>
+    /// <param name="value">要转换的 double 值。</param>
+    /// <param name="defaultValue">当转换失败时返回的默认值。</param>
+    /// <returns>转换后的 int 值，或在无法转换时返回默认值。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int ToInt32Safe(this double value, int defaultValue = 0)
     {
@@ -75,11 +75,11 @@ internal static class DoubleExtensions
     }
 
     /// <summary>
-    /// 安全地将 double 转换为 uint，处理边界情况和溢出
+    /// 安全地将 double 转换为 uint，处理边界情况和溢出。
     /// </summary>
-    /// <param name="value">要转换的 double 值</param>
-    /// <param name="defaultValue">当转换失败时返回的默认值</param>
-    /// <returns>转换后的 uint 值，或在无法转换时返回默认值</returns>
+    /// <param name="value">要转换的 double 值。</param>
+    /// <param name="defaultValue">当转换失败时返回的默认值。</param>
+    /// <returns>转换后的 uint 值，或在无法转换时返回默认值。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static uint ToUInt32Safe(this double value, uint defaultValue = 0)
     {
@@ -98,11 +98,11 @@ internal static class DoubleExtensions
     }
 
     /// <summary>
-    /// 安全地将 double 转换为 short，处理边界情况和溢出
+    /// 安全地将 double 转换为 short，处理边界情况和溢出。
     /// </summary>
-    /// <param name="value">要转换的 double 值</param>
-    /// <param name="defaultValue">当转换失败时返回的默认值</param>
-    /// <returns>转换后的 short 值，或在无法转换时返回默认值</returns>
+    /// <param name="value">要转换的 double 值。</param>
+    /// <param name="defaultValue">当转换失败时返回的默认值。</param>
+    /// <returns>转换后的 short 值，或在无法转换时返回默认值。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static short ToInt16Safe(this double value, short defaultValue = 0)
     {
@@ -121,11 +121,11 @@ internal static class DoubleExtensions
     }
 
     /// <summary>
-    /// 安全地将 double 转换为 ushort，处理边界情况和溢出
+    /// 安全地将 double 转换为 ushort，处理边界情况和溢出。
     /// </summary>
-    /// <param name="value">要转换的 double 值</param>
-    /// <param name="defaultValue">当转换失败时返回的默认值</param>
-    /// <returns>转换后的 ushort 值，或在无法转换时返回默认值</returns>
+    /// <param name="value">要转换的 double 值。</param>
+    /// <param name="defaultValue">当转换失败时返回的默认值。</param>
+    /// <returns>转换后的 ushort 值，或在无法转换时返回默认值。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ushort ToUInt16Safe(this double value, ushort defaultValue = 0)
     {
@@ -144,11 +144,11 @@ internal static class DoubleExtensions
     }
 
     /// <summary>
-    /// 安全地将 double 转换为 byte，处理边界情况和溢出
+    /// 安全地将 double 转换为 byte，处理边界情况和溢出。
     /// </summary>
-    /// <param name="value">要转换的 double 值</param>
-    /// <param name="defaultValue">当转换失败时返回的默认值</param>
-    /// <returns>转换后的 byte 值，或在无法转换时返回默认值</returns>
+    /// <param name="value">要转换的 double 值。</param>
+    /// <param name="defaultValue">当转换失败时返回的默认值。</param>
+    /// <returns>转换后的 byte 值，或在无法转换时返回默认值。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static byte ToByteSafe(this double value, byte defaultValue = 0)
     {
@@ -167,11 +167,11 @@ internal static class DoubleExtensions
     }
 
     /// <summary>
-    /// 安全地将 double 转换为 sbyte，处理边界情况和溢出
+    /// 安全地将 double 转换为 sbyte，处理边界情况和溢出。
     /// </summary>
-    /// <param name="value">要转换的 double 值</param>
-    /// <param name="defaultValue">当转换失败时返回的默认值</param>
-    /// <returns>转换后的 sbyte 值，或在无法转换时返回默认值</returns>
+    /// <param name="value">要转换的 double 值。</param>
+    /// <param name="defaultValue">当转换失败时返回的默认值。</param>
+    /// <returns>转换后的 sbyte 值，或在无法转换时返回默认值。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static sbyte ToSByteSafe(this double value, sbyte defaultValue = 0)
     {
@@ -190,11 +190,11 @@ internal static class DoubleExtensions
     }
 
     /// <summary>
-    /// 安全地将 double 转换为 decimal，处理边界情况和溢出
+    /// 安全地将 double 转换为 decimal，处理边界情况和溢出。
     /// </summary>
-    /// <param name="value">要转换的 double 值</param>
-    /// <param name="defaultValue">当转换失败时返回的默认值</param>
-    /// <returns>转换后的 decimal 值，或在无法转换时返回默认值</returns>
+    /// <param name="value">要转换的 double 值。</param>
+    /// <param name="defaultValue">当转换失败时返回的默认值。</param>
+    /// <returns>转换后的 decimal 值，或在无法转换时返回默认值。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static decimal ToDecimalSafe(this double value, decimal defaultValue = 0)
     {
@@ -217,11 +217,11 @@ internal static class DoubleExtensions
     }
 
     /// <summary>
-    /// 安全地将 double 转换为 float，处理边界情况和溢出
+    /// 安全地将 double 转换为 float，处理边界情况和溢出。
     /// </summary>
-    /// <param name="value">要转换的 double 值</param>
-    /// <param name="defaultValue">当转换失败时返回的默认值</param>
-    /// <returns>转换后的 float 值，或在无法转换时返回默认值</returns>
+    /// <param name="value">要转换的 double 值。</param>
+    /// <param name="defaultValue">当转换失败时返回的默认值。</param>
+    /// <returns>转换后的 float 值，或在无法转换时返回默认值。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float ToSingleSafe(this double value, float defaultValue = 0)
     {
@@ -244,6 +244,11 @@ internal static class DoubleExtensions
         };
     }
 
+    /// <summary>
+    /// 将 Excel 序列日期值转换为 <see cref="DateTime"/>。
+    /// </summary>
+    /// <param name="value">Excel 序列日期值。</param>
+    /// <returns>对应的 <see cref="DateTime"/> 值；如果无法转换则返回 <see langword="null"/>。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static DateTime? ToExcelDate(this double value)
     {

@@ -1,10 +1,11 @@
 namespace PurcellLibs.Converters;
 
 /// <summary>
-/// 数字转换器
+/// 数字转换器。
 /// </summary>
 public class NumericConverter : IValueConverter
 {
+    // 单例实例的懒加载
     private static readonly Lazy<NumericConverter> _instance = new(() => new NumericConverter());
 
     /// <inheritdoc cref="NumericConverter"/>

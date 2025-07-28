@@ -1,10 +1,11 @@
 namespace PurcellLibs.Converters;
 
 /// <summary>
-/// String转换器
+/// 字符串转换器。
 /// </summary>
 public class StringConverter : IValueConverter
 {
+    // 单例实例的懒加载
     private static readonly Lazy<StringConverter> _instance = new(() => new StringConverter());
 
     /// <inheritdoc cref="StringConverter"/>

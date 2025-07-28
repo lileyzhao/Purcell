@@ -4,7 +4,6 @@ using MiniExcelLibs;
 
 namespace PurcellLibs.Benchmarks;
 
-[Config(typeof(CustomConfig))]
 public class BenchmarkLarge
 {
     [Benchmark(Description = "*Purcell*", Baseline = true)]
@@ -68,12 +67,10 @@ public class BenchmarkLarge
     }
 
     // 测试操作类型
-    [Params("First", "Query", "Export")]
-    public string? Operation { get; set; }
+    [Params("First", "Query", "Export")] public string? Operation { get; set; }
 
     // 测试文件扩展名
-    [Params("xlsx", "csv")]
-    public string? Ext { get; set; }
+    [Params("xlsx", "csv")] public string? Ext { get; set; }
 
     [GlobalSetup]
     public void Setup()

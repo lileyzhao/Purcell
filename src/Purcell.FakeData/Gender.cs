@@ -1,4 +1,4 @@
-namespace Purcell.FakeData;
+namespace PurcellLibs.FakeData;
 
 /// <summary>
 /// 性别枚举

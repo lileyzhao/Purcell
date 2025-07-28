@@ -9,15 +9,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="BenchmarkDotNet" Version="0.15.2" />
-        <PackageReference Include="LargeXlsx" Version="1.12.0" />
-        <PackageReference Include="MiniExcel" Version="1.41.3" />
-        <PackageReference Include="Spectre.Console" Version="0.50.0" />
+        <PackageReference Include="BenchmarkDotNet" Version="0.15.2"/>
+        <PackageReference Include="LargeXlsx" Version="1.12.0"/>
+        <PackageReference Include="MiniExcel" Version="1.41.3"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Purcell.FakeData\Purcell.FakeData.csproj" />
-      <ProjectReference Include="..\Purcell\Purcell.csproj" />
+        <ProjectReference Include="..\Purcell.FakeData\Purcell.FakeData.csproj"/>
+        <ProjectReference Include="..\Purcell\Purcell.csproj"/>
     </ItemGroup>
 
 </Project>

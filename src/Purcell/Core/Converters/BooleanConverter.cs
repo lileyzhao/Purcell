@@ -3,10 +3,11 @@
 namespace PurcellLibs.Converters;
 
 /// <summary>
-/// 布尔值转换器
+/// 布尔值转换器。
 /// </summary>
 public sealed class BooleanConverter : IValueConverter
 {
+    // 单例实例的懒加载
     private static readonly Lazy<BooleanConverter> _instance = new(() => new BooleanConverter());
 
     /// <inheritdoc cref="BooleanConverter"/>
@@ -16,7 +17,7 @@ public sealed class BooleanConverter : IValueConverter
     {
     }
 
-    // 定义各种常见的布尔值表达方式及其对应的布尔值
+    // 各种常见的布尔值表达方式及其对应的布尔值
     private readonly Dictionary<string, bool> _predefinedValues = new(StringComparer.OrdinalIgnoreCase)
     {
         // 英文常见表达

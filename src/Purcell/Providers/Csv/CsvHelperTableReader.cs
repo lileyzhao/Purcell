@@ -48,9 +48,11 @@ public class CsvHelperTableReader(Stream stream) : TableReaderBase(stream)
                 columnLength = row.Keys.Count; // 记录表头行列数
                 Dictionary<int, object?> headerData = new(columnLength);
 
-                foreach ((string key, int colIndex) in row.Keys.Select((v, i) => (v, i)))
+                int colIndex = 0;
+                foreach (string key in row.Keys)
                 {
                     headerData[colIndex] = colIndex < tableConfig.GetHeaderStart().ColumnIndex ? null : row[key];
+                    colIndex++;
                 }
 
                 yield return headerData;
@@ -72,12 +74,14 @@ public class CsvHelperTableReader(Stream stream) : TableReaderBase(stream)
 
             Dictionary<int, object?> rowData = new(columnLength); // CSV的值永远为string类型
 
-            foreach ((string key, int colIndex) in row.Keys.Select((v, i) => (v, i)))
+            int dataColIndex = 0;
+            foreach (string key in row.Keys)
             {
-                if (colIndex < tableConfig.GetHeaderStart().ColumnIndex || colIndex >= columnLength)
-                    rowData[colIndex] = null;
+                if (dataColIndex < tableConfig.GetHeaderStart().ColumnIndex || dataColIndex >= columnLength)
+                    rowData[dataColIndex] = null;
                 else
-                    rowData[colIndex] = row[key];
+                    rowData[dataColIndex] = row[key];
+                dataColIndex++;
             }
 
             yield return rowData;

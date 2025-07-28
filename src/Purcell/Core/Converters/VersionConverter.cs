@@ -1,10 +1,11 @@
 namespace PurcellLibs.Converters;
 
 /// <summary>
-/// 版本号转换器
+/// 版本号转换器。
 /// </summary>
 public class VersionConverter : IValueConverter
 {
+    // 单例实例的懒加载
     private static readonly Lazy<VersionConverter> _instance = new(() => new VersionConverter());
 
     /// <inheritdoc cref="VersionConverter"/>
@@ -25,7 +26,7 @@ public class VersionConverter : IValueConverter
         // 验证目标类型是否为支持的类型
         if (actualType != typeof(Version))
         {
-            throw new InvalidOperationException($"目标类型 {targetType.FullName} 不是支持的类型(Guid)。");
+            throw new InvalidOperationException($"目标类型 {targetType.FullName} 不是支持的类型(Version)。");
         }
 
         Version? defaultResult = canBeNull ? null : new Version(0, 0, 0, 0);

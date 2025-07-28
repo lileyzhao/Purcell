@@ -1,6 +1,6 @@
-using Purcell.FakeData.Internal.Builders;
+using PurcellLibs.FakeData.Internal.Builders;
 
-namespace Purcell.FakeData;
+namespace PurcellLibs.FakeData;
 
 /// <summary>
 /// 学生数据模型，用于测试数据生成
