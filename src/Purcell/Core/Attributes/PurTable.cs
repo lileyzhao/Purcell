@@ -272,13 +272,13 @@ public class PurTable : Attribute, IPurTable
         }
     }
 
-    /// <inheritdoc cref="IPurTable.MaxReadRows"/>
+    /// <summary><inheritdoc/></summary>
     public int MaxReadRows { get; set; } = -1;
 
-    /// <inheritdoc cref="IPurTable.MaxWriteRows"/>
+    /// <summary><inheritdoc cref="IPurTable.MaxWriteRows"/></summary>
     public int MaxWriteRows { get; set; } = -1;
 
-    /// <inheritdoc cref="IPurTable.HeaderSpaceMode"/>
+    /// <inheritdoc />
     public WhiteSpaceMode HeaderSpaceMode { get; set; } = WhiteSpaceMode.Trim;
 
     /// <inheritdoc cref="IPurTable.IgnoreParseError"/>

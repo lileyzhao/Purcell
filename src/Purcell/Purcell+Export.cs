@@ -1,8 +1,7 @@
-﻿namespace PurcellLibs;
+﻿// 这里是 Purcell 查询表格的相关方法及重载
 
-/**
- * 这里是 Purcell 查询表格的相关方法及重载
- */
+namespace PurcellLibs;
+
 public static partial class Purcell
 {
     #region 同步导出
