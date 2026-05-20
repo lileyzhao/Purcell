@@ -25,3 +25,13 @@ Desktop.ini
 .~*.ppt*
 ~$*.pot*
 .~*.pot*
+
+# Temp and Log Files
+*.tmp
+*.log
+
+# .claude
+.claude/*.local.*
+
+# .codex
+.codex/*.local.*
