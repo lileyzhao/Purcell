@@ -26,7 +26,8 @@ public class BenchmarkQuery
             fileStream, ExcelWorkbookType.ExcelXml,
             new ExcelDataReaderOptions
             {
-                Schema = ExcelSchema.NoHeaders, ReadHiddenWorksheets = true, GetErrorAsNull = true, OwnsStream = false
+                Schema = ExcelSchema.NoHeaders, ReadHiddenWorksheets = true,
+                FormulaErrorHandling = FormulaErrorHandling.Null, OwnsStream = false
             }
         );
 

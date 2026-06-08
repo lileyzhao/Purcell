@@ -10,8 +10,8 @@
 
     <ItemGroup>
         <PackageReference Include="BenchmarkDotNet" Version="0.15.8" />
-        <PackageReference Include="LargeXlsx" Version="1.12.0"/>
-        <PackageReference Include="MiniExcel" Version="1.42.0" />
+        <PackageReference Include="LargeXlsx" Version="2.0.1" />
+        <PackageReference Include="MiniExcel" Version="1.44.1" />
     </ItemGroup>
 
     <ItemGroup>

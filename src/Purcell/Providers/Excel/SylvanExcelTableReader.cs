@@ -36,7 +36,8 @@ public class SylvanExcelTableReader(Stream stream, TableFileType tableFileType) 
             _workbookType,
             new ExcelDataReaderOptions
             {
-                Schema = ExcelSchema.NoHeaders, ReadHiddenWorksheets = true, GetErrorAsNull = true, OwnsStream = false
+                Schema = ExcelSchema.NoHeaders, ReadHiddenWorksheets = true,
+                FormulaErrorHandling = FormulaErrorHandling.Null, OwnsStream = false
             }
         );
 
@@ -60,7 +61,8 @@ public class SylvanExcelTableReader(Stream stream, TableFileType tableFileType) 
             _workbookType,
             new ExcelDataReaderOptions
             {
-                Schema = ExcelSchema.NoHeaders, ReadHiddenWorksheets = true, GetErrorAsNull = true, OwnsStream = false
+                Schema = ExcelSchema.NoHeaders, ReadHiddenWorksheets = true,
+                FormulaErrorHandling = FormulaErrorHandling.Null, OwnsStream = false
             }
         );
 

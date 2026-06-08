@@ -30,5 +30,4 @@ global using PurcellLibs.Extensions;
 global using PurcellLibs.Providers;
 global using PurcellLibs.Providers.Csv;
 global using PurcellLibs.Providers.Excel;
-global using SharpCompress.Compressors.Deflate;
 global using LargeXlsx;

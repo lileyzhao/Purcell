@@ -1,7 +1,6 @@
 using BenchmarkDotNet.Attributes;
 using LargeXlsx;
 using MiniExcelLibs;
-using SharpCompress.Compressors.Deflate;
 
 namespace PurcellLibs.Benchmarks;
 
@@ -15,7 +14,7 @@ public class BenchmarkExport
         string filePath = FileHelper.GenExportFilePath(Ext);
 
         using FileStream stream = new(filePath, FileMode.Create, FileAccess.Write);
-        using XlsxWriter xlsxWriter = new(stream, CompressionLevel.BestSpeed, false, false);
+        using XlsxWriter xlsxWriter = new(stream, XlsxCompressionLevel.Fastest, false, false);
 
         xlsxWriter.BeginWorksheet("Sheet1").BeginRow();
 

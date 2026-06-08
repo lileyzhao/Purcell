@@ -8,7 +8,7 @@ public class LargeXlsxTableWriter(Stream stream) : TableWriterBase(stream)
     /// <summary>
     /// LargeXlsx 库的 XLSX 写入器实例。
     /// </summary>
-    private readonly XlsxWriter _writer = new(stream, CompressionLevel.BestSpeed, false, false);
+    private readonly XlsxWriter _writer = new(stream, XlsxCompressionLevel.Fastest, false, false);
 
     /// <summary>
     /// 默认的日期时间格式。
