@@ -1,0 +1,12 @@
+project_doc_max_bytes = 65536
+# project_doc_fallback_filenames = ["CLAUDE.md"]
+
+# 沟通风格
+personality = "pragmatic"
+
+approval_policy = "never"
+
+sandbox_mode = "danger-full-access"
+
+[agents]
+max_threads = 30

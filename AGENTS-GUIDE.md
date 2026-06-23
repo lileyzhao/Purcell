@@ -1,390 +1,231 @@
-# AGENTS.md Writing Guide
+# AGENTS.md 编写指南
 
-## English
+这份指南用于生成和维护高质量的 `AGENTS.md`。它面向中文使用者，但会在关键概念处保留少量英文关键词（English keyword anchors），帮助 coding agent 更精准地理解规则含义。
 
-### Purpose
+## 目标
 
-`AGENTS.md` is a repository instruction file for coding agents. Treat it as an operational companion to `README.md`: the README explains the repository to humans, while `AGENTS.md` tells agents how to work safely and effectively in the repository.
+`AGENTS.md` 是写给 coding agent 的仓库指令文件。可以把它理解为 `README.md` 的操作型搭档：`README.md` 面向人解释项目是什么，`AGENTS.md` 面向 agent 说明如何在项目里安全、有效地工作。
 
-Use it for durable guidance that should apply across many future agent sessions: repository shape, exact commands, validation expectations, coding conventions, boundaries, and contribution workflow.
+它适合承载会在未来多次会话中反复生效的稳定规则，例如仓库结构、真实命令、验证要求、编码约定、边界、协作流程和提交规范。
 
-Do not use it as a dumping ground for everything an agent might ever need. A strong `AGENTS.md` is concise, scoped, current, and grounded in real files and real commands.
+不要把 `AGENTS.md` 写成资料全集。好的 `AGENTS.md` 应该是：
 
-### Discovery And Precedence
+- 有作用域（scoped）
+- 可执行（actionable）
+- 可验证（verifiable）
+- 基于真实仓库（grounded）
+- 简洁但不含糊（compact but precise）
+- 能降低 agent 犯错概率
 
-- Use the canonical filename `AGENTS.md`.
-- Place a root `AGENTS.md` at the repository root for repository-wide guidance.
-- Add nested `AGENTS.md` files only when a subdirectory has different commands, architecture, risks, generated files, or workflows.
-- Guidance is layered by filesystem scope: root guidance applies broadly; nested guidance adds or overrides details for its directory tree.
-- When instructions conflict, the more local `AGENTS.md` should win over ancestor files, and explicit user instructions win over all repository guidance.
-- Codex-specific note: Codex can also load `AGENTS.override.md` before `AGENTS.md` in the same directory, and can be configured with fallback instruction filenames. Use overrides for temporary or local exceptions, not for shared repository policy.
-- Codex-specific note: Codex has a project instruction size limit by configuration, 32 KiB by default, so split large guidance into nested files or link to stable docs when needed.
-- Do not repeat inherited rules in child files unless repetition prevents real ambiguity.
-- Keep each file small enough to load comfortably. If one file grows too large, split by directory or link to stable documentation.
+## 核心判断
 
-### What To Include
+写入 `AGENTS.md` 前先判断这条内容是否满足至少一个条件：
 
-Prefer sections that change agent behavior:
+- 它会改变 agent 的行为。
+- 它能避免 agent 反复犯错。
+- 它能说明真实命令、真实路径或真实边界。
+- 它是长期稳定规则，而不是一次性任务说明。
+- 它比让 agent 自己猜更安全。
 
-- **Scope**: what files or directories the document applies to.
-- **Context**: a short orientation to what this repository or directory is.
-- **Repository structure**: only the directories that matter for safe navigation.
-- **Commands**: exact setup, build, lint, test, format, export, or run commands.
-- **Validation**: what must be checked before work is considered done.
-- **Conventions**: naming, style, architecture, testing, documentation, or review patterns that are specific to this codebase.
-- **Boundaries**: generated files, vendored code, secrets, public APIs, historical artifacts, or files that require confirmation before changing.
-- **Git and PR workflow**: commit format, scope rules, branch rules, PR checklist, changelog or release notes expectations.
-- **Known pitfalls**: concrete traps that agents repeatedly miss.
+如果只是背景知识、临时偏好、长篇解释、人工 onboarding 内容，通常不应该放进 `AGENTS.md`。
 
-Write the most useful sections first. Agents frequently need commands and validation criteria more than long background explanations.
+## 中文优先与理解精度
 
-### What To Avoid
+中文表达应服务于中文使用者的阅读顺畅，但不得降低 agent 对规则的理解精度（operational precision）。
 
-- Generic assistant behavior such as "be helpful" or "write clean code".
-- Invented commands, paths, tools, or directory structures.
-- Copying large parts of `README.md`, architecture docs, or human onboarding docs.
-- Long essays, vague principles, or rules that cannot be acted on.
-- Secrets, credentials, private tokens, or machine-specific values.
-- Stale instructions that no longer match the repository.
-- Contradictory rules without clear precedence.
-- Empty boilerplate sections such as "Testing" when the project has no tests or no known validation command.
-- Tool-specific persona prompts. `AGENTS.md` should describe project behavior, not define who the agent is.
+- 改写既有规范前，先理解原文的 `scope`、优先级、触发条件、禁止事项、验证方式和事实来源（source of truth），再重写表达；不要做机械翻译、机械精简或术语替换。
+- 英文关键词（English keyword anchors）只用于锚定容易误读的操作概念，例如 `scope`、`source of truth`、`minimal diff`、`validation`、`do not touch`、`fallback`；少而准，不堆术语。
+- 改写完成后从两侧检查：中文使用者能自然读懂，agent 也能明确判断“何时适用、应该做什么、不能做什么、如何验证”。
+- 如果中文表达和 agent 执行精度发生冲突，优先重写句子结构、补充触发条件或加入英文锚点，而不是牺牲任一侧。
 
-### Multi-Level AGENTS.md Practice
-
-Use multi-level files for progressive disclosure:
-
-- Root file: durable repository-wide rules, global workflow, common commands, shared conventions, and commit policy.
-- Directory-level file: directory-specific architecture, commands, test commands, generated files, and risks.
-- Deep subsystem file: only when a narrow area has special invariants, security constraints, generated artifacts, or high-risk workflows.
-
-A child file should answer: "What is different here that the root file cannot know?" If the answer is "nothing", do not add the child file.
-
-Good child files are smaller than root files. They rely on inherited rules and focus on local differences.
-
-### Claude Compatibility
-
-Claude Code CLI and the Claude Desktop Code tab use `CLAUDE.md` as their project memory file. They do not treat `AGENTS.md` as the canonical project instruction file by default.
-
-To keep one source of truth, use `AGENTS.md` for shared cross-agent guidance and add a minimal `CLAUDE.md` bridge file that imports it:
-
-```markdown
-# CLAUDE.md
-
-@AGENTS.md
-
-## Claude Code
-
-- Treat the imported `AGENTS.md` as the shared source of truth.
-- Only add Claude-specific notes that cannot live in `AGENTS.md`.
-```
-
-Use `@<path-to-file>` anywhere in `CLAUDE.md`. Claude Code supports relative and absolute paths; relative paths resolve from the `CLAUDE.md` file that contains the import. Use the path that matches the filesystem relationship between the bridge file and the target `AGENTS.md`, such as `@AGENTS.md` for the same directory or `@../AGENTS.md` for a parent directory.
-
-For repositories with nested `AGENTS.md` files, mirror the bridge at the same levels where Claude needs local context:
-
-```text
-repo/
-├── AGENTS.md
-├── CLAUDE.md
-└── <directory>/
-    ├── AGENTS.md
-    └── CLAUDE.md
-```
-
-Because Claude also loads `CLAUDE.md` files from the directory hierarchy, prefer each bridge file to import only the `AGENTS.md` for its own scope.
-
-Prefer bridge files over duplicating content. Duplicated `AGENTS.md` and `CLAUDE.md` files drift quickly and create unclear precedence.
-
-Keep personal Claude preferences in local, ignored files rather than shared repository instructions.
-
-### Recommended Structure
-
-Use this as a starting point, then delete sections that do not apply:
-
-```markdown
-# AGENTS.md
-
-## Scope
-
-- Applies to `<repository-or-directory-path>`.
-- Complements parent `AGENTS.md` files; more local guidance wins on conflict.
-
-## Context
-
-- `<one-to-three bullets describing this repository or directory>`
-
-## Commands
-
-- Install: `<exact command>`
-- Build: `<exact command>`
-- Test all: `<exact command>`
-- Test focused change: `<exact command>`
-
-## Validation
-
-- `<checks that must pass before completion>`
-- `<manual review or generated artifact checks, if any>`
-
-## Conventions
-
-- `<repository-specific coding, naming, documentation, or design rules>`
-
-## Boundaries
-
-- Never edit `<generated-or-vendored-path>` manually.
-- Ask before `<high-risk-action>`.
-
-## Git Workflow
-
-- Commit format: `<format>`
-- Scope rules: `<rules>`
-```
-
-For very small repositories, `Scope`, `Commands`, `Validation`, and `Git Workflow` may be enough. For non-code projects, replace code commands with the real production or delivery workflow.
-
-### Writing Style
-
-- Use Markdown headings and bullets.
-- Prefer imperative, concrete language.
-- Use exact commands in code spans or fenced blocks.
-- Mention real paths and real files.
-- Say "must", "never", or "ask first" only when the rule truly matters.
-- Keep paragraphs short.
-- Use tables for command maps or scoped file maps when they improve scanability.
-- Keep examples context-specific.
-
-### Maintenance Checklist
-
-Review `AGENTS.md` whenever:
-
-- build, test, export, or release commands change;
-- a new project, package, or subsystem is added;
-- generated files or source-of-truth files move;
-- a recurring agent mistake reveals missing guidance;
-- commit, PR, changelog, or release rules change;
-- a child `AGENTS.md` starts duplicating root guidance;
-- the file grows enough that important rules become hard to find.
-
-Before committing an `AGENTS.md` change:
-
-- Confirm every command and path exists or is intentionally documented as external.
-- Confirm no secrets or private machine-specific values are included.
-- Confirm nested files are scoped correctly.
-- Confirm the guide is shorter and more actionable than the documentation it points to.
-
-### Quality Rubric
-
-A good `AGENTS.md` is:
-
-- **Scoped**: clear about where it applies.
-- **Actionable**: agents can execute or verify its instructions.
-- **Grounded**: based on real repository structure and tools.
-- **Layered**: root files stay general; child files stay local.
-- **Current**: updated when workflows change.
-- **Compact**: high-signal, low-boilerplate.
-- **Safe**: highlights irreversible, security-sensitive, generated, or public API boundaries.
-
-### Source References
-
-- Official AGENTS.md site: https://agents.md/
-- OpenAI Codex AGENTS.md guide: https://developers.openai.com/codex/guides/agents-md
-- AGENTS.md specification discussion: https://github.com/agentsmd/agents.md/issues/135
-- Microsoft AGENTS.md generator practice: https://github.com/microsoft/skills/blob/main/.github/plugins/deep-wiki/skills/wiki-agents-md/SKILL.md
-- Claude Code memory and import docs: https://code.claude.com/docs/en/memory
-- Cloudflare Agents SDK AGENTS.md: https://github.com/cloudflare/agents/blob/main/AGENTS.md
-- OpenAI Cookbook AGENTS.md: https://github.com/openai/openai-cookbook/blob/main/AGENTS.md
-- OpenAI Agents Python AGENTS.md: https://github.com/openai/openai-agents-python/blob/main/AGENTS.md
-- Apache Airflow providers AGENTS.md: https://github.com/apache/airflow/blob/main/providers/AGENTS.md
-- Temporal Java SDK AGENTS.md: https://github.com/temporalio/sdk-java/blob/master/AGENTS.md
-- Google ADK Python AGENTS.md: https://github.com/google/adk-python/blob/main/AGENTS.md
-
-## 中文
-
-### 目的
-
-`AGENTS.md` 是写给 coding agent 的仓库指令文件。可以把它理解为 `README.md` 的操作型搭档：README 面向人解释仓库，`AGENTS.md` 面向 agent 说明如何在仓库里安全、有效地工作。
-
-它适合放那些会在未来多次 agent 会话中反复生效的稳定指导：仓库形态、精确命令、验证要求、代码约定、边界和协作流程。
-
-不要把它写成 agent 可能需要的一切资料集合。好的 `AGENTS.md` 应该简洁、有作用域、保持更新，并且基于真实文件和真实命令。
-
-### 发现规则与优先级
+## 发现规则与优先级
 
 - 使用标准文件名 `AGENTS.md`。
 - 在仓库根目录放置根级 `AGENTS.md`，用于仓库级规则。
-- 只有当某个子目录有不同命令、架构、风险、生成文件或流程时，才添加嵌套 `AGENTS.md`。
-- 指令按文件系统作用域分层：根级规则广泛适用；子级规则为对应目录树补充或覆盖细节。
-- 指令冲突时，更靠近当前文件的 `AGENTS.md` 优先；用户明确指令优先于所有仓库文档。
-- Codex 特定说明：Codex 在同一目录中会先读取 `AGENTS.override.md`，再读取 `AGENTS.md`，也可以配置 fallback 指令文件名。override 适合临时或本地例外，不适合承载共享仓库规范。
-- Codex 特定说明：Codex 的项目指令有配置层面的大小上限，默认是 32 KiB；必要时应拆成嵌套文件，或链接到稳定文档。
+- 只有当子目录存在不同命令、架构、风险、生成文件或工作流时，才添加嵌套 `AGENTS.md`。
+- 指令按文件系统作用域分层（layered by scope）：根级规则广泛适用；子级规则为对应目录树补充或覆盖细节。
+- 指令冲突时，更靠近当前文件的 `AGENTS.md` 优先（local wins）；用户明确指令优先于所有仓库文档（user instructions win）。
 - 子级文件不要重复继承来的规则，除非重复能避免真实歧义。
-- 每个文件都应保持在容易加载和阅读的长度内；如果内容过长，按目录拆分，或链接到稳定文档。
+- 每个文件都应保持容易加载和阅读；如果内容变长，优先按目录拆分为嵌套 `AGENTS.md`，而不是堆到根文件。
 
-### 应该包含什么
+工具兼容补充（非标准主体）：
 
-优先写能改变 agent 行为的内容：
+- 以下内容用于处理具体工具的加载差异，不是 `AGENTS.md` 标准结构的一部分；只有仓库实际依赖相关工具时，才写入共享指南或桥接文件。
+- 例如 Codex 在同一目录中可加载 `AGENTS.override.md` 与 `AGENTS.md`；`override` 适合临时或本地例外，不适合承载共享仓库规范。
+- 一些工具可配置 fallback 指令文件名或项目指令大小上限；这类配置应作为工具兼容说明处理，不要覆盖标准 `AGENTS.md` 的事实来源（source of truth）地位。
+- 普通“被引用的说明文件”不等于会被 agent 自动读取。关键行为规则应写进会被稳定加载的 `AGENTS.md` 层级；外部文档只适合承载详细背景或低频资料。
 
-- **适用范围**：文档适用于哪些文件或目录。
-- **上下文**：用很短的说明让 agent 知道仓库或目录是什么。
-- **仓库结构**：只列出影响安全导航的重要目录。
-- **命令**：精确的安装、构建、lint、测试、格式化、导出或运行命令。
-- **验证要求**：什么检查完成后，工作才算可以交付。
-- **约定**：所在仓库特有的命名、风格、架构、测试、文档或评审规则。
-- **边界**：生成文件、vendor 代码、密钥、公开 API、历史产物，或需要确认才能修改的文件。
-- **Git 和 PR 流程**：提交格式、scope 规则、分支规则、PR checklist、changelog 或 release notes 要求。
-- **已知陷阱**：agent 容易反复犯错的具体问题。
+## 应该包含什么
 
-最有用的内容放前面。agent 通常更需要命令和完成标准，而不是很长的背景说明。
+优先写能直接改变 agent 行为的内容。常见有效章节包括：
 
-### 不应该包含什么
+- **适用范围（Scope）**：文档适用于哪些文件、目录或子系统。
+- **上下文（Context）**：用 1-3 条说明仓库或目录是什么，避免长背景。
+- **仓库结构（Repository structure）**：只列出影响安全导航的重要目录。
+- **命令（Commands）**：精确的安装、构建、lint、测试、格式化、导出或运行命令。
+- **验证要求（Validation）**：哪些检查通过后，工作才算可以交付。
+- **约定（Conventions）**：仓库特有的命名、风格、架构、测试、文档或评审规则。
+- **边界（Boundaries）**：生成文件、vendor 代码、密钥、公开 API、历史产物，或必须确认后才能修改的文件。
+- **协作策略（Workflow）**：review、handoff、PR、changelog 或 release notes 等流程要求。
+- **Git 规范（Git workflow）**：commit format、scope 规则、分支规则、提交范围。
+- **已知陷阱（Known pitfalls）**：agent 容易误判或反复犯错的具体问题。
 
-- 类似“be helpful”或“write clean code”的通用 assistant 行为。
+把最有用、最常用的内容放前面。agent 通常优先需要命令、边界和完成标准，而不是长篇背景。
+
+## 不应该包含什么
+
+避免把以下内容写进 `AGENTS.md`：
+
+- “be helpful”“write clean code” 这类通用 assistant 行为。
 - 不存在的命令、路径、工具或目录结构。
 - 大段复制 `README.md`、架构文档或人工 onboarding 文档。
-- 长篇论述、模糊原则，或无法执行的规则。
-- 密钥、凭据、私有 token 或绑定某台机器的值。
+- 长篇论述、抽象口号、无法执行的原则。
+- 密钥、凭据、token 或绑定个人机器的私有值。
 - 已经过期、与仓库不一致的说明。
-- 没有明确优先级的互相矛盾规则。
+- 没有明确优先级的冲突规则。
 - 空泛模板章节，例如项目没有测试却硬写 “Testing”。
-- 工具专属人格提示。`AGENTS.md` 应描述项目行为规则，而不是定义 agent 是谁。
+- 工具专属人格提示。`AGENTS.md` 应描述项目行为，不应定义 agent 的人格。
+- 只在当前会话有效的一次性计划。一次性约束应放在用户 prompt 或当前任务说明中。
 
-### 多层 AGENTS.md 实践
+## 多层 AGENTS.md 实践
 
-多层文件的核心是渐进披露：
+多层文件的核心是渐进披露（progressive disclosure）：
 
 - 根级文件：长期稳定的仓库级规则、全局流程、通用命令、共享约定和提交规范。
-- 目录级文件：目录特定架构、命令、测试命令、生成文件和风险。
-- 更深层子系统文件：只有当某个窄范围有特殊不变量、安全约束、生成产物或高风险流程时才添加。
+- 目录级文件：目录特定架构、命令、测试方式、生成文件、风险和边界。
+- 深层子系统文件：只有当窄范围存在特殊不变量（invariants）、安全约束、生成产物或高风险流程时才添加。
 
-写子级文件前先问一句：“这里有什么是根级文件无法知道的差异？” 如果答案是“没有”，就不要新增子级文件。
+写子级文件前先问：
 
-好的子级文件通常比根级文件更短。它依赖继承来的规则，只聚焦本地差异。
+> 这里有什么是根级文件无法准确表达的本地差异？
 
-### Claude 兼容
+如果答案是“没有”，不要新增子级文件。好的子级文件通常比根级文件更短，依赖继承规则，只聚焦本地差异。
 
-Claude Code CLI 和 Claude Desktop 的 Code tab 使用 `CLAUDE.md` 作为项目记忆文件。它们默认不会把 `AGENTS.md` 当作标准项目指令文件读取。
+不要为了“整理得更漂亮”把一个短小根文件拆成多个普通说明文件。拆分必须服务于加载机制、作用域或可维护性。
 
-为了保持单一事实来源，建议把 `AGENTS.md` 作为跨 agent 的共享规范，再添加一个最小化的 `CLAUDE.md` 桥接文件来导入它：
+## 推荐结构
+
+从下面模板开始，然后删除不适用的章节。不要为了模板完整而保留空章节。
+
+```markdown
+# AGENTS.md
+
+## 适用范围（Scope）
+
+- 适用于 `<repository-or-directory-path>`。
+- 与父级 `AGENTS.md` 叠加生效；发生冲突时，更靠近当前文件的规则优先（local wins）。
+
+## 项目上下文（Context）
+
+- `<用 1-3 条说明本仓库或目录的职责、关键边界或运行环境>`
+
+## 常用命令（Commands）
+
+- 安装依赖（Install）：`<exact command>`
+- 构建（Build）：`<exact command>`
+- 全量测试（Test all）：`<exact command>`
+- 聚焦验证（Test focused change）：`<exact command>`
+
+## 验证要求（Validation）
+
+- `<完成前必须通过的检查，例如 lint、test、typecheck 或 manual QA>`
+- `<需要人工检查、截图确认或生成产物比对的步骤>`
+
+## 项目约定（Conventions）
+
+- `<仓库特有的代码、命名、文档、架构、测试或 UI 规则>`
+
+## 修改边界（Boundaries）
+
+- 不要手动编辑 `<generated-or-vendored-path>`（generated/vendor）。
+- 执行 `<high-risk-action>` 前先询问（ask first）。
+
+## Git 规范（Git Workflow）
+
+- 提交格式（commit format）：`<format>`
+- 提交范围（scope rules）：`<rules>`
+```
+
+小仓库可以只保留 `适用范围（Scope）`、`常用命令（Commands）`、`验证要求（Validation）` 和 `Git 规范（Git Workflow）`。非代码项目应把代码命令替换为真实生产、交付或验收流程。
+
+如果需要，可以再加入 `仓库结构（Repository structure）`、`协作策略（Workflow）`、`已知陷阱（Known pitfalls）` 等可选章节；前提是这些内容真实改变 agent 行为，而不是为了模板完整。
+
+## 写作风格
+
+- 使用 Markdown 标题和列表。
+- 优先使用命令式、具体表达。
+- 命令、路径、配置键、文件名放在行内代码或代码块里。
+- 提到真实路径、真实文件和真实命令；不确定时不要编造。
+- 中文为主时，给容易被 agent 误解的概念补少量英文关键词（English keyword anchors），例如 `scope`、`ownership`、`acceptance criteria`、`minimal diff`、`validation`、`source of truth`、`do not touch`、`user-visible behavior`。
+- 英文关键词用于锚定操作语义，不要机械翻译每句话，也不要让文档变成中英混杂的术语堆。
+- 只有规则真的重要时，才使用 “must”、“never”、“ask first” 或“必须/禁止/先询问”。
+- 段落保持短，列表保持高信号。
+- 表格只在能提升可扫读性时使用，例如命令表、目录作用域表、风险边界表。
+- 示例应贴合当前仓库，不要使用泛化模板。
+- 用“不要做什么”时，尽量说明触发条件或替代做法，避免只写抽象禁令。
+
+## 跨工具兼容（Tool Compatibility）
+
+`AGENTS.md` 是跨 agent 的共享规范。不同工具的读取机制可能不同，应尽量保持一个事实来源（single source of truth）。
+
+本节是多工具协作的补充说明，不是每个 `AGENTS.md` 都必须包含的标准章节。只有仓库确实同时服务多个 coding agents 时，才需要桥接文件或工具说明。
+
+Claude Code CLI 和 Claude Desktop 的 Code tab 默认使用 `CLAUDE.md` 作为项目记忆文件。为了避免维护两套内容，建议添加最小桥接文件：
 
 ```markdown
 # CLAUDE.md
+
+本文件是 Claude Code 的兼容入口（compatibility bridge）。共享项目规范不在这里重复维护；请把导入的 `AGENTS.md` 视为事实来源（source of truth）。
 
 @AGENTS.md
 
 ## Claude Code
 
-- Treat the imported `AGENTS.md` as the shared source of truth.
-- Only add Claude-specific notes that cannot live in `AGENTS.md`.
+- 默认使用中文沟通（Chinese first）；必要术语、命令、代码、配置键名和关键操作概念保留英文关键词（English keyword anchors）。
+- 只有确实无法放入 `AGENTS.md` 的 Claude Code 专属说明，才应该继续写在本文件中。
 ```
 
-可以在 `CLAUDE.md` 的任意位置使用 `@<path-to-file>`。Claude Code 支持相对路径和绝对路径；相对路径从包含该 import 的 `CLAUDE.md` 文件解析。根据桥接文件与目标 `AGENTS.md` 的文件系统位置关系填写路径，例如同目录用 `@AGENTS.md`，父目录用 `@../AGENTS.md`。
+如果仓库中有多层 `AGENTS.md`，需要 Claude 在对应目录读取本地规则时，可在相同层级放置最小 `CLAUDE.md` 桥接文件，并只导入该层级自己的 `AGENTS.md`。
 
-如果仓库中有多层 `AGENTS.md`，应在 Claude 需要本地上下文的相同层级放置桥接文件：
+不要复制两份完整规则。重复的 `AGENTS.md` 和 `CLAUDE.md` 很容易漂移，导致优先级和事实来源不清。
 
-```text
-repo/
-├── AGENTS.md
-├── CLAUDE.md
-└── <directory>/
-    ├── AGENTS.md
-    └── CLAUDE.md
-```
+## 维护检查清单
 
-由于 Claude 也会按目录层级加载 `CLAUDE.md`，每个桥接文件通常只导入自己作用域内的 `AGENTS.md`。
+以下情况应检查并更新 `AGENTS.md`：
 
-优先使用桥接文件，不要维护两份重复内容。重复的 `AGENTS.md` 和 `CLAUDE.md` 很容易漂移，并让优先级变得不清楚。
-
-个人 Claude 偏好应放在本地忽略文件中，不要写进共享仓库指令。
-
-### 推荐结构
-
-可以从这个模板开始，然后删除不适用的章节：
-
-```markdown
-# AGENTS.md
-
-## Scope
-
-- Applies to `<repository-or-directory-path>`.
-- Complements parent `AGENTS.md` files; more local guidance wins on conflict.
-
-## Context
-
-- `<one-to-three bullets describing this repository or directory>`
-
-## Commands
-
-- Install: `<exact command>`
-- Build: `<exact command>`
-- Test all: `<exact command>`
-- Test focused change: `<exact command>`
-
-## Validation
-
-- `<checks that must pass before completion>`
-- `<manual review or generated artifact checks, if any>`
-
-## Conventions
-
-- `<repository-specific coding, naming, documentation, or design rules>`
-
-## Boundaries
-
-- Never edit `<generated-or-vendored-path>` manually.
-- Ask before `<high-risk-action>`.
-
-## Git Workflow
-
-- Commit format: `<format>`
-- Scope rules: `<rules>`
-```
-
-对于很小的仓库，`Scope`、`Commands`、`Validation` 和 `Git Workflow` 可能已经足够。对于非代码项目，把代码命令替换成真实的生产或交付流程。
-
-### 写作风格
-
-- 使用 Markdown 标题和列表。
-- 优先使用命令式、具体的表达。
-- 命令放在行内代码或代码块里。
-- 提到真实路径和真实文件。
-- 只有规则真的重要时，才使用 “must”、“never” 或 “ask first”。
-- 段落保持简短。
-- 当表格能提升可扫读性时，用表格整理命令或作用域映射。
-- 示例应该贴合当前上下文，不要使用泛化模板。
-
-### 维护检查清单
-
-以下情况应检查 `AGENTS.md`：
-
-- build、test、export 或 release 命令变化；
-- 新增项目、package 或子系统；
-- 生成文件或事实来源文件移动；
-- agent 反复犯同一种错误，说明缺少指导；
-- commit、PR、changelog 或 release 规则变化；
-- 子级 `AGENTS.md` 开始重复根级规则；
+- build、test、export、deploy 或 release 命令变化。
+- 新增 package、子项目或子系统。
+- 生成文件、事实来源文件或重要目录移动。
+- agent 反复犯同一种错误，说明缺少指导。
+- commit、PR、changelog 或 release 规则变化。
+- 子级 `AGENTS.md` 开始重复根级规则。
 - 文件变长，重要规则变得难以找到。
+- 关键技术栈、权限模型、公开 API 或数据边界变化。
 
-提交 `AGENTS.md` 变更前：
+提交 `AGENTS.md` 变更前确认：
 
-- 确认每个命令和路径都真实存在，或明确说明它是外部依赖。
-- 确认没有密钥或绑定个人机器的私有值。
-- 确认嵌套文件作用域正确。
-- 确认这份指南比它引用的文档更短、更可执行。
+- 每个命令和路径都真实存在，或明确说明它是外部依赖。
+- 没有密钥、token 或绑定个人机器的私有值。
+- 嵌套文件作用域正确。
+- 没有和父级或子级规则产生未解释的冲突。
+- 文档比它引用的资料更短、更可执行。
+- 新增内容能改变 agent 行为，而不是只增加背景。
 
-### 质量标准
+## 质量标准
 
-好的 `AGENTS.md` 应该是：
+好的 `AGENTS.md` 应该满足：
 
-- **有作用域的**：清楚说明适用范围。
-- **可执行的**：agent 能执行或验证其中的指令。
-- **有依据的**：基于真实仓库结构和工具。
-- **分层的**：根级文件保持通用，子级文件保持本地化。
-- **保持更新的**：工作流变化时同步更新。
-- **紧凑的**：高信号、低模板化。
-- **安全的**：明确不可逆、安全敏感、生成文件或公开 API 边界。
+- **Scoped**：清楚说明适用范围。
+- **Actionable**：agent 能按它执行。
+- **Verifiable**：agent 能知道如何验证完成。
+- **Grounded**：基于真实仓库结构、真实命令和真实文件。
+- **Layered**：根级文件保持通用，子级文件聚焦本地差异。
+- **Current**：工作流变化时同步更新。
+- **Compact**：高信号、低模板化。
+- **Safe**：明确不可逆、安全敏感、生成文件、公开 API 和数据边界。
+- **Readable**：中文使用者读起来顺，agent 也能通过英文关键词精准抓住操作语义。
 
-### 参考资料
+## 参考资料
 
 - 官方 AGENTS.md 站点：https://agents.md/
 - OpenAI Codex AGENTS.md 指南：https://developers.openai.com/codex/guides/agents-md
