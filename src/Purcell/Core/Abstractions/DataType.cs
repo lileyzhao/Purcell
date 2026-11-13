@@ -69,17 +69,15 @@ public enum DataType : byte
     /// </summary>
     TimeSpan = 42,
 
-#if NET6_0_OR_GREATER
     /// <summary>
-    /// System.DateOnly (date without time, .NET 6+)。
+    /// System.DateOnly (date without time)。
     /// </summary>
     DateOnly = 43,
 
     /// <summary>
-    /// System.TimeOnly (time without date, .NET 6+)。
+    /// System.TimeOnly (time without date)。
     /// </summary>
     TimeOnly = 44,
-#endif
 
     // 特殊类型
     /// <summary>
